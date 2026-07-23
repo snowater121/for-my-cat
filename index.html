@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>지리 메모리 · 로비</title>
+<style>
+:root{
+  --bg1:#eef2f8; --bg2:#dde5f0; --panel:#ffffff; --line:#d2dae7;
+  --text:#1b2534; --sub:#5f6b7e; --accent:#0e9cb5; --gold:#c98a00;
+}
+body.dark{
+  --bg1:#1a2540; --bg2:#0f1420; --panel:#171d2b; --line:#2b3446;
+  --text:#e8edf6; --sub:#8b97ad; --accent:#4dd0e1; --gold:#ffd54f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(1100px 700px at 80% -10%,var(--bg1),var(--bg2) 60%);color:var(--text);
+  font-family:"Noto Sans KR","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;transition:background-color .25s}
+.top{position:fixed;top:16px;right:18px}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}
+h1{font-size:34px;font-weight:900;margin:0 0 6px;text-align:center;letter-spacing:.5px}
+.sub{color:var(--sub);font-size:15px;margin-bottom:34px;text-align:center;max-width:560px;line-height:1.6}
+.cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;width:100%;max-width:840px}
+.card{flex:1;min-width:300px;max-width:390px;background:var(--panel);border:1px solid var(--line);border-radius:22px;
+  padding:28px 26px;text-decoration:none;color:inherit;box-shadow:0 12px 40px #0002;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-6px);box-shadow:0 20px 54px #0003;border-color:var(--accent)}
+.emoji{font-size:64px;line-height:1;margin-bottom:14px}
+.card h2{margin:0 0 4px;font-size:23px;font-weight:800}
+.card .cnt{color:var(--accent);font-weight:800;font-size:14px;margin-bottom:14px}
+.card p{margin:0 0 16px;color:var(--sub);font-size:14px;line-height:1.6}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--bg2);color:var(--sub);border:1px solid var(--line)}
+body.dark .tag{background:#1e2636}
+.go{margin-top:18px;align-self:flex-start;background:var(--accent);color:#04121a;font-weight:800;font-size:14px;padding:10px 18px;border-radius:12px}
+.foot{margin-top:34px;color:var(--sub);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="top"><button class="tbtn" id="themebtn" title="라이트/다크">🌙</button></div>
+
+<h1>🗺️ 지리 메모리</h1>
+<div class="sub">외우고 싶은 지도를 골라 시작하세요. 각 게임 안에서 언제든 로비로 돌아오거나 다른 버전으로 바로 전환할 수 있어요.</div>
+
+<div class="cards">
+  <a class="card" href="japan_prefectures_metro.html">
+    <div class="emoji">🗾</div>
+    <h2>일본 도도부현</h2>
+    <div class="cnt">47개 도도부현</div>
+    <p>지도를 채우며 47개 도도부현의 이름을 익히고, EJU 유학시험 대비 지역 특징 퀴즈까지 풀 수 있어요.</p>
+    <div class="tags"><span class="tag">🗺️ 자유 채우기</span><span class="tag">🔍 지목 퀴즈</span><span class="tag">⌨️ 타자 연습</span><span class="tag">🎓 EJU 지역</span></div>
+    <div class="go">시작하기 →</div>
+  </a>
+  <a class="card" href="world_countries_metro.html">
+    <div class="emoji">🌍</div>
+    <h2>세계 국가</h2>
+    <div class="cnt">256개국 · 대륙별</div>
+    <p>전 세계 국가의 이름을 한국어·영어로 외워요. 대륙별로 진행 상황을 확인하며 채워나갈 수 있어요.</p>
+    <div class="tags"><span class="tag">🗺️ 자유 채우기</span><span class="tag">🔍 지목 퀴즈</span><span class="tag">⌨️ 타자 연습</span><span class="tag">🌐 한/영</span></div>
+    <div class="go">시작하기 →</div>
+  </a>
+</div>
+
+<div class="foot">타이핑 사운드 · 콤보 · 클로즈업 줌 · 라이트/다크 지원</div>
+
+<script>
+document.getElementById("themebtn").addEventListener("click",e=>{
+  const dark=document.body.classList.toggle("dark");
+  e.currentTarget.textContent=dark?"☀️":"🌙";
+});
+</script>
+</body>
+</html>
