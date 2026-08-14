@@ -3,72 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>지리 메모리 · 로비</title>
+<title>GEO ARCADE · 지리 메모리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#eef2f8; --bg2:#dde5f0; --panel:#ffffff; --line:#d2dae7;
-  --text:#1b2534; --sub:#5f6b7e; --accent:#0e9cb5; --gold:#c98a00;
-}
-body.dark{
-  --bg1:#1a2540; --bg2:#0f1420; --panel:#171d2b; --line:#2b3446;
-  --text:#e8edf6; --sub:#8b97ad; --accent:#4dd0e1; --gold:#ffd54f;
+  --yellow:#ffe14d; --pink:#ff2e93; --cyan:#59ffd0; --blue:#2bd3ff; --purple:#7c5cff;
+  --ink:#0a0620;
+  --pix:"Press Start 2P", ui-monospace, monospace;
+  --kr:"Noto Sans KR", sans-serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:radial-gradient(1100px 700px at 80% -10%,var(--bg1),var(--bg2) 60%);color:var(--text);
-  font-family:"Noto Sans KR","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;transition:background-color .25s}
-.top{position:fixed;top:16px;right:18px}
-.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer}
-h1{font-size:34px;font-weight:900;margin:0 0 6px;text-align:center;letter-spacing:.5px}
-.sub{color:var(--sub);font-size:15px;margin-bottom:34px;text-align:center;max-width:560px;line-height:1.6}
-.cards{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;width:100%;max-width:840px}
-.card{flex:1;min-width:300px;max-width:390px;background:var(--panel);border:1px solid var(--line);border-radius:22px;
-  padding:28px 26px;text-decoration:none;color:inherit;box-shadow:0 12px 40px #0002;
-  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;display:flex;flex-direction:column}
-.card:hover{transform:translateY(-6px);box-shadow:0 20px 54px #0003;border-color:var(--accent)}
-.emoji{font-size:64px;line-height:1;margin-bottom:14px}
-.card h2{margin:0 0 4px;font-size:23px;font-weight:800}
-.card .cnt{color:var(--accent);font-weight:800;font-size:14px;margin-bottom:14px}
-.card p{margin:0 0 16px;color:var(--sub);font-size:14px;line-height:1.6}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
-.tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--bg2);color:var(--sub);border:1px solid var(--line)}
-body.dark .tag{background:#1e2636}
-.go{margin-top:18px;align-self:flex-start;background:var(--accent);color:#04121a;font-weight:800;font-size:14px;padding:10px 18px;border-radius:12px}
-.foot{margin-top:34px;color:var(--sub);font-size:12px;text-align:center}
+html,body{margin:0;height:100%}
+body{
+  min-height:100vh;overflow:hidden;position:relative;color:#fff;
+  font-family:"VT323",var(--kr);
+  background:linear-gradient(180deg,#2a0f4e 0%,#3d1163 40%,#5b1670 70%,#7a1e63 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+/* animated sky hue */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% -10%,#ff2e9333,transparent 60%),
+             radial-gradient(100% 70% at 50% 120%,#2bd3ff22,transparent 60%);
+  animation:sky 9s ease-in-out infinite alternate;}
+@keyframes sky{to{filter:hue-rotate(28deg)}}
+/* synthwave grid floor */
+.floor{position:fixed;left:50%;bottom:0;width:200%;height:46vh;transform:translateX(-50%) perspective(320px) rotateX(66deg);transform-origin:bottom center;z-index:1;pointer-events:none;
+  background-image:linear-gradient(#ff2e9366 2px,transparent 2px),linear-gradient(90deg,#ff2e9355 2px,transparent 2px);
+  background-size:44px 44px;animation:road 1.1s linear infinite;
+  mask-image:linear-gradient(180deg,transparent,#000 55%);-webkit-mask-image:linear-gradient(180deg,transparent,#000 55%);}
+@keyframes road{to{background-position:0 44px}}
+/* sun */
+.sun{position:fixed;left:50%;bottom:30vh;transform:translateX(-50%);width:220px;height:220px;border-radius:50%;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,#ffe14d,#ff6ec7 60%,#ff2e93);opacity:.9;
+  filter:drop-shadow(0 0 40px #ff2e9377);
+  -webkit-mask:repeating-linear-gradient(#000 0 12px,transparent 12px 17px);mask:repeating-linear-gradient(#000 0 12px,transparent 12px 17px);}
+/* CRT scanlines + flicker + vignette */
+.crt{position:fixed;inset:0;z-index:40;pointer-events:none;
+  background:repeating-linear-gradient(0deg,#0000 0 3px,#00000016 3px 4px);
+  animation:flick 9s steps(80) infinite;}
+@keyframes flick{0%,98%{opacity:.5}99%{opacity:.42}100%{opacity:.5}}
+.vig{position:fixed;inset:0;z-index:41;pointer-events:none;box-shadow:inset 0 0 160px #000a, inset 0 0 40px #0006;}
+/* stars */
+.star{position:fixed;width:3px;height:3px;background:#fff;z-index:0;border-radius:1px;animation:tw 2.4s ease-in-out infinite;}
+@keyframes tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+
+.wrap{position:relative;z-index:20;width:100%;max-width:860px;padding:22px;text-align:center}
+
+.coin{font-family:var(--pix);font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:18px;animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.title{font-family:var(--pix);line-height:1.15;margin:0;font-size:clamp(24px,6.5vw,46px);color:var(--yellow);
+  text-shadow:3px 3px 0 var(--pink), 6px 6px 0 #00000055;letter-spacing:1px;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.sub{font-family:var(--kr);font-weight:900;font-size:clamp(15px,3.4vw,20px);margin:14px 0 4px;color:#fff;text-shadow:2px 2px 0 #00000066}
+.tagline{font-family:var(--kr);font-weight:700;color:#ffd6f0;opacity:.85;font-size:13px;margin:0 0 26px}
+
+/* marquee */
+.marq{overflow:hidden;white-space:nowrap;margin:0 0 24px;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marq span{display:inline-block;font-size:22px;animation:slide 16s linear infinite}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:560px){.cards{grid-template-columns:1fr}}
+
+.cab{position:relative;text-decoration:none;color:#fff;border-radius:12px;padding:24px 18px 20px;
+  border:4px solid var(--yellow);box-shadow:7px 7px 0 var(--pink);
+  background:linear-gradient(180deg,#2a1a5c,#1a0f42);overflow:hidden;
+  transition:transform .16s cubic-bezier(.2,.9,.2,1),box-shadow .16s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.cab.alt{border-color:var(--cyan);box-shadow:7px 7px 0 var(--blue)}
+.cab::after{content:"";position:absolute;top:-60%;left:-30%;width:60%;height:220%;transform:rotate(20deg);
+  background:linear-gradient(90deg,transparent,#ffffff33,transparent);transition:.5s}
+.cab:hover{transform:translate(-3px,-3px) rotate(-1deg);box-shadow:11px 11px 0 var(--pink)}
+.cab.alt:hover{box-shadow:11px 11px 0 var(--blue)}
+.cab:hover::after{left:130%}
+.cab.pressed{transform:translate(4px,4px) scale(.97);box-shadow:2px 2px 0 var(--pink)}
+.cab.alt.pressed{box-shadow:2px 2px 0 var(--blue)}
+.emoji{font-size:64px;line-height:1;filter:drop-shadow(0 4px 0 #0006);animation:hop 2.6s ease-in-out infinite}
+.cab.alt .emoji{animation-delay:.5s}
+@keyframes hop{50%{transform:translateY(-7px)}}
+.name{font-family:var(--kr);font-weight:900;font-size:22px;margin-top:4px}
+.lv{font-family:var(--pix);font-size:9px;color:var(--yellow);letter-spacing:1px}
+.cab.alt .lv{color:var(--cyan)}
+.modes{font-family:var(--kr);font-size:12px;color:#ffd6f0;opacity:.8;font-weight:700}
+.sel{font-family:var(--pix);font-size:9px;letter-spacing:1px;color:#fff;margin-top:8px;opacity:0;transform:translateY(4px);transition:.2s}
+.cab:hover .sel{opacity:1;transform:none;animation:blink 1s steps(2) infinite}
+
+.foot{margin-top:26px;font-family:var(--pix);font-size:8px;letter-spacing:1px;color:#ffffff88}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.credit{position:fixed;right:10px;bottom:8px;z-index:70;font-family:var(--pix);font-size:8px;line-height:1.4;color:#fff;opacity:.62;text-shadow:1px 1px 0 #000,0 0 6px var(--cyan);pointer-events:none}
+@media(max-width:560px){.credit{font-size:7px;opacity:.5}}
 </style>
 </head>
 <body>
-<div class="top"><button class="tbtn" id="themebtn" title="라이트/다크">🌙</button></div>
+<h1 class="sr-only">지리 메모리 아케이드 로비 — 일본 도도부현 또는 세계 국가 게임을 선택하세요</h1>
+<div class="sun"></div>
+<div class="floor"></div>
+<div class="crt"></div>
+<div class="vig"></div>
 
-<h1>🗺️ 지리 메모리</h1>
-<div class="sub">외우고 싶은 지도를 골라 시작하세요. 각 게임 안에서 언제든 로비로 돌아오거나 다른 버전으로 바로 전환할 수 있어요.</div>
+<div class="wrap">
+  <div class="coin">◆ INSERT COIN ◆</div>
+  <h2 class="title">GEO<br>ARCADE</h2>
+  <div class="sub">지리 메모리</div>
+  <p class="tagline">지도를 골라 스테이지를 클리어하세요 ▶</p>
 
-<div class="cards">
-  <a class="card" href="japan_prefectures_metro.html">
-    <div class="emoji">🗾</div>
-    <h2>일본 도도부현</h2>
-    <div class="cnt">47개 도도부현</div>
-    <p>지도를 채우며 47개 도도부현의 이름을 익히고, EJU 유학시험 대비 지역 특징 퀴즈까지 풀 수 있어요.</p>
-    <div class="tags"><span class="tag">🗺️ 자유 채우기</span><span class="tag">🔍 지목 퀴즈</span><span class="tag">⌨️ 타자 연습</span><span class="tag">🎓 EJU 지역</span></div>
-    <div class="go">시작하기 →</div>
-  </a>
-  <a class="card" href="world_countries_metro.html">
-    <div class="emoji">🌍</div>
-    <h2>세계 국가</h2>
-    <div class="cnt">256개국 · 대륙별</div>
-    <p>전 세계 국가의 이름을 한국어·영어로 외워요. 대륙별로 진행 상황을 확인하며 채워나갈 수 있어요.</p>
-    <div class="tags"><span class="tag">🗺️ 자유 채우기</span><span class="tag">🔍 지목 퀴즈</span><span class="tag">⌨️ 타자 연습</span><span class="tag">🌐 한/영</span></div>
-    <div class="go">시작하기 →</div>
-  </a>
+  <div class="marq"><span>🗾 🗼 🏯 ⛩️ 🌸 🍣 🗻 🌍 🌎 🌏 🧭 🚩 🏝️ 🏔️ 🌋 &nbsp; 🗾 🗼 🏯 ⛩️ 🌸 🍣 🗻 🌍 🌎 🌏 🧭 🚩 🏝️ 🏔️ 🌋 &nbsp;</span></div>
+
+  <div class="cards">
+    <a class="cab" href="japan_prefectures_metro.html">
+      <div class="emoji">🗾</div>
+      <div class="name">일본</div>
+      <div class="lv">LV. 47 PREF</div>
+      <div class="modes">자유 · 퀴즈 · 타자 · EJU</div>
+      <div class="sel">▶ SELECT</div>
+    </a>
+    <a class="cab alt" href="world_countries_metro.html">
+      <div class="emoji">🌍</div>
+      <div class="name">세계</div>
+      <div class="lv">LV. 256 CTRY</div>
+      <div class="modes">자유 · 퀴즈 · 타자 · 한/영</div>
+      <div class="sel">▶ SELECT</div>
+    </a>
+  </div>
+
+  <div class="foot">© 2P GEO ARCADE — PLAYER 1 READY</div>
 </div>
-
-<div class="foot">타이핑 사운드 · 콤보 · 클로즈업 줌 · 라이트/다크 지원</div>
+<div class="credit">제작자 : @konomiwosawagou</div>
 
 <script>
-document.getElementById("themebtn").addEventListener("click",e=>{
-  const dark=document.body.classList.toggle("dark");
-  e.currentTarget.textContent=dark?"☀️":"🌙";
+// twinkling pixel stars
+(function(){
+  const n=26;
+  for(let i=0;i<n;i++){
+    const s=document.createElement("div"); s.className="star";
+    s.style.left=Math.random()*100+"vw";
+    s.style.top=(Math.random()*62)+"vh";
+    s.style.animationDelay=(Math.random()*2.4)+"s";
+    s.style.opacity=Math.random()*.6+.2;
+    document.body.appendChild(s);
+  }
+})();
+// arcade blips (Web Audio, no files)
+let ac=null;
+function AC(){ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}} if(ac.state==="suspended")ac.resume(); return ac; }
+function blip(f,d,g){ const a=AC(); if(!a)return; const o=a.createOscillator(),v=a.createGain(); o.type="square"; o.frequency.value=f; v.gain.setValueAtTime(0.0001,a.currentTime); v.gain.exponentialRampToValueAtTime(g||0.05,a.currentTime+0.01); v.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d); o.connect(v).connect(a.destination); o.start(); o.stop(a.currentTime+d+0.02); }
+document.querySelectorAll(".cab").forEach(function(c){
+  c.addEventListener("mouseenter",function(){ blip(660,0.05,0.03); });
+  c.addEventListener("click",function(e){
+    e.preventDefault();
+    const href=c.getAttribute("href");
+    blip(880,0.08,0.06); setTimeout(()=>blip(1320,0.12,0.06),90);
+    c.classList.add("pressed");
+    setTimeout(()=>{ window.location.href=href; },320);
+  });
 });
 </script>
 </body>
