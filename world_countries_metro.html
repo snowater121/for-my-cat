@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>세계 국가 이름 메모리 · World Countries Metro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{ /* light theme (default) */
   --bg1:#eef2f8; --bg2:#dde5f0;
@@ -173,15 +176,71 @@ body.eju label.chk{display:none}
 body.eju .stat.qonly{display:block}
 body.ejufeat #answer, body.ejufeat .typinglabel{display:none}
 body.ejufeat #hintbtn, body.ejufeat #revealbtn{display:none}
+/* ===================== ARCADE SKIN ===================== */
+.stat .v,#combo,.win,.qbanner .num,.credit,.typinglabel{font-family:"Press Start 2P",ui-monospace,monospace}
+.stat .v{font-size:15px;letter-spacing:0}
+.typinglabel{font-size:9px;letter-spacing:1px}
+.brand{text-shadow:2px 2px 0 var(--miss)}
+.btn,.seg,#answer,aside,.qbanner,.overview,.ejucard,.chip,.opt{border-radius:7px}
+.btn{border-width:2px;box-shadow:2px 2px 0 #0007;transition:transform .08s,box-shadow .08s,border-color .2s,background-color .2s,color .2s}
+.btn:active{transform:translate(2px,2px);box-shadow:none}
+.seg{border-width:2px}
+a.btn:active{transform:translate(2px,2px)}
+header{border-bottom:2px solid var(--accent);box-shadow:0 2px 0 var(--miss),0 6px 16px #0008}
+aside{border-left:2px solid var(--accent)}
+footer{border-top:2px solid var(--accent)}
+#answer{border-width:2px}
+.progress{border:1px solid var(--line)}
+.progress i{box-shadow:0 0 10px var(--accent)}
+#combo{text-shadow:2px 2px 0 #000,0 0 16px var(--gold)}
+.win{font-size:12px}
+.mapwrap{box-shadow:inset 0 0 0 2px #ffffff12}
+.qbanner .num{font-size:11px}
+/* CRT scanlines over whole screen — subtle (light) / a bit stronger (dark) */
+body::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.6;
+  background:repeating-linear-gradient(0deg,#0000 0 3px,#0000000a 3px 4px);mix-blend-mode:multiply}
+body.dark::after{opacity:1;background:repeating-linear-gradient(0deg,#0000 0 3px,#00000014 3px 4px)}
+/* maker credit, bottom-right */
+.credit{position:fixed;right:9px;bottom:7px;z-index:70;font-size:8px;line-height:1.4;color:#fff;opacity:.6;
+  text-shadow:1px 1px 0 #000,0 0 6px var(--accent);pointer-events:none}
+@media(max-width:560px){.credit{font-size:7px;opacity:.5}}
+/* light (day) = clean white arcade: softer shadows, gentler frame */
+body:not(.dark) .btn{box-shadow:2px 2px 0 #00000018}
+body:not(.dark) header{box-shadow:0 2px 0 var(--miss),0 4px 12px #0000000f}
+body:not(.dark) .mapwrap{box-shadow:inset 0 0 0 2px #0000000d}
+body:not(.dark) #combo{text-shadow:2px 2px 0 #fff,0 0 14px var(--gold)}
+body:not(.dark) .credit{color:#1b2534;opacity:.5;text-shadow:1px 1px 0 #fff}
+/* settings (gear) panel */
+.gearwrap{position:relative}
+.settings{position:absolute;top:calc(100% + 8px);right:0;z-index:95;width:230px;background:var(--panel);border:2px solid var(--accent);border-radius:10px;box-shadow:4px 4px 0 #0007;padding:9px;display:none;flex-direction:column;gap:7px}
+.settings.open{display:flex}
+.settitle{font-family:"Press Start 2P",monospace;font-size:8px;color:var(--accent);padding:2px 2px 6px;border-bottom:1px dashed var(--line);letter-spacing:0}
+.settrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:700;color:var(--text);padding:2px 2px}
+.settrow .btn{padding:5px 9px}
+.tgl{border:2px solid var(--accent);background:var(--accent);color:#04121a;font-weight:800;font-size:11px;padding:5px 12px;border-radius:7px;cursor:pointer;min-width:48px;box-shadow:2px 2px 0 #0006;transition:transform .08s,box-shadow .08s}
+.tgl:active{transform:translate(2px,2px);box-shadow:none}
+.tgl.off{background:transparent;color:var(--sub);border-color:var(--line)}
+.settings label.chk{display:flex !important;transform:scale(1.25);margin-right:6px}
+body.nocrt::after{display:none !important}
+/* start screen + countdown */
+.startscreen{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(6,4,22,.6);backdrop-filter:blur(2px)}
+body:not(.dark) .startscreen{background:rgba(240,244,250,.72)}
+.startbtn{font-family:"Press Start 2P",monospace;font-size:20px;color:#04121a;background:var(--gold);border:3px solid #fff;border-radius:12px;padding:20px 34px;cursor:pointer;box-shadow:6px 6px 0 var(--miss);animation:startbob 1.4s ease-in-out infinite}
+.startbtn:hover{filter:brightness(1.06)}
+.startbtn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 var(--miss)}
+@keyframes startbob{50%{transform:translateY(-7px)}}
+.countdown{font-family:"Press Start 2P",monospace;font-size:clamp(44px,10vw,72px);color:var(--gold);text-shadow:4px 4px 0 var(--miss),0 0 26px var(--gold);min-height:1px}
+.countdown.pulse{animation:cdpop .55s ease}
+@keyframes cdpop{0%{transform:scale(.3);opacity:0}55%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:.95}}
 </style>
 </head>
-<body class="free">
+<body class="quiz dark">
 <header>
   <div class="brand">🌍 세계 국가 이름 메모리<small id="modehint">이름을 타이핑하세요</small></div>
   <div class="tools">
     <div class="seg mode" id="mode">
-      <button data-m="free" class="on">🗺️ 자유 채우기</button>
-      <button data-m="quiz">🔍 지목 퀴즈</button>
+      <button data-m="free">🗺️ 자유 채우기</button>
+      <button data-m="quiz" class="on">🔍 지목 퀴즈</button>
       <button data-m="type">⌨️ 타자 연습</button>
     </div>
     <div class="seg" id="lang">
@@ -194,11 +253,18 @@ body.ejufeat #hintbtn, body.ejufeat #revealbtn{display:none}
     </div>
     <a class="btn" href="index.html" title="로비로">🏠 로비</a>
     <a class="btn" id="switchbtn" href="japan_prefectures_metro.html" title="일본 버전으로">🗾 일본</a>
-    <label class="chk"><input type="checkbox" id="showlbl"> 지도에 이름</label>
-    <button class="btn" id="soundbtn" title="사운드 켜기/끄기">🔊</button>
-    <button class="btn" id="themebtn" title="라이트/다크 전환">🌙</button>
     <button class="btn" id="reset">다시하기</button>
     <button class="btn danger" id="giveup">정답 보기</button>
+    <div class="gearwrap">
+      <button class="btn" id="gearbtn" title="설정">⚙️</button>
+      <div class="settings" id="settings">
+        <div class="settitle">⚙️ 설정 · OPTIONS</div>
+        <div class="settrow"><span>📺 CRT 스캔라인</span><button class="tgl on" id="crtbtn">ON</button></div>
+        <div class="settrow"><span>🔊 사운드</span><button class="btn" id="soundbtn" title="사운드 켜기/끄기">🔊</button></div>
+        <div class="settrow"><span>🎨 테마 (라이트/다크)</span><button class="btn" id="themebtn" title="라이트/다크 전환">☀️</button></div>
+        <div class="settrow"><span>🏷️ 지도에 이름 표시</span><label class="chk"><input type="checkbox" id="showlbl"></label></div>
+      </div>
+    </div>
   </div>
   <div class="stats">
     <div class="stat"><div class="v ok" id="count">0<span style="color:var(--sub);font-size:13px">/47</span></div><div class="l">맞힌 개수</div></div>
@@ -217,6 +283,10 @@ body.ejufeat #hintbtn, body.ejufeat #revealbtn{display:none}
     <div id="ejucard" class="ejucard"></div>
     <div id="combo"></div>
     <div id="fx"></div>
+    <div id="startscreen" class="startscreen">
+      <button id="startbtn" class="startbtn">▶ START</button>
+      <div id="countdown" class="countdown"></div>
+    </div>
   </div>
   <aside id="panel"></aside>
 </main>
@@ -257,7 +327,8 @@ const norm = s => (s||"").toString().trim().toLowerCase().replace(/[\s・·.\-()
 const LOOKUP = {};
 for(const code in DATA){ for(const a of DATA[code].accepted){ LOOKUP[norm(a)] = code; } }
 
-let mode="free", lang="ko", ejuDir="name";
+let mode="quiz", lang="ko", ejuDir="name";
+let pendingStart=true;
 let found=new Set(), revealed=new Set();
 let startedAt=null, timerId=null, over=false;
 let queue=[], target=null, streak=0, hintLevel=0;
@@ -459,11 +530,22 @@ function tone(freq,dur,type,gain,when,glideTo){
   o.connect(g); g.connect(ac.destination);
   o.start(t); o.stop(t+dur+0.03);
 }
-function sClick(){ tone(400+Math.random()*150,0.05,"triangle",0.05); }
-function sCorrect(st){ const b=500+Math.min(st,12)*20; tone(b,0.12,"sine",0.17,0); tone(b*1.5,0.15,"sine",0.13,0.08); tone(b*2,0.18,"sine",0.09,0.16); }
-function sWrong(){ tone(210,0.2,"sawtooth",0.11,0,120); }
-function sReveal(){ tone(340,0.14,"sine",0.1,0); tone(250,0.2,"sine",0.1,0.09); }
-function sWin(){ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,0.24,"sine",0.16,i*0.11)); }
+// ---- 8-bit / arcade chiptune SFX (square waves) ----
+function sClick(){ tone(180+Math.random()*30,0.028,"square",0.035); }
+function sCorrect(st){ // coin/blip that climbs with combo
+  const s=Math.min(st,10);
+  tone(784+s*24,0.055,"square",0.06,0);
+  tone(1175+s*36,0.11,"square",0.06,0.055);
+}
+function sWrong(){ // arcade "miss" descending buzz
+  tone(196,0.09,"square",0.07,0,150);
+  tone(130,0.16,"square",0.07,0.09,92);
+}
+function sReveal(){ tone(523,0.07,"square",0.05,0); tone(392,0.13,"square",0.05,0.07); }
+function sWin(){ // 1-UP style fanfare
+  const n=[[523,0.1],[659,0.1],[784,0.1],[1047,0.12],[784,0.1],[1047,0.12],[1319,0.26]];
+  let t=0; n.forEach(x=>{ tone(x[0],x[1],"square",0.06,t); t+=x[1]*0.9; });
+}
 
 // ---- FX overlay ----
 const mapwrap=document.querySelector(".mapwrap");
@@ -535,67 +617,95 @@ function confettiRain(){
   }
 }
 
+// ---- answer handlers ----
+function acceptFree(code){
+  found.add(code); streak++; markFound(code); updateStats(); input.value=""; flash("flash-ok");
+  sCorrect(streak); celebrate(code,streak);
+  hint.textContent=`좋아요! ${DATA[code].ko} (${DATA[code].kanji}) · 남은 ${ROUND-found.size}`;
+  if(found.size===ROUND) winGame();
+}
+function acceptType(){
+  const code=target;
+  found.add(code); streak++; queue.shift(); markFound(code);
+  updateStats(); input.value=""; flash("flash-ok"); sCorrect(streak); celebrate(code,streak);
+  hint.textContent=`좋아요! ${DATA[code].ko} · 🔥 ${streak}연속`;
+  target=null; setTimeout(()=>{ if(!over) nextTarget(); }, 500);
+}
+function acceptTarget(){ // quiz & eju(name)
+  const code=target;
+  found.add(code); streak++; queue.shift(); markFound(code);
+  updateStats(); input.value=""; flash("flash-ok"); sCorrect(streak);
+  if(mode==="eju"){ ejuReveal(code,true); }
+  else { celebrate(code,streak); hint.textContent=`정답! ${DATA[code].ko} (${DATA[code].kanji}) · 🔥 ${streak}연속`; }
+  target=null;
+  setTimeout(()=>{ if(!over) nextTarget(); }, mode==="eju"?2300:650);
+}
+function wrongAnswer(){
+  sWrong(); flash("flash-no"); streak=0; updateStats();
+  hint.textContent="❌ 오답! 다시 시도해 보세요.";
+  input.value="";
+}
+// live handling: free & type accept as you type; quiz & eju submit on Enter
 input.addEventListener("input",()=>{
-  if(over) return;
+  if(over||pendingStart) return;
   sClick(); popInput();
   if(mode==="type"&&target) updateTypeColor(input.value);
   const key=norm(input.value); if(!key) return;
   if(mode==="free"){
     const code=LOOKUP[key];
-    if(code && !found.has(code)){
-      if(!startedAt) startTimer();
-      found.add(code); streak++; markFound(code); updateStats(); input.value=""; flash("flash-ok");
-      sCorrect(streak); celebrate(code,streak);
-      hint.textContent=`좋아요! ${DATA[code].ko} (${DATA[code].kanji}) · 남은 개수 ${TOTAL-found.size}`;
-      if(found.size===ROUND) winGame();
-    }
+    if(code && !found.has(code)) acceptFree(code);
   } else if(mode==="type"){
-    if(!target) return;
-    if(norm(displayType(target))===key || DATA[target].accepted.map(norm).includes(key)){
-      if(!startedAt) startTimer();
-      const code=target;
-      found.add(code); streak++; queue.shift(); markFound(code);
-      updateStats(); input.value=""; flash("flash-ok");
-      sCorrect(streak); celebrate(code,streak);
-      hint.textContent=`좋아요! ${DATA[code].ko} (${DATA[code].kanji}) · 🔥 ${streak}연속`;
-      target=null;
-      setTimeout(()=>{ if(!over) nextTarget(); }, 500);
-    }
-  } else if(mode==="eju" && ejuDir==="name"){
-    if(!target) return;
-    if(DATA[target].accepted.map(norm).includes(key)){
-      if(!startedAt) startTimer();
-      const code=target;
-      found.add(code); streak++; queue.shift(); markFound(code);
-      updateStats(); input.value=""; flash("flash-ok");
-      sCorrect(streak); ejuReveal(code,true);
-      target=null;
-      setTimeout(()=>{ if(!over) nextTarget(); }, 2300);
-    } else if(LOOKUP[key] && LOOKUP[key]!==target && key.length>=norm(labelFor(LOOKUP[key])).length){
-      flash("flash-no"); sWrong(); streak=0; updateStats();
-      hint.textContent=`땡! 그건 ${DATA[LOOKUP[key]].ko}. 특징을 다시 읽어보세요 (💡힌트 활용).`;
-      input.value="";
-    }
-  } else {
-    if(!target) return;
-    if(DATA[target].accepted.map(norm).includes(key)){
-      if(!startedAt) startTimer();
-      const code=target;
-      found.add(code); streak++; queue.shift(); markFound(code);
-      updateStats(); input.value=""; flash("flash-ok");
-      sCorrect(streak); celebrate(code,streak);
-      hint.textContent=`정답! ${DATA[code].ko} (${DATA[code].kanji}) · 🔥 ${streak}연속`;
-      target=null;
-      setTimeout(()=>{ if(!over) nextTarget(); }, 650);
-    } else if(LOOKUP[key] && LOOKUP[key]!==target && key.length>=norm(labelFor(LOOKUP[key])).length){
-      // typed a full valid but wrong prefecture name
-      flash("flash-no"); sWrong(); streak=0; updateStats();
-      hint.textContent=`땡! 그건 ${DATA[LOOKUP[key]].ko} 예요. 하이라이트된 곳을 다시 보세요.`;
-      input.value="";
-    }
+    if(target && (norm(displayType(target))===key || DATA[target].accepted.map(norm).includes(key))) acceptType();
   }
 });
-input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&mode==="free") input.value=""; });
+// Enter = submit answer (with wrong feedback)
+input.addEventListener("keydown",e=>{
+  if(e.key!=="Enter") return;
+  if(over||pendingStart) return;
+  const key=norm(input.value);
+  if(mode==="quiz" || (mode==="eju" && ejuDir==="name")){
+    if(!target||!key) return;
+    if(DATA[target].accepted.map(norm).includes(key)) acceptTarget(); else wrongAnswer();
+  } else if(mode==="free"){
+    if(!key) return;
+    const code=LOOKUP[key];
+    if(code && !found.has(code)) acceptFree(code);
+    else if(code && found.has(code)) input.value="";
+    else wrongAnswer();
+  } else if(mode==="type"){
+    if(target && key && (norm(displayType(target))===key || DATA[target].accepted.map(norm).includes(key))) acceptType();
+  }
+});
+
+// ---- START button + 3·2·1 countdown ----
+const startScreen=document.getElementById("startscreen");
+function armGame(){
+  pendingStart=true;
+  document.getElementById("countdown").textContent="";
+  document.getElementById("startbtn").style.display="";
+  startScreen.style.display="flex";
+  hint.textContent="▶ START를 눌러 시작하세요!";
+}
+function beginRound(){
+  pendingStart=false; startScreen.style.display="none";
+  startedAt=null; startTimer();
+  if(mode==="free"){ hint.textContent="떠오르는 이름을 입력하세요!"; }
+  else { nextTarget(); hint.textContent = mode==="quiz" ? "하이라이트된 곳의 이름을 입력하고 Enter!" : mode==="type" ? "화면의 이름을 그대로 따라 입력!" : "특징을 읽고 이름을 입력한 뒤 Enter!"; }
+  input.value=""; input.focus();
+}
+function runCountdown(){
+  const cd=document.getElementById("countdown"), sb=document.getElementById("startbtn");
+  sb.style.display="none";
+  const seq=["3","2","1","GO!"]; let i=0;
+  (function step(){
+    if(i>=seq.length){ cd.textContent=""; beginRound(); return; }
+    cd.textContent=seq[i];
+    cd.classList.remove("pulse"); void cd.offsetWidth; cd.classList.add("pulse");
+    if(soundOn){ AC(); tone(i<3?659:1046,0.13,"square",0.07); if(i>=3) tone(1568,0.2,"square",0.06,0.08); }
+    i++; setTimeout(step,700);
+  })();
+}
+document.getElementById("startbtn").addEventListener("click",()=>{ if(soundOn){AC();} runCountdown(); });
 
 function winGame(){
   over=true; stopTimer();
@@ -693,8 +803,17 @@ document.getElementById("soundbtn").addEventListener("click",e=>{
   soundOn=!soundOn;
   e.currentTarget.textContent=soundOn?"🔊":"🔇";
   e.currentTarget.classList.toggle("off",!soundOn);
-  if(soundOn){ AC(); tone(660,0.09,"sine",0.12); tone(880,0.1,"sine",0.1,0.07); }
+  if(soundOn){ AC(); tone(784,0.07,"square",0.06); tone(1175,0.1,"square",0.06,0.07); }
   input.focus();
+});
+// ---- settings (gear) panel ----
+const gearBtn=document.getElementById("gearbtn"), settingsEl=document.getElementById("settings");
+gearBtn.addEventListener("click",e=>{ e.stopPropagation(); settingsEl.classList.toggle("open"); if(soundOn){AC();tone(660,0.04,"square",0.04);} });
+document.addEventListener("click",e=>{ if(!settingsEl.contains(e.target) && e.target!==gearBtn) settingsEl.classList.remove("open"); });
+document.getElementById("crtbtn").addEventListener("click",function(){
+  const off=document.body.classList.toggle("nocrt");
+  this.classList.toggle("off",off); this.textContent=off?"OFF":"ON";
+  if(soundOn){AC();tone(off?400:880,0.06,"square",0.05);}
 });
 
 function resetGame(){
@@ -720,14 +839,14 @@ function resetGame(){
   for(const region of REGION_ORDER) updateRegionCount(region);
   updateStats();
   document.getElementById("modehint").textContent=lang==="ko"?(mode==="free"?"한국어로 타이핑":mode==="quiz"?"한국어로 이름 맞히기":mode==="type"?"화면 이름 따라 입력":"특징 읽고 지역 맞히기"):"영어(English)로 입력";
-  if(mode==="quiz"){ setVB(FULL_VB); hint.textContent="하이라이트된 지역의 이름을 입력하세요. 첫 입력에 타이머 시작!"; startQuiz(); }
-  else if(mode==="type"){ setVB(FULL_VB); hint.textContent="화면에 나온 이름을 그대로 따라 입력하세요. 순수 타자 연습!"; startQuiz(); }
-  else if(mode==="eju"){ setVB(FULL_VB); hint.textContent="특징을 읽고 해당 도도부현 이름을 입력하세요. 첫 입력에 타이머 시작!"; startQuiz(); }
-  else { setVB(FULL_VB); hint.textContent="첫 글자를 입력하면 타이머가 시작됩니다."; }
-  input.value=""; input.focus();
+  setVB(FULL_VB);
+  if(mode!=="free"){ const pool=(mode==="eju")?EJU_CODES:CODES; queue=shuffle(pool.filter(c=>!found.has(c))); }
+  armGame();
+  input.value="";
 }
 
-buildPanel(); updateStats(); input.focus();
+buildPanel(); resetGame();
 </script>
+<div class="credit">제작자 : @konomiwosawagou</div>
 </body>
 </html>
