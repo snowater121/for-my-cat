@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4155818445062457"
-     crossorigin="anonymous"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GEO ARCADE · 지리 메모리</title>
@@ -96,9 +94,26 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .credit{position:fixed;right:10px;bottom:8px;z-index:70;font-family:var(--pix);font-size:8px;line-height:1.4;color:#fff;opacity:.62;text-shadow:1px 1px 0 #000,0 0 6px var(--cyan);pointer-events:none}
 @media(max-width:560px){.credit{font-size:7px;opacity:.5}}
+/* ===== CRT power-on intro ===== */
+#crton{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+#crton .bar{position:absolute;left:0;right:0;height:51%;background:#000}
+#crton .bar.top{top:0;transform-origin:top;animation:crtBar 1.15s cubic-bezier(.7,0,.25,1) forwards}
+#crton .bar.bot{bottom:0;transform-origin:bottom;animation:crtBar 1.15s cubic-bezier(.7,0,.25,1) forwards}
+@keyframes crtBar{0%,18%{transform:scaleY(1)}52%{transform:scaleY(0)}100%{transform:scaleY(0)}}
+#crton .seam{position:absolute;top:50%;left:50%;right:50%;height:3px;transform:translateY(-50%);background:#fff;box-shadow:0 0 22px 6px #fff,0 0 60px 12px #bfefff;animation:crtSeam 1.15s ease-out forwards}
+@keyframes crtSeam{0%{left:50%;right:50%;opacity:0;height:3px}9%{left:0;right:0;opacity:1;height:3px}18%{opacity:1;height:3px}33%{opacity:1;height:100%}45%{opacity:0;height:100%}100%{opacity:0}}
+#crton .noise{position:absolute;inset:0;mix-blend-mode:screen;opacity:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:crtNoiseOp 1.15s steps(1) forwards, crtNoiseMv .11s steps(4) infinite}
+@keyframes crtNoiseOp{0%,28%{opacity:0}33%{opacity:.55}42%{opacity:.2}50%{opacity:.45}60%{opacity:.12}72%{opacity:.3}85%{opacity:.05}100%{opacity:0}}
+@keyframes crtNoiseMv{0%{background-position:0 0}25%{background-position:40px -30px}50%{background-position:-25px 20px}75%{background-position:15px 35px}100%{background-position:-40px -10px}}
+.wrap{animation:crtWrap 1.15s ease-out}
+@keyframes crtWrap{0%,28%{opacity:0;transform:scaleY(.55);filter:brightness(3)}38%{opacity:1;transform:none;filter:brightness(2.2) contrast(1.3)}42%{transform:translateX(-7px);filter:contrast(1.5) hue-rotate(12deg)}45%{transform:translateX(6px)}48%{transform:translateX(-3px);filter:contrast(1.2)}51%{transform:translateX(0)}100%{opacity:1;transform:none;filter:none}}
+body.crtdone #crton{display:none}
 </style>
 </head>
 <body>
+<div id="crton"><div class="bar top"></div><div class="bar bot"></div><div class="seam"></div><div class="noise"></div></div>
 <h1 class="sr-only">지리 메모리 아케이드 로비 — 일본 도도부현 또는 세계 국가 게임을 선택하세요</h1>
 <div class="sun"></div>
 <div class="floor"></div>
@@ -135,6 +150,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="credit">제작자 : @konomiwosawagou</div>
 
 <script>
+// CRT power-on: remove overlay after boot
+setTimeout(function(){ document.body.classList.add("crtdone"); var c=document.getElementById("crton"); if(c) c.remove(); }, 1250);
 // twinkling pixel stars
 (function(){
   const n=26;
