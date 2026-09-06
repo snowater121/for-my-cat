@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4155818445062457"
-     crossorigin="anonymous"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일본 도도부현 메모리 · Japan Prefecture Metro</title>
@@ -114,12 +112,49 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:12px 18p
 .win{color:var(--ok);font-weight:800}
 @media(max-width:820px){
   main{flex-direction:column}
-  aside{max-width:none;min-width:0;border-left:0;border-top:1px solid var(--line);flex:none;max-height:30vh}
-  .mapwrap{flex:none;height:46vh}
+  aside{max-width:none;min-width:0;border-left:0;border-top:2px solid var(--accent);flex:none;max-height:32vh}
+  .mapwrap{flex:none;height:44vh}
   .overview{width:110px;height:96px}
   svg#ovmap{height:74px}
   #answer{font-size:22px;padding:14px 16px}
   #combo{font-size:18px}
+}
+/* phones: compact header, keep everything readable */
+@media(max-width:600px){
+  header{padding:8px 10px;gap:7px}
+  .brand{font-size:14px;width:100%;order:1}
+  .brand small{display:none}
+  .tools{order:2;gap:6px;width:100%;justify-content:flex-start}
+  .stats{order:3;width:100%;gap:0;justify-content:space-between;margin-left:0}
+  .stat{min-width:0;flex:1}
+  .stat .v{font-size:13px}
+  .stat .l{font-size:10px}
+  .seg button{padding:6px 8px;font-size:11px}
+  .btn{padding:6px 9px;font-size:12px}
+  .settings{width:min(90vw,240px)}
+  .mapwrap{height:46vh}
+  aside{max-height:30vh;padding:9px}
+  .region h3{font-size:12px}
+  .chip{font-size:11px;padding:3px 7px}
+  #answer{font-size:20px;padding:12px 14px}
+  .qbtns .btn{padding:8px 10px}
+  .ejucard{max-height:58%;width:calc(100% - 24px);padding:12px 14px;bottom:12px}
+  .ejucard li{font-size:14px}
+  .ejucard .qname h2{font-size:24px}
+  .opt{font-size:14px;padding:9px 11px}
+  .startbtn{font-size:16px;padding:16px 24px}
+  .countdown{font-size:clamp(40px,16vw,64px)}
+  .credit{font-size:6px}
+  .overview{width:92px;height:80px;top:8px;right:8px}
+  svg#ovmap{height:60px}
+  .typinglabel{display:none}
+}
+/* landscape phones: shrink map so input stays reachable */
+@media(max-height:520px) and (orientation:landscape){
+  main{flex-direction:row}
+  .mapwrap{flex:1.4;height:auto}
+  aside{max-height:none;max-width:230px;border-top:0;border-left:2px solid var(--accent)}
+  header{padding:6px 10px}
 }
 /* ---- design + fx ---- */
 .typingstage{max-width:860px;margin:0 auto;position:relative}
@@ -258,6 +293,7 @@ body:not(.dark) .startscreen{background:rgba(240,244,250,.72)}
     <a class="btn" id="switchbtn" href="world_countries_metro.html" title="세계 버전으로">🌍 세계</a>
     <button class="btn" id="reset">다시하기</button>
     <button class="btn danger" id="giveup">정답 보기</button>
+    <button class="btn" id="fsbtn" title="전체화면 전환">⛶</button>
     <div class="gearwrap">
       <button class="btn" id="gearbtn" title="설정">⚙️</button>
       <div class="settings" id="settings">
@@ -793,7 +829,7 @@ document.getElementById("giveup").addEventListener("click",()=>{
     labels[code].textContent=labelFor(code); labels[code].classList.add("show");
   }
   if(mode==="quiz") tweenVB(FULL_VB);
-  hint.innerHTML=`정답을 공개했어요. 맞힌 개수 <b>${found.size}/47</b> · 빨간색이 놓친 곳이에요.`;
+  hint.innerHTML=`정답을 공개했어요. 맞힌 개수 <b>${found.size}/${ROUND}</b> · 빨간색이 놓친 곳이에요.`;
 });
 document.getElementById("themebtn").addEventListener("click",e=>{
   const dark=document.body.classList.toggle("dark");
@@ -818,6 +854,17 @@ document.getElementById("crtbtn").addEventListener("click",function(){
   this.classList.toggle("off",off); this.textContent=off?"OFF":"ON";
   if(soundOn){AC();tone(off?400:880,0.06,"square",0.05);}
 });
+// ---- fullscreen toggle ----
+const fsBtn=document.getElementById("fsbtn");
+fsBtn.addEventListener("click",()=>{
+  const el=document.documentElement, fe=document.fullscreenElement||document.webkitFullscreenElement;
+  if(!fe){ (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }
+  else { (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document); }
+  if(soundOn){AC();tone(660,0.05,"square",0.04);}
+});
+function syncFS(){ fsBtn.textContent=(document.fullscreenElement||document.webkitFullscreenElement)?"🗗":"⛶"; }
+document.addEventListener("fullscreenchange",syncFS);
+document.addEventListener("webkitfullscreenchange",syncFS);
 
 function resetGame(){
   vbAnim++; stopTimer();
