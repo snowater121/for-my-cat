@@ -39,7 +39,7 @@ body.dark{
 body,header,aside,footer,.btn,.seg,#answer,.chip{transition:background-color .25s ease,color .25s ease,border-color .25s ease}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:radial-gradient(1100px 640px at 82% -12%,var(--bg1),var(--bg2) 60%);color:var(--text);font-family:"Noto Sans KR","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+body{background:radial-gradient(1100px 640px at 82% -12%,var(--bg1),var(--bg2) 60%);color:var(--text);font-family:"Noto Sans KR","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 header{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--headbg1),var(--headbg2));flex-wrap:wrap;box-shadow:0 3px 14px #0003;position:relative;z-index:8}
 header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5}
 .brand{font-weight:800;font-size:17px;letter-spacing:.3px}
@@ -110,51 +110,111 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:12px 18p
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--ok));transition:width .4s ease}
 .hint{max-width:820px;margin:8px auto 0;font-size:12px;color:var(--sub);text-align:center;min-height:16px}
 .win{color:var(--ok);font-weight:800}
+/* ===================== RESPONSIVE ===================== */
+/* 태블릿 / 좁은 가로: 지도 위, 지역 패널 아래로 세로 배치.
+   높이를 vh로 고정하지 않고 flex로 나눠 헤더·푸터가 커져도 넘치지 않게 한다. */
 @media(max-width:820px){
   main{flex-direction:column}
-  aside{max-width:none;min-width:0;border-left:0;border-top:2px solid var(--accent);flex:none;max-height:32vh}
-  .mapwrap{flex:none;height:44vh}
+  .mapwrap{flex:1 1 auto;height:auto;min-height:0}
+  aside{flex:0 0 auto;height:24vh;min-height:0;max-width:none;min-width:0;
+        border-left:0;border-top:2px solid var(--accent);padding:10px}
   .overview{width:110px;height:96px}
   svg#ovmap{height:74px}
   #answer{font-size:22px;padding:14px 16px}
   #combo{font-size:18px}
+  /* 헤더 3단 구성: 제목 / 도구(한 줄 가로 스크롤) / 스탯 */
+  .brand{width:100%;order:1}
+  .tools{order:2;width:100%;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+         scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tools::-webkit-scrollbar{display:none}
+  .tools>*{flex:0 0 auto}
+  .seg button,.btn{white-space:nowrap}
+  .stats{order:3;width:100%;margin-left:0;justify-content:space-between;gap:0}
+  .stat{min-width:0;flex:1}
 }
-/* phones: compact header, keep everything readable */
+/* 휴대폰 세로 */
 @media(max-width:600px){
-  header{padding:8px 10px;gap:7px}
-  .brand{font-size:14px;width:100%;order:1}
+  header{padding:7px 10px;gap:6px}
+  .brand{font-size:13px;width:100%;order:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .brand small{display:none}
-  .tools{order:2;gap:6px;width:100%;justify-content:flex-start}
+  /* 도구는 줄바꿈 대신 가로 스크롤 — 헤더가 화면을 잡아먹지 않도록 */
+  .tools{order:2;width:100%;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:6px;
+         justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tools::-webkit-scrollbar{display:none}
+  .tools>*{flex:0 0 auto}
+  .seg button{padding:6px 9px;font-size:11.5px;white-space:nowrap}
+  .btn{padding:6px 9px;font-size:12px;white-space:nowrap}
   .stats{order:3;width:100%;gap:0;justify-content:space-between;margin-left:0}
   .stat{min-width:0;flex:1}
-  .stat .v{font-size:13px}
-  .stat .l{font-size:10px}
-  .seg button{padding:6px 8px;font-size:11px}
-  .btn{padding:6px 9px;font-size:12px}
-  .settings{width:min(90vw,240px)}
-  .mapwrap{height:46vh}
-  aside{max-height:30vh;padding:9px}
-  .region h3{font-size:12px}
-  .chip{font-size:11px;padding:3px 7px}
-  #answer{font-size:20px;padding:12px 14px}
-  .qbtns .btn{padding:8px 10px}
-  .ejucard{max-height:58%;width:calc(100% - 24px);padding:12px 14px;bottom:12px}
-  .ejucard li{font-size:14px}
-  .ejucard .qname h2{font-size:24px}
-  .opt{font-size:14px;padding:9px 11px}
-  .startbtn{font-size:16px;padding:16px 24px}
-  .countdown{font-size:clamp(40px,16vw,64px)}
+  .stat .v{font-size:12px}
+  .stat .l{font-size:9px}
+  .settings{width:min(84vw,240px)}
+  aside{height:20vh;padding:8px}
+  .region{margin-bottom:8px}
+  .region h3{font-size:11px}
+  .chip{font-size:10.5px;padding:2px 6px}
+  /* 문제 배너: 폭을 다 쓰고 가운데 정렬 */
+  .qbanner{left:8px;right:8px;top:8px;transform:none;justify-content:center;text-align:center;
+           flex-wrap:wrap;gap:5px;font-size:12px;padding:6px 10px;border-radius:9px}
+  .qbanner .num{font-size:9px}
+  .qhint{font-size:11px}
+  /* 미니맵을 좌하단으로 — 위쪽 배너와 겹치지 않게 */
+  .overview{width:84px;height:74px;top:auto;bottom:8px;left:8px;right:auto;padding:3px}
+  .overview .cap{font-size:8px}
+  svg#ovmap{height:56px}
+  body.eju .overview{display:none}
+  /* 입력줄: 입력칸 한 줄 + 버튼 한 줄. 버튼이 글자 단위로 쪼개지던 문제를 막는다 */
+  footer{padding:9px 10px 20px}   /* 하단 여백은 제작자 워터마크 자리 */
+  .inbar{flex-wrap:wrap;gap:7px}
+  #answer{flex:1 1 100%;font-size:19px;padding:12px 14px;border-radius:12px}
+  .qbtns{width:100%;gap:6px}
+  .qbtns .btn{flex:1 1 0;min-width:0;white-space:nowrap;text-align:center;padding:10px 4px;font-size:12px}
+  .typetarget{font-size:22px;padding:9px 12px;min-height:44px}
+  .startbtn{font-size:15px;padding:14px 20px}
+  .countdown{font-size:clamp(38px,15vw,58px)}
   .credit{font-size:6px}
-  .overview{width:92px;height:80px;top:8px;right:8px}
-  svg#ovmap{height:60px}
   .typinglabel{display:none}
+  .ejucard{max-height:52%;width:calc(100% - 16px);padding:11px 13px;bottom:10px}
+  .ejucard li{font-size:13.5px}
+  .ejucard .qname h2{font-size:22px}
+  .opt{font-size:13.5px;padding:9px 11px}
 }
-/* landscape phones: shrink map so input stays reachable */
+/* 아주 좁은 화면 */
+@media(max-width:380px){
+  .stat .v{font-size:11px}
+  .qbtns .btn{font-size:11px;padding:9px 2px}
+  #answer{font-size:17px}
+  .seg button{padding:6px 7px;font-size:11px}
+}
+/* 휴대폰 가로: 세로 공간이 귀하므로 다시 좌우 배치하고 헤더를 최소화 */
 @media(max-height:520px) and (orientation:landscape){
   main{flex-direction:row}
-  .mapwrap{flex:1.4;height:auto}
-  aside{max-height:none;max-width:230px;border-top:0;border-left:2px solid var(--accent)}
-  header{padding:6px 10px}
+  .mapwrap{flex:1.5;height:auto}
+  aside{flex:.9;height:auto;max-height:none;max-width:220px;min-width:0;
+        border-top:0;border-left:2px solid var(--accent)}
+  /* 헤더를 한 줄로 눌러 담는다 — 세로 375px에서 헤더가 화면의 1/3을 먹던 문제 */
+  header{padding:5px 10px;gap:8px;flex-wrap:nowrap}
+  .brand{display:none}
+  .tools{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+         gap:5px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tools::-webkit-scrollbar{display:none}
+  .tools>*{flex:0 0 auto}
+  .seg button{padding:5px 8px;font-size:11px;white-space:nowrap}
+  .btn{padding:5px 8px;font-size:11px;white-space:nowrap}
+  .stats{flex:0 0 auto;width:auto;margin-left:0;gap:9px;flex-wrap:nowrap}
+  .stat{min-width:42px}
+  .stat .v{font-size:12px}
+  .stat .l{font-size:9px}
+  .typinglabel{display:none}
+  footer{padding:6px 10px 8px}
+  .inbar{flex-wrap:nowrap}
+  #answer{flex:1;font-size:17px;padding:9px 12px}
+  .qbtns{width:auto}
+  .progress{margin-top:6px}
+  .hint{margin-top:5px;font-size:11px}
+  .startbtn{font-size:14px;padding:11px 18px}
+  .overview{width:78px;height:68px}
+  svg#ovmap{height:50px}
 }
 /* ---- design + fx ---- */
 .typingstage{max-width:860px;margin:0 auto;position:relative}
@@ -409,8 +469,22 @@ function tweenVB(tv,dur=560){
     if(k<1)requestAnimationFrame(step); }
   requestAnimationFrame(step);
 }
+// bbox는 buildMap()의 requestAnimationFrame에서 채워진다. 그 전에 라운드가
+// 시작되면(탭이 백그라운드라 rAF가 미뤄진 경우 등) 여기서 예외가 나면서
+// 지도 확대·안내문·입력창 포커스가 통째로 건너뛰어졌다. 없으면 즉석에서 계산한다.
+function bboxOf(code){
+  let b=bbox[code];
+  if(!b){
+    const el=svg.querySelector(`path[data-code="${code}"]`);
+    if(!el) return null;
+    try{ const r=el.getBBox(); b=bbox[code]={x:r.x,y:r.y,w:r.width,h:r.height}; }
+    catch(e){ return null; }
+  }
+  return b;
+}
 function vbForTarget(code){
-  const b=bbox[code]; const pad=Math.max(b.w,b.h)*0.85+10;
+  const b=bboxOf(code); if(!b) return FULL_VB.slice();
+  const pad=Math.max(b.w,b.h)*0.85+10;
   let w=b.w+pad*2, h=b.h+pad*2;
   const ar=(svg.clientWidth||900)/(svg.clientHeight||600);
   if(w/h<ar) w=h*ar; else h=w/ar;

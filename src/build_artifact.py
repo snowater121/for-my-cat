@@ -105,11 +105,11 @@ sub('/* start screen + countdown */', r'''/* ===== 세계 데이터셋: 조밀�
 body.world text.lbl{font-size:6px}
 body.world #mode button[data-m="eju"]{display:none}
 /* ===== 기록·랭킹 패널 ===== */
-.recwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:20px;
+.recwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:14px;
   background:rgba(6,4,22,.72);backdrop-filter:blur(3px)}
 body:not(.dark) .recwrap{background:rgba(226,233,243,.8)}
 body.recopen .recwrap{display:flex}
-.recbox{width:min(720px,100%);max-height:min(86vh,720px);display:flex;flex-direction:column;
+.recbox{width:min(720px,100%);max-height:min(86dvh,720px);display:flex;flex-direction:column;
   background:var(--panel);border:3px solid var(--accent);border-radius:12px;box-shadow:7px 7px 0 var(--miss);overflow:hidden}
 .rechead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:13px 16px;border-bottom:2px solid var(--line);
   background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
