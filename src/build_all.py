@@ -42,9 +42,24 @@ lobby, n = re.subn(r"/\*SEASON\*/.*?/\*END\*/", lambda m: "/*SEASON*/" + season 
 assert n == 1, "index.html에 /*SEASON*/…/*END*/ 표시가 없음"
 io.open(os.path.join("..", "index.html"), "w", encoding="utf-8").write(lobby)
 
+# 로비 문제 예시 띠: 실제 특산물 데이터의 첫 단서 → 정답 (한국·일본 번갈아)
+sgg = json.load(io.open("specialty_kr_sgg.json", encoding="utf-8"))
+sp_jp, jpmap = json.load(io.open("specialty_jp.json", encoding="utf-8")), json.load(io.open("data.json", encoding="utf-8"))
+KR_PICK = ["이천", "보성", "성주", "완도", "안동", "영주"]
+JP_PICK = ["AOM", "WKM", "HRS", "ISH", "KCH", "OKY"]
+ticker = []
+for kr, jpc in zip(KR_PICK, JP_PICK):
+    ticker.append(["KR", sgg[kr]["clues"][0], kr])
+    ticker.append(["JP", sp_jp[jpc]["clues"][0], jpmap[jpc]["ko"]])
+lobby = io.open(os.path.join("..", "index.html"), encoding="utf-8").read()
+lobby, n = re.subn(r"/\*TICKER\*/.*?/\*END\*/", lambda m: "/*TICKER*/" + json.dumps(ticker, ensure_ascii=False) + "/*END*/", lobby, flags=re.S)
+assert n == 1, "index.html에 /*TICKER*/…/*END*/ 표시가 없음"
+io.open(os.path.join("..", "index.html"), "w", encoding="utf-8").write(lobby)
+
 # 서비스워커: 배포 파일 내용이 바뀌면 캐시 이름도 바뀌어 옛 캐시가 정리된다
 h = hashlib.sha1()
-for f in ("index.html", "arcade.html", "specialty.html", "manifest.webmanifest"):
+for f in ("index.html", "arcade.html", "specialty.html", "manifest.webmanifest",
+          "terms.html", "privacy.html", "legal.css", "shot-arcade.jpg", "shot-specialty.jpg"):
     h.update(io.open(os.path.join("..", f), "rb").read())
 sw = io.open("sw.template.js", encoding="utf-8").read().replace("__BUILD__", h.hexdigest()[:10])
 io.open(os.path.join("..", "sw.js"), "w", encoding="utf-8").write(sw)
