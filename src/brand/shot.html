@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+/* 게임 화면을 휴대폰 크기로 띄워 조작한 뒤, 지도 부분만 잘라 보이게 한다 (build_brand.py가 이 창을 찍는다) */
+html,body{margin:0;background:#1a0f42;overflow:hidden}
+#vp{position:relative;width:390px;height:300px;overflow:hidden}
+iframe{position:absolute;left:0;top:-118px;width:390px;height:844px;border:0}
+</style></head><body>
+<div id="vp"><iframe id="f"></iframe></div>
+<script>
+const P=new URLSearchParams(location.search).get("p");
+const f=document.getElementById("f");
+f.src="../../"+P+".html";
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+f.onload=async()=>{
+  const w=f.contentWindow, run=code=>w.eval(code);
+  await wait(1600);                                   // CRT 인트로가 끝날 때까지
+  run('try{localStorage.clear()}catch(e){}; soundOn=false;');
+  if(P==="arcade"){
+    // 자유 채우기: 일본 지도에 맞힌 도도부현이 지방색으로 채워지는 장면
+    run(`document.querySelector('#mode button[data-m="free"]').click(); document.getElementById("startbtn").click();`);
+    await wait(3300);
+    run(`["HOK","AOM","IWT","MGI","AKI","YGT","FSH","TKY","KNG","STM","CHB","IBR","TCG","GNM","AIC","SZK","GIF","NGN","YMN","KYO","OSK","HYG","NRA","SHG","MIE","WKM","HRS","OKY","FKO","NGS","KMT","KGS","OKN"]
+          .forEach(c=>{found.add(c); markFound(c);}); updateStats();
+          const lb=document.getElementById("showlbl"); lb.checked=true; lb.dispatchEvent(new Event("change"));
+          input.value="에히메";`);
+  } else {
+    // 특산물 → 지역: '이천' 문제가 떠 있는 장면
+    run(`const code=Object.keys(DATA).find(c=>DATA[c].ko==="이천");
+         document.getElementById("startbtn").click();
+         queue=[code].concat(queue.filter(c=>c!==code));`);
+    await wait(3600);
+    run(`input.value="이천";`);
+  }
+  await wait(1400);
+  // 입력창에 글자를 넣으면 브라우저가 입력창 쪽으로 스크롤한다 → 되돌리고 원하는 부분만 보이게 자른다
+  run(`input.blur(); document.scrollingElement.scrollTop=0; document.body.scrollTop=0;`);
+  f.style.top=(P==="arcade"?-118:-250)+"px";          // 지도 전체 / 확대된 지역 + 단서 카드
+  // iframe 안에서 포커스가 움직이면 바깥 틀도 따라 스크롤된다 → 바깥도 되돌린다
+  const vp=document.getElementById("vp"); vp.scrollTop=0; vp.scrollLeft=0; scrollTo(0,0);
+  await wait(300);
+  document.title="ready";
+};
+</script></body></html>
