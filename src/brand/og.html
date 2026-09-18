@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@700;900&display=block" rel="stylesheet">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden}
+body{position:relative;background:linear-gradient(180deg,#120a2e 0%,#2a0f4e 45%,#5b1670 80%,#7a1e63 100%);font-family:"Noto Sans KR",sans-serif;color:#fff}
+.sun{position:absolute;left:50%;top:250px;width:420px;height:420px;margin-left:-210px;border-radius:50%;
+  background:linear-gradient(180deg,#ffe14d,#ff6ec7 60%,#ff2e93);opacity:.55;
+  -webkit-mask:repeating-linear-gradient(#000 0 18px,transparent 18px 26px);filter:drop-shadow(0 0 40px #ff2e93)}
+.floor{position:absolute;left:-50%;bottom:-40px;width:200%;height:260px;transform:perspective(300px) rotateX(62deg);transform-origin:bottom;
+  background-image:linear-gradient(#ff2e9366 2px,transparent 2px),linear-gradient(90deg,#ff2e9355 2px,transparent 2px);background-size:48px 48px;
+  -webkit-mask:linear-gradient(180deg,transparent,#000 50%)}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 3px,#0000002a 3px 4px)}
+.wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:62px;gap:0;text-align:center}
+.coin{font-family:"Press Start 2P";font-size:16px;color:#59ffd0;letter-spacing:3px}
+h1{margin:22px 0 0;font-family:"Press Start 2P";font-weight:400;font-size:78px;line-height:1;color:#ffe14d;text-shadow:6px 6px 0 #ff2e93,11px 11px 0 #0006}
+.sub{margin-top:30px;font-size:40px;font-weight:900;text-shadow:3px 3px 0 #0008}
+.chips{display:flex;gap:14px;margin-top:30px}
+.chip{font-size:24px;font-weight:700;background:#0a0620cc;border:3px solid #ffe14d;border-radius:12px;padding:10px 18px;box-shadow:5px 5px 0 #ff2e93}
+.chip.alt{border-color:#59ffd0;box-shadow:5px 5px 0 #2bd3ff}
+.url{position:absolute;bottom:24px;width:100%;text-align:center;font-size:20px;font-weight:700;color:#ffffffb0}
+</style></head><body>
+<div class="sun"></div><div class="floor"></div>
+<div class="wrap">
+  <div class="coin">◆ INSERT COIN ◆</div>
+  <h1>GEO ARCADE</h1>
+  <div class="sub">지도·특산물 타이핑으로 외우는 지리</div>
+  <div class="chips">
+    <span class="chip">🗾 일본 47</span><span class="chip">🏘️ 한국 시·군 167</span><span class="chip">🌍 세계 256</span>
+    <span class="chip alt">🍊 특산물 퀴즈</span>
+  </div>
+</div>
+<div class="url">snowater121.github.io/for-my-cat</div>
+<div class="scan"></div>
+</body></html>

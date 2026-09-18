@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=block" rel="stylesheet">
+<style>
+/* 512×512 기준. 마스커블 아이콘 안전영역(가운데 80%) 안에 내용을 둔다 */
+html,body{margin:0;width:512px;height:512px;overflow:hidden}
+body{position:relative;background:linear-gradient(180deg,#1a0f42 0%,#3d1163 55%,#7a1e63 100%)}
+.sun{position:absolute;left:96px;top:118px;width:320px;height:320px;border-radius:50%;
+  background:linear-gradient(180deg,#ffe14d,#ff6ec7 60%,#ff2e93);-webkit-mask:repeating-linear-gradient(#000 0 22px,transparent 22px 32px)}
+.floor{position:absolute;left:-50%;bottom:-20px;width:200%;height:170px;transform:perspective(220px) rotateX(60deg);transform-origin:bottom;
+  background-image:linear-gradient(#59ffd0aa 3px,transparent 3px),linear-gradient(90deg,#59ffd099 3px,transparent 3px);background-size:44px 44px}
+.t{position:absolute;left:0;right:0;top:180px;text-align:center;font-family:"Press Start 2P";font-size:100px;color:#ffe14d;
+  text-shadow:8px 8px 0 #ff2e93,14px 14px 0 #0007}
+</style></head><body><div class="sun"></div><div class="floor"></div><div class="t">GEO</div></body></html>

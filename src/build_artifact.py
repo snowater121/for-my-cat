@@ -90,6 +90,8 @@ PAGES = {
                ["kr","quiz"],["kr","type"],["kr","free"],
                ["kr_sgg","quiz"],["kr_sgg","type"],["kr_sgg","free"],
                ["world","quiz"],["world","type"],["world","free"]],
+    "file": "arcade.html",
+    "og_desc": "일본 47 도도부현 · 한국 시·도 16 · 시·군 167 · 세계 256개국 — 지도 위 지역 이름을 타이핑해서 외우는 아케이드 게임",
     "standalone": os.path.join("..", "arcade.html"),
     "artifact": os.path.join("..", "artifact", "geo_arcade.html"),
   },
@@ -101,10 +103,20 @@ PAGES = {
     "ejudir_label": ["🍊 특산물 → 지역", "📍 지역 → 특산물"],
     "boards": [["kr_sgg_sp","eju_name"],["kr_sgg_sp","eju_feat"],
                ["kr_sp","eju_name"],["kr_sp","eju_feat"],["jp_sp","eju_name"],["jp_sp","eju_feat"]],
+    "file": "specialty.html",
+    "og_desc": "이천 쌀, 보성 녹차, 아오모리 사과 — 특산물·랜드마크를 보고 한국 시·군과 일본 도도부현을 맞히는 퀴즈",
     "standalone": os.path.join("..", "specialty.html"),
     "artifact": None,
   },
 }
+# 이달의 특집 — 제철·축제 시·군 묶음. 이름은 korea_sgg.json의 표시명이어야 한다.
+SEASON = load("season.json")
+_sgg_names = {v["ko"] for v in korea_sgg.values()}
+for _s in SEASON:
+    _bad = [n for n in _s["names"] if n not in _sgg_names]
+    assert not _bad, "season.json %d월: 지도에 없는 이름 %s" % (_s["m"], _bad)
+assert sorted(x["m"] for x in SEASON) == list(range(1, 13)), "season.json: 1~12월이 모두 있어야 함"
+
 CFG = PAGES[PAGE]
 DATASETS = {k: CATALOG[k] for k in CFG["datasets"]}
 DEF = CFG["default"]
@@ -569,6 +581,10 @@ loadDataset(__DEFAULT__);
 renderRecords();
 connectDB();''')
 
+# ---------------------------------------------------------------- 7b. 공유·재방문 기능 (growth.js / growth.css)
+sub('/* start screen + countdown */', io.open('growth.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
+sub("connectDB();\n</script>", "connectDB();\n" + io.open('growth.js', encoding='utf-8').read() + "\n</script>")
+
 # ---------------------------------------------------------------- 8. Artifact 본문으로 변환
 sub("<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"utf-8\">\n"
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n", "")
@@ -581,8 +597,11 @@ H = H.replace("__MODE_LABEL__", json.dumps(CFG["mode_label"], ensure_ascii=False
 H = H.replace("__BOARDS__", json.dumps(CFG["boards"]))
 H = H.replace("__PAGE_MODES__", json.dumps(CFG["modes"]))
 H = H.replace("__DEFAULT__", json.dumps(DEF))
+H = H.replace("__PAGE_FILE__", json.dumps(CFG["file"]))
+H = H.replace("__SEASON__", json.dumps(SEASON, ensure_ascii=False))
 
 for tok in ["__DATA__", "__EJU__", "__DATASETS__", "__MODE_LABEL__", "__BOARDS__", "__PAGE_MODES__", "__DEFAULT__",
+            "__PAGE_FILE__", "__SEASON__",
             "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
     assert tok not in H, "남아있는 토큰: " + tok
 
@@ -591,11 +610,32 @@ def mb(t):
 
 # GitHub Pages 배포용 단독 HTML — Artifact 호스트가 붙여주는 head 골격을 직접 포함한다.
 # (db가 없는 환경이므로 기록은 자동으로 localStorage 단독으로 동작)
+SITE = "https://snowater121.github.io/for-my-cat/"
+HEAD_META = (
+    '<meta name="description" content="%(d)s">\n'
+    '<meta property="og:type" content="website">\n'
+    '<meta property="og:site_name" content="GEO ARCADE">\n'
+    '<meta property="og:title" content="%(t)s">\n'
+    '<meta property="og:description" content="%(d)s">\n'
+    '<meta property="og:url" content="%(u)s">\n'
+    '<meta property="og:image" content="%(s)sog.png">\n'
+    '<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
+    '<meta name="twitter:card" content="summary_large_image">\n'
+    '<meta name="theme-color" content="#1a0f42">\n'
+    '<link rel="manifest" href="manifest.webmanifest">\n'
+    '<link rel="icon" type="image/png" href="icon-192.png">\n'
+    '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n'
+    '<meta name="apple-mobile-web-app-capable" content="yes">\n'
+    '<meta name="apple-mobile-web-app-title" content="GEO ARCADE">\n'
+) % {"d": CFG["og_desc"], "t": CFG["standalone_title"], "u": SITE + CFG["file"], "s": SITE}
+SW_REGISTER = ('<script>if("serviceWorker" in navigator){addEventListener("load",function(){'
+               'navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>\n')
 wrap = ('<!DOCTYPE html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        + HEAD_META
         + H.replace("<title>%s</title>" % CFG["title"], "<title>%s</title>" % CFG["standalone_title"], 1)
            .replace("</style>\n", "</style>\n</head>\n<body>\n", 1)
-        + "\n</body>\n</html>\n")
+        + "\n" + SW_REGISTER + "</body>\n</html>\n")
 io.open(CFG["standalone"], "w", encoding="utf-8").write(wrap)
 print("written %s — %.2f MB (%s)" % (CFG["standalone"], mb(wrap),
       ", ".join("%s %d" % (DATASETS[k]["label"], len(DATASETS[k]["data"])) for k in DATASETS)))

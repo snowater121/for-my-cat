@@ -1,0 +1,16 @@
+{
+  "name": "GEO ARCADE · 지리 메모리",
+  "short_name": "GEO ARCADE",
+  "description": "지도·특산물 타이핑으로 외우는 지리 게임 — 일본 47 · 한국 시·군 167 · 세계 256",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a0f42",
+  "theme_color": "#1a0f42",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
