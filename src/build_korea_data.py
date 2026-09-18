@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-build_korea_data.py — 한국 17개 시·도 지도 데이터(korea.json) 생성.
+build_korea_data.py — 한국 16개 광역자치단체 지도 데이터(korea.json) 생성.
 
 원본: npm @svg-maps/south-korea 2.0.0 (MapSVG 기반, CC BY 4.0)
       https://registry.npmjs.org/@svg-maps/south-korea/-/south-korea-2.0.0.tgz
@@ -8,7 +8,7 @@ build_korea_data.py — 한국 17개 시·도 지도 데이터(korea.json) 생�
   ko     화면 표시용 약칭 (서울, 경기, 충북 …)
   kanji  일본어 표기 (日本語 토글에서 표시)
 """
-import io, json, os, tarfile, urllib.request
+import io, json, os, re, tarfile, urllib.request
 
 URL = "https://registry.npmjs.org/@svg-maps/south-korea/-/south-korea-2.0.0.tgz"
 CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache_south-korea-2.0.0.tgz")
@@ -55,5 +55,26 @@ for sid, code, ko, ko_extra, kanji, kanji_extra, kana, romaji, region in ROWS:
                  "region": region, "accepted": list(dict.fromkeys(acc)), "d": d}
 assert not paths, "매핑 안 된 지역: %s" % list(paths)
 
+
+def absolute_start(d):
+    """경로 첫 'm x,y dx,dy …'를 'M x,y l dx,dy …'로 바꾼다.
+    다른 경로 뒤에 이어 붙이면 첫 m이 앞 도형 기준 상대좌표가 되어 엉뚱한 곳에 그려지기 때문."""
+    m = re.match(r"\s*m\s*([-\d.]+)[ ,]([-\d.]+)\s*", d)
+    assert m, d[:30]
+    rest = d[m.end():]
+    return "M %s,%s " % (m.group(1), m.group(2)) + ("l " + rest if rest[:1] not in "mMzZlLhHvVcCsSqQtTaA" else rest)
+
+# 2026-07-01 광주광역시 + 전라남도 → 전남광주통합특별시 (첫 광역자치단체 통합)
+gw, jn = out.pop("GWJ"), out.pop("JLN")
+out["JNG"] = {
+    "ko": "전남광주", "kanji": "全南光州", "kana": "ちょんなむくぁんじゅ", "romaji": "Jeonnam-Gwangju",
+    "region": "호남",
+    "accepted": ["전남광주", "전남광주통합특별시", "전남광주특별시", "全南光州", "全南光州統合特別市",
+                 "ちょんなむくぁんじゅ", "jeonnam-gwangju", "jeonnamgwangju",
+                 # 통합 전 이름도 정답으로 받는다 (익숙한 이름으로 입력해도 맞게)
+                 "전라남도", "전남", "광주광역시", "광주", "全羅南道", "光州", "jeonnam", "gwangju"],
+    "d": jn["d"].rstrip() + " z " + absolute_start(gw["d"]) + " z",
+}
+
 io.open("korea.json", "w", encoding="utf-8").write(json.dumps(out, ensure_ascii=False))
-print("korea.json — %d개 시·도" % len(out))
+print("korea.json — %d개 시·도 (2026-07 전남광주 통합 반영)" % len(out))
