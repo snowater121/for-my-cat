@@ -229,3 +229,52 @@ python3 build_artifact.py      # ../geo_arcade.html 과 ../artifact/geo_arcade.h
     rAF가 미뤄진 경우 등) `beginRound()` 안에서 예외가 나면서 **지도 확대·안내문·입력창
     포커스가 통째로 건너뛰어진다.** 증상은 "게임은 도는데 문제 번호가 초기값 그대로".
     `bboxOf()`를 거쳐 없으면 즉석에서 `getBBox()`로 계산하도록 방어했다.
+
+---
+
+## 12. 2026-09-18 — 로비 + 지역 특산물 + 한국 지도
+
+### 12.1 페이지 구성 (바뀜)
+```
+index.html          로비 (손으로 관리) — 카드 2장: 지도 타이핑 / 지역 특산물
+arcade.html         지도 타이핑: 일본 47 · 한국 17 · 세계 256   ← build_artifact.py arcade
+specialty.html      지역 특산물: 한국 17 · 일본 47              ← build_artifact.py specialty
+artifact/geo_arcade.html   arcade와 같은 내용의 Artifact 본문 (로비 버튼만 뺌)
+japan_prefectures_metro.html / world_countries_metro.html   예전 단독판 (그대로 유지)
+```
+예전 로비 `lobby.html`은 새 `index.html`로 바뀌었다(디자인 그대로, 카드만 교체).
+
+### 12.2 빌드
+```bash
+cd src && python3 build_all.py
+```
+`build_all.py`가 korea.json(없을 때만) → 두 단독판 → arcade → specialty 순으로 전부 만든다.
+
+### 12.3 한국 지도
+- `build_korea_data.py` → `korea.json`. 원본은 npm `@svg-maps/south-korea` 2.0.0
+  (MapSVG 기반, **CC BY 4.0 — 출처 표기 필요**, 로비 하단에 표기함). tarball은
+  `src/.cache_*.tgz`에 캐시(gitignore).
+- 표시명은 약칭(서울·경기·충북…), 정답은 정식 명칭·옛 명칭·영문·일본어까지 인정
+  (예: 전북 = 전라북도 = 전북특별자치도 = 全羅北道 = Jeonbuk).
+- 권역: 수도권 / 강원 / 충청 / 호남 / 영남 / 제주.
+
+### 12.4 특산물 데이터
+- `specialty_kr.json`(17), `specialty_jp.json`(47). 항목 형식은 `{cat, clues[3], detail}`.
+  ko/kanji/region은 빌더가 지도 데이터에서 채운다.
+- **clues[0]은 '지역 → 특산물' 4지선다의 정답 보기로도 쓰인다.** 가장 대표적인 특징을 둘 것.
+- 빌더가 **단서에 정답 지역명이 들어갔는지 검사**한다(약칭·정식명·한자 어간). 걸리면 빌드 실패.
+- 순위 주장("생산량 일본 1위")은 확실한 것만 넣었다. 녹차는 가고시마가 시즈오카를
+  추월한 해가 있어 순위 없이 "대표 산지"로 썼다.
+- 특산물 페이지는 기존 EJU 모드 엔진을 그대로 쓴다: `DATASETS[k].eju`에 특산물 단서를 끼움.
+
+### 12.5 빌더 일반화
+`build_artifact.py`는 이제 `PAGES` 설정으로 페이지를 찍어낸다(담을 지도, 쓸 모드, 기본값,
+기록판 구성, 출력 위치). 데이터셋 성격은 플래그로: `dense`(라벨 6px), EJU 단서 없음 →
+`body.noeju`로 EJU 버튼 숨김.
+- 기록 키: EJU/특산물 모드는 방향별로 따로 — `<ds>_eju_name`, `<ds>_eju_feat`.
+  특산물 페이지의 데이터셋 키는 `kr_sp`, `jp_sp`라 지도 타이핑 기록과 섞이지 않는다.
+- localStorage는 두 페이지가 공유(누적 통계는 합산, 기록판·약점은 각 페이지 것만 표시).
+
+### 12.6 모바일
+EJU·특산물 모드에서는 휴대폰(≤600px)일 때 지역 패널을 접는다. 단서 카드가 지도 아래를
+덮어서 확대된 목표 지역이 카드 뒤로 숨고 세 번째 단서가 잘렸기 때문.

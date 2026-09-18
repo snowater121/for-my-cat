@@ -1,4 +1,9 @@
-<title>GEO ARCADE</title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEO ARCADE · 지도 타이핑</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
@@ -414,6 +419,8 @@ body:not(.dark) .startscreen{background:rgba(240,244,250,.72)}
 .countdown.pulse{animation:cdpop .55s ease}
 @keyframes cdpop{0%{transform:scale(.3);opacity:0}55%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:.95}}
 </style>
+</head>
+<body>
 <div id="crton"><div class="bar top"></div><div class="bar bot"></div><div class="seam"></div><div class="noise"></div></div>
 <header>
   <div class="brand"><span id="brandtxt">🗾 일본 도도부현 메모리</span><small id="modehint">이름을 타이핑하세요</small></div>
@@ -432,6 +439,7 @@ body:not(.dark) .startscreen{background:rgba(240,244,250,.72)}
       <button data-d="name" class="on">특징→지역</button>
       <button data-d="feat">지역→특징</button>
     </div>
+    <a class="btn" id="lobbybtn" href="index.html" title="로비로">🏠</a>
     <div class="seg" id="dset">
       <button data-ds="jp" class="on">🗾 일본</button>
       <button data-ds="kr">🇰🇷 한국</button>
@@ -1297,3 +1305,6 @@ renderRecords();
 connectDB();
 </script>
 <div class="credit">제작자 : @konomiwosawagou</div>
+
+</body>
+</html>

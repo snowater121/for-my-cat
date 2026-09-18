@@ -1,39 +1,97 @@
 # -*- coding: utf-8 -*-
 """
-build_artifact.py — 일본 + 세계를 한 페이지에 담고 기록/랭킹판을 붙인 Artifact 빌드.
+build_artifact.py — 여러 지도를 한 페이지에 담고 기록/랭킹판을 붙인 페이지를 만든다.
 
-build_html2.py 의 HTML 템플릿을 읽어 문자열 치환으로 변환한다.
-출력: ../artifact/geo_arcade.html  (Artifact 본문 — doctype/html/head/body 태그 없음)
+  python3 build_artifact.py arcade     → ../arcade.html (+ ../artifact/geo_arcade.html)
+  python3 build_artifact.py specialty  → ../specialty.html
+
+build_html2.py 의 HTML 템플릿을 읽어 문자열 치환으로 변환한다. 페이지마다 다른 것은
+아래 PAGES 설정(어떤 지도를 담는지, 어떤 모드를 쓰는지, 기록판 구성, 출력 위치)뿐이다.
+보통은 build_all.py 로 전부 한 번에 빌드한다.
 """
-import json, re, io, os
+import json, re, io, os, sys
+
+PAGE = sys.argv[1] if len(sys.argv) > 1 else "arcade"
 
 src = io.open('build_html2.py', encoding='utf-8').read()
 H = re.search(r"HTML = r'''(.*?)'''", src, re.S).group(1)
 
-jp    = json.load(io.open('data.json',  encoding='utf-8'))
-eju   = json.load(io.open('eju.json',   encoding='utf-8'))
-world = json.load(io.open('world.json', encoding='utf-8'))
+def load(path):
+    return json.load(io.open(path, encoding='utf-8'))
 
-DATASETS = {
-  "jp": {
-    "label": "일본", "icon": "🗾", "brand": "일본 도도부현 메모리",
-    "vb": [-40, -5, 650, 546],
-    "altLang": "日本語", "altHint": "日本語で入力（漢字・かな・ローマ字）",
-    "regionOrder": ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"],
-    "regionColor": {"홋카이도":"#4E79A7","도호쿠":"#59A14F","간토":"#E15759","주부":"#F28E2B",
-                    "간사이":"#B07AA1","주고쿠":"#76B7B2","시코쿠":"#E6B800","규슈":"#FF7CA0","오키나와":"#00B8D4"},
-    "data": jp, "eju": eju,
+jp, eju, world, korea = load('data.json'), load('eju.json'), load('world.json'), load('korea.json')
+
+JP_REGIONS = ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"]
+JP_COLORS  = {"홋카이도":"#4E79A7","도호쿠":"#59A14F","간토":"#E15759","주부":"#F28E2B",
+              "간사이":"#B07AA1","주고쿠":"#76B7B2","시코쿠":"#E6B800","규슈":"#FF7CA0","오키나와":"#00B8D4"}
+KR_REGIONS = ["수도권","강원","충청","호남","영남","제주"]
+KR_COLORS  = {"수도권":"#E15759","강원":"#59A14F","충청":"#F28E2B","호남":"#B07AA1","영남":"#4E79A7","제주":"#00B8D4"}
+
+
+def specialty(mapdata, path):
+    """특산물 단서 파일을 EJU 엔진 형식으로 바꾼다. 지도 데이터에서 ko/kanji/region을 채우고,
+    단서에 정답 지역명이 새어 나가지 않았는지 검사한다."""
+    clues = load(path)
+    assert set(clues) == set(mapdata), "%s: 지도와 코드 불일치 %s" % (path, set(clues) ^ set(mapdata))
+    out = {}
+    for code, c in clues.items():
+        m = mapdata[code]
+        assert c.get("cat") and c.get("detail") and len(c.get("clues", [])) >= 3, "%s %s: 항목 부족" % (path, code)
+        names = {m["ko"], re.sub("[県府都]$", "", m["kanji"])}
+        names |= {a for a in m["accepted"] if re.fullmatch("[가-힣]{2,}", a)}
+        for clue in c["clues"]:
+            for n in names:
+                assert n not in clue, "%s %s: 단서에 정답 '%s'가 들어 있음 — %s" % (path, code, n, clue)
+        out[code] = dict(c, ko=m["ko"], kanji=m["kanji"], region=m["region"])
+    return out
+
+
+CATALOG = {
+  "jp":    {"label": "일본", "icon": "🗾", "brand": "일본 도도부현 메모리", "vb": [-40, -5, 650, 546],
+            "altLang": "日本語", "altHint": "日本語で入力（漢字・かな・ローマ字）",
+            "regionOrder": JP_REGIONS, "regionColor": JP_COLORS, "data": jp, "eju": eju},
+  "kr":    {"label": "한국", "icon": "🇰🇷", "brand": "한국 시·도 메모리", "vb": [0, 0, 524, 631],
+            "altLang": "日本語", "altHint": "日本語で入力（漢字・かな）",
+            "regionOrder": KR_REGIONS, "regionColor": KR_COLORS, "data": korea, "eju": {}},
+  "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "vb": [0, 0, 1010, 666],
+            "altLang": "English", "altHint": "영어(English)로 입력", "dense": True,
+            "regionOrder": ["아시아","유럽","아프리카","북·중미","남아메리카","오세아니아","기타"],
+            "regionColor": {"아시아":"#E15759","유럽":"#4E79A7","아프리카":"#F28E2B","북·중미":"#59A14F",
+                            "남아메리카":"#B07AA1","오세아니아":"#76B7B2","기타":"#9aa4b2"},
+            "data": world, "eju": {}},
+}
+# 특산물 페이지용: 같은 지도에 특산물 단서를 EJU 엔진 자리에 끼운다
+CATALOG["kr_sp"] = dict(CATALOG["kr"], brand="한국 · 지역 특산물", eju=specialty(korea, "specialty_kr.json"))
+CATALOG["jp_sp"] = dict(CATALOG["jp"], brand="일본 · 지역 특산물", eju=specialty(jp, "specialty_jp.json"))
+
+PAGES = {
+  "arcade": {
+    "title": "GEO ARCADE", "standalone_title": "GEO ARCADE · 지도 타이핑",
+    "datasets": ["jp", "kr", "world"], "default": "jp",
+    "modes": ["free", "quiz", "type", "eju"], "default_mode": "quiz",
+    "mode_label": {"quiz": "지목 퀴즈", "free": "자유 채우기", "type": "타자 연습",
+                   "eju_name": "EJU 특징→지역", "eju_feat": "EJU 지역→특징"},
+    "ejudir_label": ["특징→지역", "지역→특징"],
+    "boards": [["jp","quiz"],["jp","eju_name"],["jp","eju_feat"],["jp","type"],["jp","free"],
+               ["kr","quiz"],["kr","type"],["kr","free"],
+               ["world","quiz"],["world","type"],["world","free"]],
+    "standalone": os.path.join("..", "arcade.html"),
+    "artifact": os.path.join("..", "artifact", "geo_arcade.html"),
   },
-  "world": {
-    "label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리",
-    "vb": [0, 0, 1010, 666],
-    "altLang": "English", "altHint": "영어(English)로 입력",
-    "regionOrder": ["아시아","유럽","아프리카","북·중미","남아메리카","오세아니아","기타"],
-    "regionColor": {"아시아":"#E15759","유럽":"#4E79A7","아프리카":"#F28E2B","북·중미":"#59A14F",
-                    "남아메리카":"#B07AA1","오세아니아":"#76B7B2","기타":"#9aa4b2"},
-    "data": world, "eju": {},
+  "specialty": {
+    "title": "지역 특산물", "standalone_title": "GEO ARCADE · 지역 특산물",
+    "datasets": ["kr_sp", "jp_sp"], "default": "kr_sp",
+    "modes": ["eju"], "default_mode": "eju",
+    "mode_label": {"eju_name": "특산물 보고 지역", "eju_feat": "지역 보고 특산물"},
+    "ejudir_label": ["🍊 특산물 → 지역", "📍 지역 → 특산물"],
+    "boards": [["kr_sp","eju_name"],["kr_sp","eju_feat"],["jp_sp","eju_name"],["jp_sp","eju_feat"]],
+    "standalone": os.path.join("..", "specialty.html"),
+    "artifact": None,
   },
 }
+CFG = PAGES[PAGE]
+DATASETS = {k: CATALOG[k] for k in CFG["datasets"]}
+DEF = CFG["default"]
 
 def sub(old, new, count=1):
     """치환이 실제로 일어났는지 반드시 검증한다 (템플릿이 바뀌면 즉시 실패)."""
@@ -45,16 +103,16 @@ def sub(old, new, count=1):
 # ---------------------------------------------------------------- 1. 데이터셋
 sub("const DATA = __DATA__;\nconst EJU = __EJU__;",
     "const DATASETS = __DATASETS__;\n"
-    "let CURRENT = \"jp\";\n"
-    "let DATA = DATASETS.jp.data, EJU = DATASETS.jp.eju;")
+    "let CURRENT = \"%s\";\n"
+    "let DATA = DATASETS[CURRENT].data, EJU = DATASETS[CURRENT].eju;" % DEF)
 
 sub('const REGION_ORDER = ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"];\n'
     'const REGION_COLOR = {\n'
     ' "홋카이도":"#4E79A7","도호쿠":"#59A14F","간토":"#E15759","주부":"#F28E2B",\n'
     ' "간사이":"#B07AA1","주고쿠":"#76B7B2","시코쿠":"#E6B800","규슈":"#FF7CA0","오키나와":"#00B8D4"\n'
     '};',
-    'let REGION_ORDER = DATASETS.jp.regionOrder;\n'
-    'let REGION_COLOR = DATASETS.jp.regionColor;')
+    'let REGION_ORDER = DATASETS[CURRENT].regionOrder;\n'
+    'let REGION_COLOR = DATASETS[CURRENT].regionColor;')
 
 sub("const CODES = Object.keys(DATA);\n"
     "const TOTAL = CODES.length;\n"
@@ -62,7 +120,7 @@ sub("const CODES = Object.keys(DATA);\n"
     "let ROUND = TOTAL;\n"
     "const FULL_VB=[-40,-5,650,546];",
     "let CODES = [], TOTAL = 0, EJU_CODES = [], ROUND = 0;\n"
-    "let FULL_VB = DATASETS.jp.vb.slice();\n"
+    "let FULL_VB = DATASETS[CURRENT].vb.slice();\n"
     "function ALTHINT(){ return DATASETS[CURRENT].altHint; }")
 
 sub("const LOOKUP = {};\nfor(const code in DATA){ for(const a of DATA[code].accepted){ LOOKUP[norm(a)] = code; } }",
@@ -88,22 +146,37 @@ sub(RAF, RAF + "\n}")
 
 # ---------------------------------------------------------------- 3. 헤더 UI
 sub('  <div class="brand">🗾 일본 도도부현 메모리<small id="modehint">이름을 타이핑하세요</small></div>',
-    '  <div class="brand"><span id="brandtxt">🗾 일본 도도부현 메모리</span><small id="modehint">이름을 타이핑하세요</small></div>')
+    '  <div class="brand"><span id="brandtxt">%s %s</span><small id="modehint">이름을 타이핑하세요</small></div>'
+    % (DATASETS[DEF]["icon"], DATASETS[DEF]["brand"]))
 
 sub('    <a class="btn" href="index.html" title="로비로">🏠 로비</a>\n'
     '    <a class="btn" id="switchbtn" href="world_countries_metro.html" title="세계 버전으로">🌍 세계</a>\n',
+    '    <a class="btn" id="lobbybtn" href="index.html" title="로비로">🏠</a>\n'
     '    <div class="seg" id="dset">\n'
-    '      <button data-ds="jp" class="on">🗾 일본</button>\n'
-    '      <button data-ds="world">🌍 세계</button>\n'
-    '    </div>\n'
+    + "".join('      <button data-ds="%s"%s>%s %s</button>\n'
+              % (k, ' class="on"' if k == DEF else '', DATASETS[k]["icon"], DATASETS[k]["label"]) for k in DATASETS)
+    + '    </div>\n'
     '    <button class="btn" id="recbtn" title="기록·랭킹">🏆 기록</button>\n')
 
 sub('      <button data-l="ja">日本語</button>', '      <button data-l="ja" id="altlangbtn">日本語</button>')
 
+# ---------------------------------------------------------------- 3b. 페이지별 모드 구성
+sub('let mode="quiz", lang="ko", ejuDir="name";', 'let mode="%s", lang="ko", ejuDir="name";' % CFG["default_mode"])
+if CFG["default_mode"] != "quiz":
+    sub('      <button data-m="quiz" class="on">', '      <button data-m="quiz">')
+    sub('      <button data-m="%s">' % CFG["default_mode"], '      <button data-m="%s" class="on">' % CFG["default_mode"])
+sub('      <button data-d="name" class="on">특징→지역</button>', '      <button data-d="name" class="on">%s</button>' % CFG["ejudir_label"][0])
+sub('      <button data-d="feat">지역→특징</button>', '      <button data-d="feat">%s</button>' % CFG["ejudir_label"][1])
+HIDE_MODES = "".join('#mode button[data-m="%s"]{display:none}\n' % m for m in ["free","quiz","type","eju"] if m not in CFG["modes"])
+if len(CFG["modes"]) == 1:
+    HIDE_MODES += "#mode{display:none !important}\n"
+if PAGE == "specialty":
+    sub('<div class="q">🎓 하이라이트된 이 지역의 이름은?</div>', '<div class="q">📍 하이라이트된 이 지역의 이름은?</div>')
+
 # ---------------------------------------------------------------- 4. 기록 CSS
-sub('/* start screen + countdown */', r'''/* ===== 세계 데이터셋: 조밀한 지도용 라벨 축소 · EJU 숨김 ===== */
-body.world text.lbl{font-size:6px}
-body.world #mode button[data-m="eju"]{display:none}
+sub('/* start screen + countdown */', HIDE_MODES + r'''/* ===== 데이터셋 성격: 조밀한 지도는 라벨 축소, EJU 단서가 없으면 EJU 모드 숨김 ===== */
+body.dense text.lbl{font-size:6px}
+body.noeju #mode button[data-m="eju"]{display:none}
 /* ===== 기록·랭킹 패널 ===== */
 .recwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:14px;
   background:rgba(6,4,22,.72);backdrop-filter:blur(3px)}
@@ -265,8 +338,11 @@ sub('buildPanel(); resetGame();', r'''/* =======================================
    저장소: db(공유 랭킹) 가능하면 db + localStorage, 아니면 localStorage 단독
    ======================================================================= */
 const REC_KEY="geoarcade.player.v2";
-const MODE_LABEL={quiz:"지목 퀴즈",free:"자유 채우기",type:"타자 연습",eju:"EJU 지역"};
-const BOARD_ORDER=[["jp","quiz"],["jp","eju"],["jp","type"],["jp","free"],["world","quiz"],["world","type"],["world","free"]];
+const MODE_LABEL=__MODE_LABEL__;
+const BOARD_ORDER=__BOARDS__;
+const PAGE_MODES=__PAGE_MODES__;
+// EJU(특산물) 모드는 방향(특징→지역 / 지역→특징)마다 난이도가 달라 기록을 따로 낸다
+function modeKey(){ return mode==="eju" ? "eju_"+ejuDir : mode; }
 
 function blankPlayer(){ return {name:"",best:{},misses:{},stats:{plays:0,clears:0,totalMs:0,correct:0,wrong:0,bestStreak:0},at:0}; }
 let P=blankPlayer();
@@ -302,7 +378,7 @@ const REC={
            if(code&&DATA[code]) P.misses[CURRENT+":"+code]=(P.misses[CURRENT+":"+code]||0)+1; },
   finish(cleared){
     if(!startedAt) return;
-    const ms=Date.now()-startedAt, key=CURRENT+"_"+mode;
+    const ms=Date.now()-startedAt, key=CURRENT+"_"+modeKey();
     P.stats.plays++; P.stats.totalMs+=ms; if(cleared) P.stats.clears++;
     const prev=P.best[key];
     const better=!prev||found.size>prev.found||(found.size===prev.found&&ms<prev.ms);
@@ -406,9 +482,9 @@ function renderRecords(){ renderBoard(); renderMiss(); renderStat(); }
 function renderBestStrip(){
   const el=document.getElementById("beststrip"); if(!el) return;
   const items=[];
-  for(const md of ["quiz","eju","type","free"]){
-    if(CURRENT==="world"&&md==="eju") continue;
-    const b=P.best[CURRENT+"_"+md]; if(!b) continue;
+  for(const [ds,md] of BOARD_ORDER){
+    if(ds!==CURRENT) continue;
+    const b=P.best[ds+"_"+md]; if(!b) continue;
     items.push(`<span class="bs">${MODE_LABEL[md]} <b>${fmt(b.ms)}</b> <span style="opacity:.75">${b.found}/${b.round}</span></span>`);
   }
   el.innerHTML=items.length?`<span class="bs" style="border-style:dashed">🏆 내 최고 기록</span>`+items.join(""):"";
@@ -433,7 +509,7 @@ const nameInput=document.getElementById("pname");
 nameInput.addEventListener("input",()=>{ P.name=nameInput.value.trim(); persist(); });
 
 /* =======================================================================
-   데이터셋 전환 (일본 ↔ 세계)
+   데이터셋 전환 (헤더의 지도 토글)
    ======================================================================= */
 function loadDataset(key){
   const d=DATASETS[key]; if(!d) return;
@@ -450,10 +526,11 @@ function loadDataset(key){
   for(const k of Object.keys(chipEls)) delete chipEls[k];
   ov.setAttribute("viewBox",d.vb.join(" "));
   svg.setAttribute("viewBox",d.vb.join(" "));
-  document.body.classList.toggle("world",key==="world");
+  document.body.classList.toggle("dense",!!d.dense);
+  document.body.classList.toggle("noeju",!Object.keys(d.eju).length);
   document.getElementById("brandtxt").textContent=d.icon+" "+d.brand;
   document.getElementById("altlangbtn").textContent=d.altLang;
-  if(key==="world"&&mode==="eju"){
+  if(mode==="eju"&&!Object.keys(d.eju).length&&PAGE_MODES.includes("quiz")){
     mode="quiz";
     [...document.getElementById("mode").children].forEach(x=>x.classList.toggle("on",x.dataset.m==="quiz"));
   }
@@ -472,38 +549,47 @@ document.getElementById("dset").addEventListener("click",e=>{
 document.body.classList.add("dark","crtboot");
 setTimeout(()=>{ document.body.classList.add("crtdone"); const c=document.getElementById("crton"); if(c) c.remove(); },1250);
 P=lsLoad(); nameInput.value=P.name||"";
-loadDataset("jp");
+loadDataset(__DEFAULT__);
 renderRecords();
 connectDB();''')
 
 # ---------------------------------------------------------------- 8. Artifact 본문으로 변환
 sub("<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"utf-8\">\n"
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n", "")
-sub("<title>일본 도도부현 메모리 · Japan Prefecture Metro</title>", "<title>GEO ARCADE</title>")
+sub("<title>일본 도도부현 메모리 · Japan Prefecture Metro</title>", "<title>%s</title>" % CFG["title"])
 sub("</head>\n<body class=\"quiz dark\">\n", "")
 sub("</body>\n</html>", "")
 
 H = H.replace("__DATASETS__", json.dumps(DATASETS, ensure_ascii=False, separators=(",", ":")))
+H = H.replace("__MODE_LABEL__", json.dumps(CFG["mode_label"], ensure_ascii=False))
+H = H.replace("__BOARDS__", json.dumps(CFG["boards"]))
+H = H.replace("__PAGE_MODES__", json.dumps(CFG["modes"]))
+H = H.replace("__DEFAULT__", json.dumps(DEF))
 
-for tok in ["__DATA__", "__EJU__", "__DATASETS__", "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
+for tok in ["__DATA__", "__EJU__", "__DATASETS__", "__MODE_LABEL__", "__BOARDS__", "__PAGE_MODES__", "__DEFAULT__",
+            "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
     assert tok not in H, "남아있는 토큰: " + tok
 
-out = os.path.join("..", "artifact")
-if not os.path.isdir(out):
-    os.makedirs(out)
-path = os.path.join(out, "geo_arcade.html")
-io.open(path, "w", encoding="utf-8").write(H)
+def mb(t):
+    return len(t.encode("utf-8")) / 1048576.0
+
 # GitHub Pages 배포용 단독 HTML — Artifact 호스트가 붙여주는 head 골격을 직접 포함한다.
 # (db가 없는 환경이므로 기록은 자동으로 localStorage 단독으로 동작)
 wrap = ('<!DOCTYPE html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        + H.replace("<title>GEO ARCADE</title>",
-                    "<title>GEO ARCADE · 지리 메모리</title>", 1)
+        + H.replace("<title>%s</title>" % CFG["title"], "<title>%s</title>" % CFG["standalone_title"], 1)
            .replace("</style>\n", "</style>\n</head>\n<body>\n", 1)
         + "\n</body>\n</html>\n")
-standalone = os.path.join("..", "index.html")   # 리포 진입점 = 통합본
-io.open(standalone, "w", encoding="utf-8").write(wrap)
+io.open(CFG["standalone"], "w", encoding="utf-8").write(wrap)
+print("written %s — %.2f MB (%s)" % (CFG["standalone"], mb(wrap),
+      ", ".join("%s %d" % (DATASETS[k]["label"], len(DATASETS[k]["data"])) for k in DATASETS)))
 
-print("written %s — %.2f MB, 일본 %d + 세계 %d + EJU %d"
-      % (path, len(H.encode("utf-8")) / 1048576.0, len(jp), len(world), len(eju)))
-print("        %s — GitHub Pages 배포용 단독본 (%.2f MB)" % (standalone, len(wrap.encode("utf-8"))/1048576.0))
+# Artifact 본문: 한 페이지짜리라 로비로 돌아갈 곳이 없으므로 로비 버튼을 뺀다
+if CFG["artifact"]:
+    A = H.replace('    <a class="btn" id="lobbybtn" href="index.html" title="로비로">🏠</a>\n', "", 1)
+    assert 'id="lobbybtn"' not in A
+    d = os.path.dirname(CFG["artifact"])
+    if not os.path.isdir(d):
+        os.makedirs(d)
+    io.open(CFG["artifact"], "w", encoding="utf-8").write(A)
+    print("written %s — %.2f MB (Artifact 본문)" % (CFG["artifact"], mb(A)))

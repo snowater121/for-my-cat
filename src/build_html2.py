@@ -181,7 +181,12 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:12px 18p
   .countdown{font-size:clamp(38px,15vw,58px)}
   .credit{font-size:6px}
   .typinglabel{display:none}
-  .ejucard{max-height:52%;width:calc(100% - 16px);padding:11px 13px;bottom:10px}
+  /* EJU·특산물 모드: 단서 카드가 지도 아래를 덮으므로 지역 패널을 접어 지도에 자리를 준다.
+     패널이 있으면 확대된 목표 지역이 카드 뒤로 숨고 세 번째 단서가 잘렸다. */
+  body.eju aside{display:none}
+  .ejucard{max-height:48%;width:calc(100% - 16px);padding:10px 12px;bottom:8px}
+  .ejucard .cat{margin-bottom:8px}
+  .ejucard ul{gap:6px}
   .ejucard li{font-size:13.5px}
   .ejucard .qname h2{font-size:22px}
   .opt{font-size:13.5px;padding:9px 11px}
