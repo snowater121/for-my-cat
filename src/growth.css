@@ -1,0 +1,89 @@
+/* ===================== GROWTH — 공유·재방문 기능 =====================
+   시작 화면(오늘의 문제·연속 공부·특집), 결과 창(공유·이미지·도전장), 업적, 토스트 */
+
+/* 시작 화면 부가 영역 */
+.gstart{display:flex;flex-direction:column;align-items:center;gap:9px;max-width:560px;padding:0 12px}
+.gstreak{font-size:13px;font-weight:800;color:var(--text);text-shadow:0 1px 6px #0008}
+.gstreak b{font-family:"Press Start 2P",monospace;font-size:11px;color:var(--gold)}
+body:not(.dark) .gstreak{text-shadow:none}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.gbtn{font:inherit;font-size:13px;font-weight:800;color:var(--text);background:var(--panel);border:2px solid var(--accent);
+  border-radius:9px;padding:9px 13px;cursor:pointer;box-shadow:3px 3px 0 #0007;display:inline-flex;align-items:center;gap:6px}
+.gbtn:hover{filter:brightness(1.12)}
+.gbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0007}
+.gbtn:focus-visible,.gact button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.gbtn.done{border-color:var(--ok)}
+.gbtn small{font-weight:700;color:var(--sub);font-size:11px}
+.gbanner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;text-align:center;
+  background:var(--panel);border:2px dashed var(--gold);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:800;color:var(--text)}
+.gbanner .gsub{display:block;font-size:11px;color:var(--sub);font-weight:700;margin-top:2px}
+.gbanner button{font:inherit;font-size:11px;font-weight:800;background:none;border:1px solid var(--line);color:var(--sub);
+  border-radius:7px;padding:4px 8px;cursor:pointer}
+
+/* 결과 창 */
+.gwrap{position:fixed;inset:0;z-index:125;display:none;align-items:center;justify-content:center;padding:14px;
+  background:rgba(6,4,22,.74);backdrop-filter:blur(3px)}
+body:not(.dark) .gwrap{background:rgba(226,233,243,.82)}
+.gwrap.open{display:flex}
+.gbox{width:min(460px,100%);max-height:min(90dvh,760px);overflow:auto;background:var(--panel);border:3px solid var(--gold);
+  border-radius:12px;box-shadow:7px 7px 0 var(--miss);display:flex;flex-direction:column}
+.ghead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:2px solid var(--line);
+  background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
+.ghead h2{flex:1;margin:0;font-family:"Press Start 2P",monospace;font-size:13px;color:var(--gold);letter-spacing:0;line-height:1.5}
+.gbody{padding:16px 16px 6px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.gmeta{font-size:13px;font-weight:800;color:var(--sub)}
+.gbig{font-family:"Press Start 2P",monospace;font-size:34px;color:var(--accent);text-shadow:3px 3px 0 #0006;font-variant-numeric:tabular-nums}
+.gstats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.gstats span{font-size:12px;font-weight:800;background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:4px 10px;color:var(--text)}
+.ggrid{font-size:28px;letter-spacing:3px;line-height:1.2}
+.gvs{font-size:13px;font-weight:800;padding:8px 12px;border-radius:9px;border:2px solid var(--line);background:var(--panel2);color:var(--text)}
+.gvs.win{border-color:var(--ok)}
+.gvs.lose{border-color:var(--miss)}
+.gnew{font-family:"Press Start 2P",monospace;font-size:10px;color:var(--gold);letter-spacing:0;animation:blinkNew 1s steps(2) infinite}
+@keyframes blinkNew{50%{opacity:.35}}
+.gstk{font-size:13px;font-weight:800;color:var(--text)}
+.gachnew{display:flex;flex-direction:column;gap:5px;width:100%}
+.gachnew div{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;background:var(--panel2);
+  border:2px solid var(--gold);border-radius:8px;padding:6px 9px;text-align:left;color:var(--text)}
+.gachnew div span{font-size:18px}
+.gname{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--sub);flex-wrap:wrap;justify-content:center}
+.gname input{width:130px;background:var(--inputbg1);border:2px solid var(--line);border-radius:7px;color:var(--text);
+  padding:6px 9px;font:inherit;font-size:13px;font-weight:700}
+.gname input:focus{outline:none;border-color:var(--accent)}
+.gact{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 14px}
+.gact button{font:inherit;font-size:13px;font-weight:800;color:var(--text);background:var(--panel2);border:2px solid var(--line);
+  border-radius:9px;padding:11px 8px;cursor:pointer;box-shadow:2px 2px 0 #0006;white-space:nowrap}
+.gact button.primary{background:var(--gold);color:#04121a;border-color:var(--gold)}
+.gact button:active{transform:translate(2px,2px);box-shadow:none}
+.gnote{padding:0 16px 14px;font-size:12px;font-weight:700;color:var(--sub);text-align:center}
+.gnote:empty{display:none}
+.gnote textarea{width:100%;min-height:92px;margin-top:6px;background:var(--inputbg1);color:var(--text);border:2px solid var(--accent);
+  border-radius:8px;padding:8px;font:12px/1.5 ui-monospace,monospace;resize:vertical}
+
+/* 업적 탭 */
+.gachs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.gach{display:flex;gap:9px;align-items:flex-start;background:var(--panel2);border:2px solid var(--line);border-radius:9px;padding:9px 10px}
+.gach .i{font-size:22px;line-height:1}
+.gach b{display:block;font-size:12.5px;color:var(--text)}
+.gach small{display:block;font-size:11px;color:var(--sub);font-weight:600;margin-top:2px;line-height:1.35}
+.gach.on{border-color:var(--gold)}
+.gach:not(.on){opacity:.55}
+.gach:not(.on) .i{filter:grayscale(1)}
+.gachhead{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:11px}
+
+/* 토스트 */
+.gtoast{position:fixed;left:50%;top:16px;transform:translate(-50%,-140%);z-index:130;background:var(--panel);
+  border:2px solid var(--gold);border-radius:10px;box-shadow:4px 4px 0 var(--miss);padding:10px 14px;font-size:13px;font-weight:800;
+  color:var(--text);transition:transform .35s cubic-bezier(.2,.9,.2,1);max-width:calc(100% - 32px);display:flex;gap:8px;align-items:center}
+.gtoast.show{transform:translate(-50%,0)}
+
+@media(max-width:600px){
+  .gbig{font-size:26px}
+  .ggrid{font-size:24px}
+  .gbtn{font-size:12px;padding:8px 10px}
+  .gact button{font-size:12px;padding:10px 6px}
+}
+@media(prefers-reduced-motion:reduce){
+  .gnew{animation:none}
+  .gtoast{transition:none}
+}

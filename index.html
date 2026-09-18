@@ -4,6 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GEO ARCADE</title>
+<meta name="description" content="지도·특산물 타이핑으로 외우는 지리 게임 — 일본 47 도도부현 · 한국 시·군 167 · 세계 256개국, 매일 바뀌는 오늘의 문제">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GEO ARCADE">
+<meta property="og:title" content="GEO ARCADE · 지리 메모리">
+<meta property="og:description" content="지도·특산물 타이핑으로 외우는 지리 게임 — 일본 47 도도부현 · 한국 시·군 167 · 세계 256개국, 매일 바뀌는 오늘의 문제">
+<meta property="og:url" content="https://snowater121.github.io/for-my-cat/">
+<meta property="og:image" content="https://snowater121.github.io/for-my-cat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1a0f42">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GEO ARCADE">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
@@ -92,6 +108,16 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 
 .foot{margin-top:26px;font-family:var(--pix);font-size:8px;letter-spacing:1px;color:#ffffff88}
 .attrib{margin-top:10px;font-family:var(--kr);font-size:10px;font-weight:500;color:#ffffff66;line-height:1.5}
+/* 이달의 특집 배너 · 연속 공부 */
+.season{display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 auto 22px;max-width:620px;
+  text-decoration:none;color:#fff;font-family:var(--kr);font-weight:900;font-size:15px;background:#0a0620b3;
+  border:3px dashed var(--yellow);border-radius:12px;padding:11px 16px;transition:transform .15s}
+.season.show{display:flex}
+.season:hover{transform:translateY(-2px)}
+.season:focus-visible,.cab:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.season small{font-weight:700;color:#ffd6f0;font-size:12px}
+.season .go{font-family:var(--pix);font-size:9px;color:var(--yellow)}
+.streak{font-family:var(--kr);font-weight:900;font-size:14px;color:#ffe14d;margin:-12px 0 18px;min-height:1px;text-shadow:2px 2px 0 #0008}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .credit{position:fixed;right:10px;bottom:8px;z-index:70;font-family:var(--pix);font-size:8px;line-height:1.4;color:#fff;opacity:.62;text-shadow:1px 1px 0 #000,0 0 6px var(--cyan);pointer-events:none}
 @media(max-width:560px){.credit{font-size:7px;opacity:.5}}
@@ -143,6 +169,8 @@ body.crtdone #crton{display:none}
   <h2 class="title">GEO<br>ARCADE</h2>
   <div class="sub">지리 메모리</div>
   <p class="tagline">게임을 골라 스테이지를 클리어하세요 ▶</p>
+  <div class="streak" id="streak"></div>
+  <a class="season" id="season" href="specialty.html"></a>
 
   <div class="marq"><span>🗾 🍊 🏯 🍎 ⛩️ 🍵 🗻 🦪 🌍 🍜 🧭 🍑 🏝️ 🦀 🌋 &nbsp; 🗾 🍊 🏯 🍎 ⛩️ 🍵 🗻 🦪 🌍 🍜 🧭 🍑 🏝️ 🦀 🌋 &nbsp;</span></div>
 
@@ -169,6 +197,28 @@ body.crtdone #crton{display:none}
 <div class="credit">제작자 : @konomiwosawagou</div>
 
 <script>
+// 이달의 특집 (build_all.py가 src/season.json으로 채운다)
+var SEASON = /*SEASON*/[{"m": 1, "emoji": "❄️", "title": "겨울 축제", "desc": "산천어·빙어·송어·눈축제", "ds": "kr_sgg_sp", "names": ["화천", "인제", "평창", "태백"]}, {"m": 2, "emoji": "🦀", "title": "겨울 바다의 맛", "desc": "대게·과메기·굴", "ds": "kr_sgg_sp", "names": ["영덕", "울진", "포항", "통영"]}, {"m": 3, "emoji": "🌼", "title": "봄꽃 마중", "desc": "매화·산수유", "ds": "kr_sgg_sp", "names": ["광양", "구례", "의성", "양산"]}, {"m": 4, "emoji": "🌸", "title": "벚꽃과 튤립", "desc": "군항제 벚꽃·튤립·철쭉", "ds": "kr_sgg_sp", "names": ["창원", "하동", "태안", "군포"]}, {"m": 5, "emoji": "🦋", "title": "초록의 계절", "desc": "나비·녹차·대나무·장미·철쭉", "ds": "kr_sgg_sp", "names": ["함평", "보성", "담양", "곡성", "합천"]}, {"m": 6, "emoji": "🍉", "title": "초여름 제철", "desc": "단오제·참외·수박", "ds": "kr_sgg_sp", "names": ["강릉", "성주", "고령", "함안"]}, {"m": 7, "emoji": "🏖️", "title": "여름 바다", "desc": "머드·연꽃·서핑", "ds": "kr_sgg_sp", "names": ["보령", "부여", "양양", "속초"]}, {"m": 8, "emoji": "🍇", "title": "포도와 반딧불", "desc": "반딧불·포도·자두", "ds": "kr_sgg_sp", "names": ["무주", "영동", "영천", "김천"]}, {"m": 9, "emoji": "🍄", "title": "가을의 문턱", "desc": "송이·인삼·탈춤", "ds": "kr_sgg_sp", "names": ["봉화", "금산", "영주", "안동"]}, {"m": 10, "emoji": "🍁", "title": "단풍과 축제", "desc": "유등·단풍·쌀 축제", "ds": "kr_sgg_sp", "names": ["진주", "정읍", "장성", "이천"]}, {"m": 11, "emoji": "🍊", "title": "가을걷이", "desc": "곶감·반시·장류", "ds": "kr_sgg_sp", "names": ["상주", "산청", "청도", "순창"]}, {"m": 12, "emoji": "🦪", "title": "겨울 별미", "desc": "굴·김·매생이·미역", "ds": "kr_sgg_sp", "names": ["여수", "완도", "장흥", "기장"]}]/*END*/;
+(function(){
+  var m=new Date().getMonth()+1, s=null;
+  for(var i=0;i<SEASON.length;i++) if(SEASON[i].m===m) s=SEASON[i];
+  if(!s) return;
+  var a=document.getElementById("season");
+  a.href="specialty.html?season="+m;
+  a.innerHTML=s.emoji+" "+m+"월 특집 · "+s.title+' <small>'+s.names.join(" · ")+'</small><span class="go">▶ PLAY</span>';
+  a.classList.add("show");
+})();
+// 연속 공부 — 게임 페이지가 localStorage에 남긴 기록을 읽는다
+(function(){
+  try{
+    var p=JSON.parse(localStorage.getItem("geoarcade.player.v2")||"null"); if(!p||!p.days||!p.days.length) return;
+    var set={}; p.days.forEach(function(d){set[d]=1;});
+    function key(t){ return t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2); }
+    var d=new Date(), n=0; if(!set[key(d)]) d.setDate(d.getDate()-1);
+    while(set[key(d)]){ n++; d.setDate(d.getDate()-1); }
+    if(n>0) document.getElementById("streak").textContent="🔥 "+n+"일 연속 공부 중"+(p.name?" — "+p.name:"");
+  }catch(e){}
+})();
 // fullscreen toggle
 (function(){
   var b=document.getElementById("fsbtn");
@@ -210,5 +260,6 @@ document.querySelectorAll(".cab").forEach(function(c){
   });
 });
 </script>
+<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
 </body>
 </html>
