@@ -19,19 +19,28 @@ H = re.search(r"HTML = r'''(.*?)'''", src, re.S).group(1)
 def load(path):
     return json.load(io.open(path, encoding='utf-8'))
 
-jp, eju, world, korea = load('data.json'), load('eju.json'), load('world.json'), load('korea.json')
+jp, eju, world = load('data.json'), load('eju.json'), load('world.json')
+korea, korea_sgg = load('korea.json'), load('korea_sgg.json')
 
 JP_REGIONS = ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"]
 JP_COLORS  = {"홋카이도":"#4E79A7","도호쿠":"#59A14F","간토":"#E15759","주부":"#F28E2B",
               "간사이":"#B07AA1","주고쿠":"#76B7B2","시코쿠":"#E6B800","규슈":"#FF7CA0","오키나와":"#00B8D4"}
 KR_REGIONS = ["수도권","강원","충청","호남","영남","제주"]
 KR_COLORS  = {"수도권":"#E15759","강원":"#59A14F","충청":"#F28E2B","호남":"#B07AA1","영남":"#4E79A7","제주":"#00B8D4"}
+SGG_REGIONS = ["수도권","강원","충북","충남·대전·세종","전북","전남광주","경북·대구","경남·부산·울산","제주"]
+SGG_COLORS  = {"수도권":"#E15759","강원":"#59A14F","충북":"#EDC948","충남·대전·세종":"#F28E2B","전북":"#B07AA1",
+               "전남광주":"#FF9DA7","경북·대구":"#4E79A7","경남·부산·울산":"#76B7B2","제주":"#00B8D4"}
 
 
 def specialty(mapdata, path):
     """특산물 단서 파일을 EJU 엔진 형식으로 바꾼다. 지도 데이터에서 ko/kanji/region을 채우고,
     단서에 정답 지역명이 새어 나가지 않았는지 검사한다."""
     clues = load(path)
+    if not set(clues) <= set(mapdata):          # 지도 표시명(이천, 가평 …)을 키로 쓴 파일
+        byname = {m["ko"]: code for code, m in mapdata.items()}
+        unknown = set(clues) - set(byname)
+        assert not unknown, "%s: 지도에 없는 이름 %s" % (path, sorted(unknown))
+        clues = {byname[k]: v for k, v in clues.items()}
     assert set(clues) == set(mapdata), "%s: 지도와 코드 불일치 %s" % (path, set(clues) ^ set(mapdata))
     out = {}
     for code, c in clues.items():
@@ -50,9 +59,12 @@ CATALOG = {
   "jp":    {"label": "일본", "icon": "🗾", "brand": "일본 도도부현 메모리", "vb": [-40, -5, 650, 546],
             "altLang": "日本語", "altHint": "日本語で入力（漢字・かな・ローマ字）",
             "regionOrder": JP_REGIONS, "regionColor": JP_COLORS, "data": jp, "eju": eju},
-  "kr":    {"label": "한국", "icon": "🇰🇷", "brand": "한국 시·도 메모리", "vb": [0, 0, 524, 631],
+  "kr":    {"label": "시·도", "icon": "🇰🇷", "brand": "한국 시·도 메모리", "vb": [0, 0, 524, 631],
             "altLang": "日本語", "altHint": "日本語で入力（漢字・かな）",
             "regionOrder": KR_REGIONS, "regionColor": KR_COLORS, "data": korea, "eju": {}},
+  "kr_sgg": {"label": "시·군", "icon": "🏘️", "brand": "한국 시·군 메모리", "vb": [0, 0, 900, 972],
+            "altLang": "정식 명칭", "altHint": "정식 명칭으로 입력 (이천시, 가평군 …)", "dense": True,
+            "regionOrder": SGG_REGIONS, "regionColor": SGG_COLORS, "data": korea_sgg, "eju": {}},
   "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "vb": [0, 0, 1010, 666],
             "altLang": "English", "altHint": "영어(English)로 입력", "dense": True,
             "regionOrder": ["아시아","유럽","아프리카","북·중미","남아메리카","오세아니아","기타"],
@@ -61,30 +73,34 @@ CATALOG = {
             "data": world, "eju": {}},
 }
 # 특산물 페이지용: 같은 지도에 특산물 단서를 EJU 엔진 자리에 끼운다
-CATALOG["kr_sp"] = dict(CATALOG["kr"], brand="한국 · 지역 특산물", eju=specialty(korea, "specialty_kr.json"))
+CATALOG["kr_sp"] = dict(CATALOG["kr"], brand="한국 시·도 · 지역 특산물", eju=specialty(korea, "specialty_kr.json"))
+CATALOG["kr_sgg_sp"] = dict(CATALOG["kr_sgg"], brand="한국 시·군 · 지역 특산물",
+                            eju=specialty(korea_sgg, "specialty_kr_sgg.json"))
 CATALOG["jp_sp"] = dict(CATALOG["jp"], brand="일본 · 지역 특산물", eju=specialty(jp, "specialty_jp.json"))
 
 PAGES = {
   "arcade": {
     "title": "GEO ARCADE", "standalone_title": "GEO ARCADE · 지도 타이핑",
-    "datasets": ["jp", "kr", "world"], "default": "jp",
+    "datasets": ["jp", "kr", "kr_sgg", "world"], "default": "jp",
     "modes": ["free", "quiz", "type", "eju"], "default_mode": "quiz",
     "mode_label": {"quiz": "지목 퀴즈", "free": "자유 채우기", "type": "타자 연습",
                    "eju_name": "EJU 특징→지역", "eju_feat": "EJU 지역→특징"},
     "ejudir_label": ["특징→지역", "지역→특징"],
     "boards": [["jp","quiz"],["jp","eju_name"],["jp","eju_feat"],["jp","type"],["jp","free"],
                ["kr","quiz"],["kr","type"],["kr","free"],
+               ["kr_sgg","quiz"],["kr_sgg","type"],["kr_sgg","free"],
                ["world","quiz"],["world","type"],["world","free"]],
     "standalone": os.path.join("..", "arcade.html"),
     "artifact": os.path.join("..", "artifact", "geo_arcade.html"),
   },
   "specialty": {
     "title": "지역 특산물", "standalone_title": "GEO ARCADE · 지역 특산물",
-    "datasets": ["kr_sp", "jp_sp"], "default": "kr_sp",
+    "datasets": ["kr_sgg_sp", "kr_sp", "jp_sp"], "default": "kr_sgg_sp",
     "modes": ["eju"], "default_mode": "eju",
     "mode_label": {"eju_name": "특산물 보고 지역", "eju_feat": "지역 보고 특산물"},
     "ejudir_label": ["🍊 특산물 → 지역", "📍 지역 → 특산물"],
-    "boards": [["kr_sp","eju_name"],["kr_sp","eju_feat"],["jp_sp","eju_name"],["jp_sp","eju_feat"]],
+    "boards": [["kr_sgg_sp","eju_name"],["kr_sgg_sp","eju_feat"],
+               ["kr_sp","eju_name"],["kr_sp","eju_feat"],["jp_sp","eju_name"],["jp_sp","eju_feat"]],
     "standalone": os.path.join("..", "specialty.html"),
     "artifact": None,
   },
