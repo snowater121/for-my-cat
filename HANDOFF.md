@@ -206,3 +206,26 @@ python3 build_artifact.py      # ../geo_arcade.html 과 ../artifact/geo_arcade.h
   로그인한 사람만 랭킹판에 참여할 수 있다.
 - **GitHub Pages**: `geo_arcade.html`을 올리면 통합판이 동작한다(기록은 기기별 localStorage).
   기존 3개 파일도 그대로 유효하며, `/47` 하드코딩 버그 수정본으로 교체 필요.
+
+### 11.8 반응형 재작업 (모바일 깨짐 수정)
+
+기존 `@media` 3블록을 통째로 다시 썼다. 핵심은 **높이를 vh로 고정하지 않는 것**.
+예전에는 `.mapwrap{height:44vh}` + `aside{max-height:32vh}`로 잡아놨는데, 헤더가
+3줄로 늘어나자 합이 화면을 넘겨 지역 패널이 한 줄로 찌그러졌다. 지금은
+`.mapwrap{flex:1 1 auto}` + `aside{height:20~24vh}`로 남는 공간을 지도가 먹는다.
+
+- **도구 줄바꿈 → 가로 스크롤**: `.tools{flex-wrap:nowrap;overflow-x:auto}` (≤820px).
+  헤더 197→150px(태블릿), 208→118px(모바일).
+- **가로 모드**: `header{flex-wrap:nowrap}`로 한 줄에 눌러 담아 139→45px, 지도 124→239px.
+- **입력줄**: `.inbar{flex-wrap:wrap}` + `#answer{flex:1 1 100%}` + `.qbtns .btn{flex:1;white-space:nowrap}`.
+  버튼이 "넘 어 가 기"처럼 글자 단위로 쪼개지고 `정답`이 화면 밖으로 잘리던 문제.
+- **문제 배너 / 미니맵 충돌**: 배너는 `left/right:8px`로 폭 전체, 미니맵은 좌하단으로 이동.
+- `body{height:100vh;height:100dvh}` — 모바일 주소창 때문에 잘리던 문제.
+- 푸터 하단 여백 20px — 제작자 워터마크(하단 15px 점유)와 안내문 겹침.
+
+### 11.9 다시 밟지 말 것 (신규)
+10. **`vbForTarget()`은 `bbox`가 비어 있으면 예외를 던진다.** `bbox`는 `buildMap()`의
+    `requestAnimationFrame`에서 채워지는데, 그 전에 라운드가 시작되면(탭이 백그라운드라
+    rAF가 미뤄진 경우 등) `beginRound()` 안에서 예외가 나면서 **지도 확대·안내문·입력창
+    포커스가 통째로 건너뛰어진다.** 증상은 "게임은 도는데 문제 번호가 초기값 그대로".
+    `bboxOf()`를 거쳐 없으면 즉석에서 `getBBox()`로 계산하도록 방어했다.
