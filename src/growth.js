@@ -74,7 +74,7 @@ function toast(html){
   t.innerHTML=html; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2800);
 }
 function announce(list){
-  list.forEach((a,i)=>setTimeout(()=>{ toast(`<span style="font-size:20px">${a.i}</span> 업적 달성 — ${esc(a.n)}`); if(soundOn){AC();tone(988,0.07,"square",0.05);tone(1319,0.12,"square",0.05,0.07);} },i*3000));
+  list.forEach((a,i)=>setTimeout(()=>{ toast(`<span style="font-size:20px">${a.i}</span> 업적 달성! <b>${esc(a.n)}</b>`); if(soundOn){AC();tone(988,0.07,"square",0.05);tone(1319,0.12,"square",0.05,0.07);} },i*3000));
 }
 
 /* ---------- 특별 라운드 ---------- */
@@ -192,12 +192,12 @@ function renderStart(){
   const box=$("gstart"); if(!box) return; ensure();
   const st=streakNow(), doneToday=P.days.includes(ymd());
   let html=`<div class="gstreak">`+(st>0
-      ?(doneToday?`🔥 <b>${st}</b>일 연속 공부 — 오늘 완료 ✓`:`🔥 <b>${st}</b>일 연속 공부 중 — 오늘도 이어가기`)
+      ?(doneToday?`🔥 <b>${st}</b>일째 연속 공부. 오늘 몫 완료 ✓`:`🔥 <b>${st}</b>일째 연속 공부 중. 오늘 한 판이면 ${st+1}일째`)
       :`📅 오늘 첫 판을 시작해 보세요`)+`</div>`;
   if(SPECIAL){
     let sub=SPECIAL.sub||"";
     if(SPECIAL.type==="daily") sub=`모두에게 같은 ${ROUND}문제 · ${esc(DATASETS[CURRENT].label)} · ${esc(modeName(mk()))}`;
-    if(SPECIAL.type==="challenge"&&SPECIAL.from){ const f=SPECIAL.from; sub=`이길 기록: ${fmt(f.t)} · ${f.f}/${f.r} — 같은 순서로 출제돼요`; }
+    if(SPECIAL.type==="challenge"&&SPECIAL.from){ const f=SPECIAL.from; sub=`이길 기록 ${fmt(f.t)} (${f.f}/${f.r}). 문제 순서도 똑같아요`; }
     html+=`<div class="gbanner"><div>${esc(SPECIAL.title)}<span class="gsub">${esc(sub)}</span></div><button type="button" data-g="exit">✕ 일반 모드</button></div>`;
   } else {
     const done=!!P.daily[dailyKey()], s=seasonNow(), canSeason=s&&seasonTarget(s);
@@ -240,7 +240,7 @@ function showResult(res){
     body+=`<div class="gvs ${res.win?"win":"lose"}">⚔️ ${esc(f.n)} ${fmt(f.t)} (${f.f}/${f.r}) → ${res.win?"승리! 🎉":"아쉬워요, 다시 도전!"}</div>`; }
   if(res.newBest) body+=`<div class="gnew">NEW RECORD!</div>`;
   const st=streakNow(); if(st>0) body+=`<div class="gstk">🔥 ${st}일 연속 공부 중</div>`;
-  if(res.fresh.length) body+=`<div class="gachnew">${res.fresh.map(a=>`<div><span>${a.i}</span>새 업적 — ${esc(a.n)}</div>`).join("")}</div>`;
+  if(res.fresh.length) body+=`<div class="gachnew">${res.fresh.map(a=>`<div><span>${a.i}</span>새 업적: ${esc(a.n)}</div>`).join("")}</div>`;
   if(!P.name) body+=`<label class="gname">도전장에 표시할 이름 <input id="gname" maxlength="12" placeholder="이름" autocomplete="off"></label>`;
   w.innerHTML=`<div class="gbox" role="dialog" aria-modal="true" aria-label="라운드 결과"><div class="ghead"><h2>${title}</h2><button type="button" class="btn" data-a="close" aria-label="닫기">✕</button></div>`+
     `<div class="gbody">${body}</div>`+
@@ -261,7 +261,7 @@ function counted(){ ensure(); P.shares++; const f=checkAch(); persist(); announc
 async function shareOrCopy(text,label){
   try{ if(navigator.share){ await navigator.share({text}); counted(); note(label+" 공유 창을 열었어요."); return; } }
   catch(e){ if(e&&e.name==="AbortError") return; }
-  try{ await navigator.clipboard.writeText(text); counted(); note("📋 복사했어요 — 카톡이나 DM에 붙여넣기 하세요."); return; }catch(e){}
+  try{ await navigator.clipboard.writeText(text); counted(); note("📋 복사했어요. 카톡이나 DM에 붙여넣으면 돼요."); return; }catch(e){}
   note(`아래 내용을 길게 눌러 복사하세요.<textarea readonly>${esc(text)}</textarea>`);
   const ta=document.querySelector("#gnote textarea"); if(ta){ ta.focus(); ta.select(); }
   counted();
@@ -274,7 +274,7 @@ async function act(a){
   if(a==="challenge"){
     const who=P.name||"친구";
     const text=`⚔️ ${who}의 도전장! GEO ARCADE ${DATASETS[res.ds].brand} · ${modeName(res.mk)}\n`+
-               `기록 ${fmt(res.ms)} (${res.found}/${res.round}) — 같은 문제, 같은 순서로 이겨 봐!\n`+challengeURL(res);
+               `기록 ${fmt(res.ms)} (${res.found}/${res.round}). 같은 문제를 같은 순서로 풀어서 이겨 봐!\n`+challengeURL(res);
     return shareOrCopy(text,"⚔️");
   }
   if(a==="image") return saveImage(res);
@@ -325,7 +325,7 @@ async function saveImage(res){
        if(dl){ await dl.save({filename:name,data:blob}); note("🖼️ 저장했어요."); counted(); return; } }
   catch(e){ if(e&&e.code==="declined"){ note("저장을 취소했어요."); return; } }
   try{ const file=new File([blob],name,{type:"image/png"});
-       if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],text:shareText(res)}); note("🖼️ 공유 창을 열었어요 — 인스타 스토리에도 올릴 수 있어요."); counted(); return; } }
+       if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],text:shareText(res)}); note("🖼️ 공유 창을 열었어요. 인스타 스토리에도 올릴 수 있어요."); counted(); return; } }
   catch(e){ if(e&&e.name==="AbortError") return; }
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);

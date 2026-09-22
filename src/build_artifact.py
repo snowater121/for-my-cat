@@ -91,7 +91,7 @@ PAGES = {
                ["kr_sgg","quiz"],["kr_sgg","type"],["kr_sgg","free"],
                ["world","quiz"],["world","type"],["world","free"]],
     "file": "arcade.html",
-    "og_desc": "일본 47 도도부현 · 한국 시·도 16 · 시·군 167 · 세계 256개국 — 지도 위 지역 이름을 타이핑해서 외우는 아케이드 게임",
+    "og_desc": "일본 47 도도부현, 한국 시·도 16과 시·군 167, 세계 256개국. 지도에 뜬 지역 이름을 타이핑해서 외우는 아케이드 게임",
     "standalone": os.path.join("..", "arcade.html"),
     "artifact": os.path.join("..", "artifact", "geo_arcade.html"),
   },
@@ -104,7 +104,7 @@ PAGES = {
     "boards": [["kr_sgg_sp","eju_name"],["kr_sgg_sp","eju_feat"],
                ["kr_sp","eju_name"],["kr_sp","eju_feat"],["jp_sp","eju_name"],["jp_sp","eju_feat"]],
     "file": "specialty.html",
-    "og_desc": "이천 쌀, 보성 녹차, 아오모리 사과 — 특산물·랜드마크를 보고 한국 시·군과 일본 도도부현을 맞히는 퀴즈",
+    "og_desc": "이천 쌀, 보성 녹차, 아오모리 사과처럼 특산물과 랜드마크를 보고 한국 시·군과 일본 도도부현을 맞히는 퀴즈",
     "standalone": os.path.join("..", "specialty.html"),
     "artifact": None,
   },
@@ -427,7 +427,7 @@ async function connectDB(){
   if(!db) return;
   DB=db;
   dot.classList.add("on");
-  msg.textContent="공유 랭킹판에 연결됨 — 이름을 입력하면 기록이 함께 올라갑니다";
+  msg.textContent="공유 랭킹판에 연결됐어요. 이름을 입력하면 기록이 함께 올라가요";
   try{
     DB.collection("players").limit(50).onSnapshot(snap=>{
       PEERS=snap.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
@@ -485,7 +485,7 @@ function renderMiss(){
   }).filter(Boolean).sort((a,b)=>b.n-a.n).slice(0,20);
   if(!rows.length){ el.innerHTML=`<div class="recempty">아직 틀린 곳이 없어요.<br>정답 보기·넘어가기·오답이 여기에 모입니다.</div>`; return; }
   const max=rows[0].n;
-  el.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:11px">가장 자주 놓친 곳 ${rows.length}개 — 여기부터 복습하면 돼요</div>`+
+  el.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:11px">가장 자주 놓친 곳 ${rows.length}개. 여기부터 복습하면 돼요</div>`+
     rows.map(r=>`<div class="missrow"><span style="font-size:14px">${DATASETS[r.ds].icon}</span>`+
       `<span class="nm">${esc(r.ko)}</span><span class="rg">${esc(r.rg)}</span>`+
       `<span class="missbar"><i style="width:${Math.round(r.n/max*100)}%"></i></span>`+
@@ -643,6 +643,8 @@ print("written %s — %.2f MB (%s)" % (CFG["standalone"], mb(wrap),
 # Artifact 본문: 한 페이지짜리라 로비로 돌아갈 곳이 없으므로 로비 버튼을 뺀다
 if CFG["artifact"]:
     A = H.replace('    <a class="btn" id="lobbybtn" href="index.html" title="로비로">🏠</a>\n', "", 1)
+    for doc in ("terms.html", "privacy.html"):
+        A = A.replace('href="%s"' % doc, 'href="%s%s" target="_blank" rel="noopener"' % (SITE, doc))
     assert 'id="lobbybtn"' not in A
     d = os.path.dirname(CFG["artifact"])
     if not os.path.isdir(d):

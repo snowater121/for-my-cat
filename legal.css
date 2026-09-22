@@ -1,0 +1,44 @@
+/* 이용약관·개인정보처리방침 공용 — 로비와 같은 색을 쓰되, 오래 읽는 문서라 장식은 뺀다 */
+:root{
+  --ink:#130a30; --paper:#1a0f42; --line:#3b2a70;
+  --text:#f3eefe; --sub:#c9bde6;
+  --yellow:#ffe14d; --pink:#ff2e93; --cyan:#59ffd0;
+  --pix:"Press Start 2P", ui-monospace, monospace;
+  --kr:"Noto Sans KR", -apple-system, "Apple SD Gothic Neo", sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--kr);font-size:16px;line-height:1.75}
+a{color:var(--cyan);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--yellow);outline-offset:2px;border-radius:3px}
+.lg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:14px 20px;border-bottom:2px solid var(--line);background:var(--paper)}
+.lg-home{font-family:var(--pix);font-size:12px;color:var(--yellow);text-decoration:none;text-shadow:2px 2px 0 var(--pink)}
+.lg-head nav{display:flex;gap:16px;font-size:14px;font-weight:700}
+.lg-head nav a{color:var(--sub);text-decoration:none;padding:4px 0}
+.lg-head nav a[aria-current="page"]{color:var(--text);box-shadow:inset 0 -2px 0 var(--yellow)}
+.lg{max-width:720px;margin:0 auto;padding:32px 20px 48px}
+.lg h1{margin:0 0 6px;font-size:28px;font-weight:900;line-height:1.3;text-wrap:balance}
+.lg h2{margin:36px 0 10px;font-size:19px;font-weight:900;line-height:1.4;text-wrap:balance}
+.lg p,.lg ul{margin:0 0 12px}
+.lg ul{padding-left:1.2em}
+.lg li{margin-bottom:6px}
+.lg-meta{color:var(--sub);font-size:14px}
+.lead{font-size:17px;color:var(--text);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+code{font-family:ui-monospace,monospace;font-size:.9em;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+table{width:100%;border-collapse:collapse;margin:8px 0 14px;font-size:14.5px;line-height:1.6;display:block;overflow-x:auto}
+th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-weight:700;font-size:13px;white-space:nowrap}
+.lg-dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:8px 0 12px}
+.lg-dl dt{color:var(--sub);font-weight:700}
+.lg-dl dd{margin:0}
+/* 실제 정보가 들어가야 하는 자리 — 눈에 띄게 */
+mark.todo{background:#ffe14d;color:#130a30;font-weight:700;padding:1px 6px;border-radius:4px}
+.todo-box{margin-top:4px}
+.lg-foot{max-width:720px;margin:0 auto;padding:0 20px 40px;font-weight:700}
+@media(max-width:560px){
+  .lg{padding:24px 16px 40px}
+  .lg h1{font-size:24px}
+  .lg-dl{grid-template-columns:1fr;gap:2px}
+  .lg-dl dd{margin-bottom:8px}
+}
