@@ -239,6 +239,9 @@ body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.22))}
 .mas-say::after{content:"";position:absolute;left:-9px;bottom:9px;width:0;height:0;
   border:6px solid transparent;border-right-color:var(--accent)}
 .mas-say b{color:var(--gold)}
+/* 오른쪽 끝에 세울 때는 말풍선을 왼쪽으로 */
+.mas.sayleft .mas-say{left:auto;right:78%}
+.mas.sayleft .mas-say::after{left:auto;right:-9px;border-right-color:transparent;border-left-color:var(--accent)}
 
 /* ---- 역 스탬프 ----
    잉크색은 color 로 내려보낸다 (도장 SVG가 currentColor를 쓴다).
@@ -295,12 +298,13 @@ body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
   .mas-say{transition:none}
 }
 /*END*/
-.lobbycat{display:flex;justify-content:center;align-items:flex-end;margin:-6px 0 16px;
+/* 고양이는 제목 오른쪽에 겹쳐 세운다 — 흐름에서 높이를 차지하면 카드가 화면 밖으로 밀린다 */
+.lobbycat{position:absolute;right:6px;top:30px;width:150px;z-index:22;
   --panel:#1b1242; --panel2:#251a52; --line:#3b2f6b; --text:#ffffff; --sub:#c9bbef;
   --accent:var(--blue); --gold:var(--yellow); --miss:var(--pink)}
-.lobbycat .mas{width:118px;margin-right:130px}
-.lobbycat .mas-say{font-size:12.5px;max-width:190px;box-shadow:3px 3px 0 #0006}
-@media(max-width:600px){ .lobbycat .mas{width:92px;margin-right:112px} .lobbycat .mas-say{font-size:11.5px;max-width:150px} }
+.lobbycat .mas{width:150px}
+.lobbycat .mas-say{font-size:12.5px;max-width:176px;box-shadow:3px 3px 0 #0006}
+@media(max-width:880px){ .lobbycat{display:none} }   /* 좁으면 제목과 겹친다 */
 </style>
 </head>
 <body>
@@ -748,8 +752,7 @@ document.querySelectorAll(".cab").forEach(function(c){
 /* ---- 고양이 역장: 로비 인사 ---- */
 (function(){
   var box=document.getElementById("lobbycat"); if(!box||typeof MAS==="undefined") return;
-  var cat=MAS.make(); box.appendChild(cat.el);
-  var line=document.getElementById("streak"); if(line) line.style.display="none";   // 같은 말을 두 번 하지 않는다
+  var cat=MAS.make({cls:"sayleft"}); box.appendChild(cat.el);
   var streak=0, name="";
   try{
     var p=JSON.parse(localStorage.getItem("geoarcade.player.v2")||"null");
@@ -762,8 +765,8 @@ document.querySelectorAll(".cab").forEach(function(c){
     }
   }catch(e){}
   var hello = streak>0
-    ? (name?name+", ":"")+"<b>"+streak+"일째</b> 연속 공부 중! 오늘도 한 판?"
-    : "어서 와! 오늘은 어디부터 가 볼까? 🐾";
+    ? "오늘도 한 판 하고 갈래? 🐾"
+    : "어서 와! 어디부터 가 볼까? 🐾";
   cat.face("wink",1600).say(hello,0);
   /* 카드에 마우스를 올리면 한마디 거든다 */
   var lines={ "arcade.html":"지도 채우는 거, 내가 제일 좋아해!", "specialty.html":"특산물 퀴즈? 힌트는 내가 줄게 🐾" };

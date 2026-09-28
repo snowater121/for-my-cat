@@ -496,6 +496,9 @@ body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.22))}
 .mas-say::after{content:"";position:absolute;left:-9px;bottom:9px;width:0;height:0;
   border:6px solid transparent;border-right-color:var(--accent)}
 .mas-say b{color:var(--gold)}
+/* 오른쪽 끝에 세울 때는 말풍선을 왼쪽으로 */
+.mas.sayleft .mas-say{left:auto;right:78%}
+.mas.sayleft .mas-say::after{left:auto;right:-9px;border-right-color:transparent;border-left-color:var(--accent)}
 
 /* ---- 역 스탬프 ----
    잉크색은 color 로 내려보낸다 (도장 SVG가 currentColor를 쓴다).
