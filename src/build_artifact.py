@@ -605,6 +605,14 @@ H = H.replace("__DEFAULT__", json.dumps(DEF))
 H = H.replace("__PAGE_FILE__", json.dumps(CFG["file"]))
 H = H.replace("__SEASON__", json.dumps(SEASON, ensure_ascii=False))
 
+# 고양이 그림: 사이트는 파일을 부르고, Artifact 본문은 한 파일이어야 하니 data URI로 박는다
+import base64, build_cat
+MASCOT_DIR = os.path.join("..", "mascot")
+SPRITE_URL = json.dumps(build_cat.urls())
+SPRITE_B64 = json.dumps({k: "data:image/png;base64," + base64.b64encode(
+    io.open(os.path.join(MASCOT_DIR, k + ".png"), "rb").read()).decode()
+    for k in build_cat.SPRITES})
+
 for tok in ["__DATA__", "__EJU__", "__DATASETS__", "__MODE_LABEL__", "__BOARDS__", "__PAGE_MODES__", "__DEFAULT__",
             "__PAGE_FILE__", "__SEASON__",
             "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
@@ -641,6 +649,7 @@ wrap = ('<!DOCTYPE html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n'
         + H.replace("<title>%s</title>" % CFG["title"], "<title>%s</title>" % CFG["standalone_title"], 1)
            .replace("</style>\n", "</style>\n</head>\n<body>\n", 1)
         + "\n" + SW_REGISTER + "</body>\n</html>\n")
+wrap = wrap.replace("__SPRITES__", SPRITE_URL)
 io.open(CFG["standalone"], "w", encoding="utf-8").write(wrap)
 print("written %s — %.2f MB (%s)" % (CFG["standalone"], mb(wrap),
       ", ".join("%s %d" % (DATASETS[k]["label"], len(DATASETS[k]["data"])) for k in DATASETS)))
@@ -650,6 +659,7 @@ if CFG["artifact"]:
     A = H.replace('    <a class="btn" id="lobbybtn" href="index.html" title="로비로">🏠</a>\n', "", 1)
     for doc in ("terms.html", "privacy.html"):
         A = A.replace('href="%s"' % doc, 'href="%s%s" target="_blank" rel="noopener"' % (SITE, doc))
+    A = A.replace("__SPRITES__", SPRITE_B64)
     assert 'id="lobbybtn"' not in A
     d = os.path.dirname(CFG["artifact"])
     if not os.path.isdir(d):
