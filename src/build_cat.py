@@ -31,6 +31,10 @@ SPRITES = {
     "panic":    ("expression_14_dizzy.png",      180),   # 당황 — 오답
     "full":     ("turnaround_01_front.png",      300),   # 전신 정면 — 결과 이미지
     "full3q":   ("turnaround_02_front_3q.png",   300),   # 전신 3/4 — 로비
+    # 맵을 고르면 시작 화면에 뜨는 그림. 고른 것만 받으므로 첫 화면 용량에 얹히지 않는다.
+    "map_jp":    ("map_japan.png",               360),   # 일본
+    "map_kr":    ("map_korea.png",               360),   # 한국 (시·도·시·군 공용)
+    "map_world": ("map_global.png",              360),   # 세계
 }
 
 

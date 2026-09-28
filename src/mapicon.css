@@ -1,0 +1,25 @@
+/* ===================== MAPICON — 맵 선택 버튼의 지도 썸네일 ===================== */
+#dset button{display:inline-flex;align-items:center;gap:6px}
+.dsmap{width:28px;height:21px;display:block;flex:0 0 auto;overflow:visible}
+.dsmap path{fill:currentColor;fill-opacity:.6;stroke:currentColor;stroke-opacity:1;
+  stroke-linejoin:round;stroke-linecap:round}
+/* 고른 칸은 배경이 금색이라 진하게 눌러 준다 */
+#dset button.on .dsmap path{fill-opacity:.5}
+
+@media(max-width:900px){ .dsmap{width:23px;height:17px} }
+@media(max-width:600px){ .dsmap{width:20px;height:15px} #dset button{gap:4px} }
+
+/* 고른 지도에 맞는 고양이 그림 (시작 화면) */
+/* 시작 화면은 지도 위에 얹히는 칸이라 세로가 넉넉하지 않다 — 화면 높이에 맞춰 줄인다.
+   안 그러면 START 버튼을 밀어내고 머리말까지 비집고 올라간다. */
+.mapart{height:min(170px,19vh);width:auto;max-width:38vw;object-fit:contain;display:block;margin:0 0 -8px;
+  opacity:0;transform:translateY(8px) scale(.94);transition:opacity .35s,transform .35s;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));pointer-events:none}
+.mapart.on{opacity:1;transform:none}
+body:not(.dark) .mapart{filter:drop-shadow(0 6px 12px rgba(24,32,54,.25))}
+/* 지도 칸이 낮을 때 — mapicon.js 가 재서 붙인다 */
+.mapart.tiny{height:min(104px,13vh)}
+.mapart.gone{display:none}
+@media(max-width:600px){ .mapart{height:min(120px,15vh);max-width:44vw} }
+@media(max-height:560px){ .mapart{display:none} }
+@media(prefers-reduced-motion:reduce){ .mapart{transition:none} }

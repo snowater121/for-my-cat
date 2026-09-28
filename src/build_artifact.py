@@ -581,13 +581,15 @@ loadDataset(__DEFAULT__);
 renderRecords();
 connectDB();''')
 
-# ---------------------------------------------------------------- 7b. 마스코트 + 공유·재방문 기능
+# ---------------------------------------------------------------- 7b. 맵 썸네일 + 마스코트 + 공유·재방문 기능
 # mascot.js 가 먼저 와야 growth.js 가 MAS 를 쓸 수 있다.
 sub('/* start screen + countdown */',
+    io.open('mapicon.css', encoding='utf-8').read() + '\n' +
     io.open('mascot.css', encoding='utf-8').read() + '\n' +
     io.open('growth.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
 sub("connectDB();\n</script>",
     "connectDB();\n" + io.open('mascot.js', encoding='utf-8').read() + "\n" +
+    io.open('mapicon.js', encoding='utf-8').read() + "\n" +
     io.open('growth.js', encoding='utf-8').read() + "\n</script>")
 
 # ---------------------------------------------------------------- 8. Artifact 본문으로 변환
