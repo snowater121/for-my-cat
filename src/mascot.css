@@ -1,0 +1,124 @@
+/* ===================== MASCOT — 고양이 역장 =====================
+   마스코트 배치·표정 전환·동작 애니메이션, 역 스탬프, 스탬프 수첩.
+   그림 자체 색은 캐릭터 시트를 그대로 쓰고, 말풍선·스탬프만 테마를 따른다. */
+
+.mas{position:relative;width:96px;flex:0 0 auto;user-select:none;pointer-events:none}
+.mas.off{display:none}
+.mas-fig{width:100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.22))}
+.mas-svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* 게임 화면: 지도 왼쪽 아래에 선다 */
+.mas-stage{position:absolute;left:14px;bottom:10px;width:104px;z-index:11}
+
+/* ---- 표정 전환 (data-e) ---- */
+.mas .f,.mas .mo{display:none}
+.mas[data-e="base"] .f-base,
+.mas[data-e="wink"] .f-wink,
+.mas[data-e="happy"] .f-happy,
+.mas[data-e="focus"] .f-focus,
+.mas[data-e="surprise"] .f-surprise,
+.mas[data-e="panic"] .f-panic{display:block}
+.mas[data-e="base"] .mo-base,
+.mas[data-e="wink"] .mo-base,
+.mas[data-e="happy"] .mo-open,
+.mas[data-e="focus"] .mo-line,
+.mas[data-e="surprise"] .mo-o,
+.mas[data-e="panic"] .mo-wave{display:block}
+/* 곁들이는 효과: 놀랐을 때 !! / 당황했을 때 땀 */
+.mas .m-mark,.mas .m-sweat{opacity:0;transition:opacity .15s}
+.mas[data-e="surprise"] .m-mark{opacity:1}
+.mas[data-e="panic"] .m-sweat{opacity:1}
+
+/* ---- 동작 (data-p) ---- */
+.mas[data-p="idle"] .m-all{animation:masBob 3.4s ease-in-out infinite}
+.mas[data-p="idle"] .m-tail{animation:masTail 2.6s ease-in-out infinite;transform-origin:78px 100px}
+.mas[data-p="jump"] .m-all{animation:masJump .62s cubic-bezier(.3,1.5,.5,1)}
+.mas[data-p="hop"] .m-all{animation:masHop .5s ease-out}
+.mas[data-p="spin"] .m-all{animation:masSpin .8s ease-in-out}
+.mas[data-p="shake"] .m-all{animation:masShake .5s ease-in-out}
+.mas[data-p="run"] .m-all{animation:masRun .38s linear infinite}
+.mas[data-p="point"] .m-arm-r{animation:masPoint .9s ease-in-out;transform-origin:92px 100px}
+.mas[data-p="stamp"] .m-arm-r{animation:masStampArm .8s ease-in;transform-origin:92px 100px}
+.mas .m-all{transform-origin:60px 118px}
+
+@keyframes masBob{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-3px) scaleY(1.02)}}
+@keyframes masTail{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
+@keyframes masJump{0%{transform:translateY(0) scaleY(.9) scaleX(1.08)}
+  35%{transform:translateY(-26px) scaleY(1.1) scaleX(.94)}
+  70%{transform:translateY(0) scaleY(.92) scaleX(1.06)}100%{transform:none}}
+@keyframes masHop{0%{transform:translateY(0)}45%{transform:translateY(-11px)}100%{transform:translateY(0)}}
+@keyframes masSpin{0%{transform:translateY(0) rotate(0)}40%{transform:translateY(-22px) rotate(200deg)}
+  75%{transform:translateY(0) rotate(360deg) scaleY(.92)}100%{transform:none}}
+@keyframes masShake{0%,100%{transform:translateX(0) rotate(0)}
+  20%{transform:translateX(-6px) rotate(-5deg)}45%{transform:translateX(6px) rotate(5deg)}
+  70%{transform:translateX(-4px) rotate(-3deg)}}
+@keyframes masRun{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+@keyframes masPoint{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-62deg) translateY(-6px)}}
+@keyframes masStampArm{0%{transform:rotate(0)}40%{transform:rotate(-70deg) translateY(-10px)}
+  60%{transform:rotate(-70deg) translateY(-10px)}80%{transform:rotate(6deg) translateY(4px)}100%{transform:none}}
+
+/* ---- 말풍선 ---- */
+.mas-say{position:absolute;left:78%;bottom:68%;width:max-content;min-width:104px;max-width:210px;
+  background:var(--panel);border:2px solid var(--accent);border-radius:11px;padding:7px 10px;
+  font-size:12px;font-weight:800;line-height:1.45;color:var(--text);box-shadow:3px 3px 0 rgba(0,0,0,.28);
+  opacity:0;transform:translateY(6px) scale(.92);transform-origin:0 100%;transition:opacity .2s,transform .2s;z-index:2}
+.mas-say.on{opacity:1;transform:none}
+.mas-say::after{content:"";position:absolute;left:-9px;bottom:9px;width:0;height:0;
+  border:6px solid transparent;border-right-color:var(--accent)}
+.mas-say b{color:var(--gold)}
+
+/* ---- 역 스탬프 ----
+   잉크색은 color 로 내려보낸다 (도장 SVG가 currentColor를 쓴다).
+   밤 화면에서는 같은 주홍이 가라앉아 보여서 한 단계 밝게 쓴다. */
+.mas-stamp,.gstamp.on .sc{color:#d9452f}
+body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
+.mas-stamp{width:124px;margin:0 auto;position:relative;opacity:0}
+.mas-stamp.on{opacity:1}
+.mas-stamp-svg{display:block;width:100%;height:auto}
+.mas-stamp-t{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700;letter-spacing:2px}
+.mas-stamp-m{font-family:"Noto Sans KR",sans-serif;font-size:17px;font-weight:900;letter-spacing:1px}
+.mas-stamp-s{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700}
+.mas-stamp.hit{animation:masPress .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes masPress{0%{opacity:0;transform:scale(2.4) rotate(-20deg)}
+  55%{opacity:1;transform:scale(.94) rotate(-7deg)}
+  70%{transform:scale(1.03) rotate(-5deg)}100%{opacity:1;transform:scale(1) rotate(-6deg)}}
+
+/* 결과 창 안에서 고양이와 스탬프를 나란히 */
+.masresult{display:flex;align-items:flex-end;justify-content:center;gap:4px;width:100%;margin:2px 0 4px}
+.masresult .mas{width:86px;margin-bottom:-4px}
+.masresult .mas-say{display:none}
+
+/* 칭호 — 스탬프 수첩에서 가장 어려운 걸 딴 것이 따라온다 */
+.gtitle{font-size:12.5px;font-weight:800;color:var(--sub)}
+.gtitle b{color:var(--gold);font-size:13.5px}
+
+/* ---- 스탬프 수첩 (업적 탭) ---- */
+.gstampbook{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.gstamp{text-align:center}
+.gstamp .sc{position:relative;width:88px;height:88px;margin:0 auto 6px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  border:2px dashed var(--sub);background:var(--panel2);opacity:.42;filter:grayscale(1)}
+.gstamp.on .sc{border:none;background:none;opacity:1;filter:none;
+  transform:rotate(-6deg)}
+.gstamp.on .sc svg{width:100%;height:100%}
+.gstamp b{display:block;font-size:12px;color:var(--text)}
+.gstamp small{display:block;font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.35;margin-top:2px}
+.gstamp:not(.on) b{color:var(--sub)}
+.gstampnote{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.gstampnote .bar{flex:1;height:7px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.gstampnote .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold))}
+
+/* ---- 좁은 화면 ---- */
+@media(max-width:820px){ .mas-stage{width:80px;left:8px;bottom:6px} .mas-say{font-size:11px;max-width:150px} }
+@media(max-width:600px){ .mas-stage{width:62px} .mas-stage .mas-say{display:none}
+  .masresult .mas{width:66px} .mas-stamp{width:104px}
+  .gstampbook{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+  .gstamp .sc{width:72px;height:72px;font-size:24px} }
+@media(max-height:520px) and (orientation:landscape){ .mas-stage{display:none} }
+
+@media(prefers-reduced-motion:reduce){
+  .mas .m-all,.mas .m-tail,.mas .m-arm-r{animation:none!important}
+  .mas-stamp.hit{animation:none}
+  .mas-say{transition:none}
+}

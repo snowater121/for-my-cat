@@ -44,26 +44,34 @@ function bestDays(){
   return best;
 }
 
-/* ---------- 업적 ---------- */
+/* ---------- 업적 = 스탬프 수첩 ----------
+   역장 고양이가 찍어 주는 역 스탬프 한 칸씩. s=도장에 새길 글자, t=따라오는 칭호 */
 function fullClear(re,n){ return Object.keys(P.best).some(k=>re.test(k)&&P.best[k].found>=n&&P.best[k].round>=n); }
 const ACH=[
-  {id:"first",  i:"🎮", n:"첫 라운드",     d:"라운드를 처음 끝냈다",               ok:()=>P.stats.plays>=1},
-  {id:"p10",    i:"🕹️", n:"단골 손님",     d:"10판 플레이",                         ok:()=>P.stats.plays>=10},
-  {id:"p50",    i:"👾", n:"오락실 주인",   d:"50판 플레이",                         ok:()=>P.stats.plays>=50},
-  {id:"clear",  i:"🏁", n:"완주",          d:"한 라운드를 빠짐없이 맞혔다",         ok:()=>P.stats.clears>=1},
-  {id:"s10",    i:"🔥", n:"불붙었다",      d:"10문제 연속 정답",                    ok:()=>P.stats.bestStreak>=10},
-  {id:"s30",    i:"☄️", n:"멈출 수 없어",  d:"30문제 연속 정답",                    ok:()=>P.stats.bestStreak>=30},
-  {id:"d3",     i:"📅", n:"사흘 연속",     d:"3일 연속 공부",                       ok:()=>bestDays()>=3},
-  {id:"d7",     i:"🗓️", n:"일주일 개근",   d:"7일 연속 공부",                       ok:()=>bestDays()>=7},
-  {id:"d30",    i:"🏆", n:"한 달 개근",    d:"30일 연속 공부",                      ok:()=>bestDays()>=30},
-  {id:"daily",  i:"☀️", n:"오늘의 문제",   d:"오늘의 문제에 처음 참여",             ok:()=>Object.keys(P.daily).length>=1},
-  {id:"perfect",i:"🟩", n:"퍼펙트 데이",   d:"오늘의 문제를 모두 초록으로",         ok:()=>Object.values(P.daily).some(x=>x.grid&&!/[🟨🟥]/u.test(x.grid))},
-  {id:"jp",     i:"🗾", n:"일본 일주",     d:"일본 47곳을 한 라운드에 전부",        ok:()=>fullClear(/^jp(_sp)?_/,47)},
-  {id:"sgg",    i:"🏘️", n:"전국 방방곡곡", d:"한국 시·군 167곳을 한 라운드에 전부", ok:()=>fullClear(/^kr_sgg(_sp)?_/,167)},
-  {id:"world",  i:"🌍", n:"세계 일주",     d:"세계 256개국을 한 라운드에 전부",     ok:()=>fullClear(/^world_/,256)},
-  {id:"win",    i:"⚔️", n:"도전 성공",     d:"받은 도전장의 기록을 이겼다",         ok:()=>P.wins>=1},
-  {id:"share",  i:"📤", n:"자랑하기",      d:"결과를 처음 공유했다",                ok:()=>P.shares>=1},
+  {id:"first",  i:"🎮", s:"첫차",   t:"첫 승차",       n:"첫 라운드",     d:"라운드를 처음 끝냈다",               ok:()=>P.stats.plays>=1},
+  {id:"p10",    i:"🕹️", s:"단골",   t:"단골 손님",     n:"단골 손님",     d:"10판 플레이",                         ok:()=>P.stats.plays>=10},
+  {id:"p50",    i:"👾", s:"주인",   t:"오락실 주인",   n:"오락실 주인",   d:"50판 플레이",                         ok:()=>P.stats.plays>=50},
+  {id:"clear",  i:"🏁", s:"완주",   t:"완주자",        n:"완주",          d:"한 라운드를 빠짐없이 맞혔다",         ok:()=>P.stats.clears>=1},
+  {id:"s10",    i:"🔥", s:"십연",   t:"불붙은 손",     n:"불붙었다",      d:"10문제 연속 정답",                    ok:()=>P.stats.bestStreak>=10},
+  {id:"s30",    i:"☄️", s:"삼십연", t:"멈출 수 없는 손",n:"멈출 수 없어", d:"30문제 연속 정답",                    ok:()=>P.stats.bestStreak>=30},
+  {id:"d3",     i:"📅", s:"사흘",   t:"사흘 개근",     n:"사흘 연속",     d:"3일 연속 공부",                       ok:()=>bestDays()>=3},
+  {id:"d7",     i:"🗓️", s:"개근",   t:"주간 개근",     n:"일주일 개근",   d:"7일 연속 공부",                       ok:()=>bestDays()>=7},
+  {id:"d30",    i:"🏆", s:"한달",   t:"한 달 개근 역장",n:"한 달 개근",   d:"30일 연속 공부",                      ok:()=>bestDays()>=30},
+  {id:"daily",  i:"☀️", s:"오늘",   t:"오늘의 승객",   n:"오늘의 문제",   d:"오늘의 문제에 처음 참여",             ok:()=>Object.keys(P.daily).length>=1},
+  {id:"perfect",i:"🟩", s:"만점",   t:"무실수 승객",   n:"퍼펙트 데이",   d:"오늘의 문제를 모두 초록으로",         ok:()=>Object.values(P.daily).some(x=>x.grid&&!/[🟨🟥]/u.test(x.grid))},
+  {id:"jp",     i:"🗾", s:"열도",   t:"열도 완주자",   n:"일본 일주",     d:"일본 47곳을 한 라운드에 전부",        ok:()=>fullClear(/^jp(_sp)?_/,47)},
+  {id:"sgg",    i:"🏘️", s:"전국",   t:"전국 방방곡곡", n:"전국 방방곡곡", d:"한국 시·군 167곳을 한 라운드에 전부", ok:()=>fullClear(/^kr_sgg(_sp)?_/,167)},
+  {id:"world",  i:"🌍", s:"세계",   t:"세계 일주자",   n:"세계 일주",     d:"세계 256개국을 한 라운드에 전부",     ok:()=>fullClear(/^world_/,256)},
+  {id:"win",    i:"⚔️", s:"승리",   t:"도전 승자",     n:"도전 성공",     d:"받은 도전장의 기록을 이겼다",         ok:()=>P.wins>=1},
+  {id:"share",  i:"📤", s:"공유",   t:"소문내는 사람", n:"자랑하기",      d:"결과를 처음 공유했다",                ok:()=>P.shares>=1},
 ];
+/* 칭호: 달성한 업적 중 가장 나중 것(표 아래쪽일수록 어려움)을 대표로 쓴다 */
+const TITLE_RANK=["first","share","p10","daily","d3","s10","clear","p50","win","d7","perfect","s30","jp","sgg","d30","world"];
+function titleNow(){
+  ensure(); let t=null;
+  for(const id of TITLE_RANK){ if(P.ach[id]){ const a=ACH.find(x=>x.id===id); if(a) t=a; } }
+  return t;
+}
 function checkAch(){
   ensure(); const fresh=[];
   for(const a of ACH){ if(!P.ach[a.id]&&a.ok()){ P.ach[a.id]=Date.now(); fresh.push(a); } }
@@ -204,7 +212,37 @@ function renderStart(){
     html+=`<div class="gbtns"><button type="button" class="gbtn${done?" done":""}" data-g="daily">📅 오늘의 문제 <small>${done?"완료 ✓":DAILY_N+"문제"}</small></button>`+
           (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+`</div>`;
   }
+  const tt=titleNow();
+  if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
   box.innerHTML=html;
+  guide();
+}
+
+/* ---------- 역장 고양이 ---------- */
+function cat(){ try{ return MAS.stage||null; }catch(e){ return null; } }
+function guide(){
+  const c=cat(); if(!c) return; ensure();
+  const st=streakNow();
+  let msg;
+  if(SPECIAL&&SPECIAL.type==="challenge") msg="도전장이 왔어! 문제 순서까지 똑같아 🐾";
+  else if(SPECIAL&&SPECIAL.type==="daily") msg=`오늘 문제 ${ROUND}개. 같이 가 보자!`;
+  else if(SPECIAL) msg="특집 노선이야. 출발!";
+  else if(P.daily[dailyKey()]) msg="오늘 몫은 끝났어. 한 판 더 할래?";
+  else if(st>0) msg=`<b>${st}일째</b> 연속 공부 중! 오늘도 한 판?`;
+  else msg="어서 와. 오늘의 문제부터 갈까? 🐾";
+  c.face("wink",1400).say(msg,0);
+}
+/* 결과에 찍을 도장을 고른다 (위에 있을수록 우선) */
+function stampOf(res){
+  /* 도장 안쪽은 좁다 — 긴 brand 대신 짧은 label(일본·시·군·세계)을 쓴다 */
+  const brand=(DATASETS[res.ds].label||DATASETS[res.ds].brand||"").slice(0,7);
+  let mid="하차";
+  if(res.special&&res.special.type==="challenge"&&res.win) mid="승리";
+  else if(res.grid&&!/[🟨🟥]/u.test(res.grid)) mid="만점";
+  else if(res.cleared) mid="완주";
+  else if(res.newBest) mid="신기록";
+  else if(res.special&&res.special.type==="daily") mid="오늘";
+  return {top:"GEO ARCADE",mid,sub:brand,date:ymd().replace(/-/g,".")};
 }
 
 /* ---------- 결과 창 ---------- */
@@ -221,6 +259,8 @@ function shareText(res){
   else L.push("GEO ARCADE 🕹️");
   L.push(d.icon+" "+d.brand+" · "+modeName(res.mk));
   L.push(res.grid?res.grid+"  ⏱ "+fmt(res.ms):"⏱ "+fmt(res.ms)+" · ✅ "+res.found+"/"+res.round);
+  L.push("🐾 역장 도장 「"+stampOf(res).mid+"」");
+  const tt=titleNow(); if(tt) L.push("🎖️ "+tt.t);
   const st=streakNow(); if(st>=2) L.push("🔥 "+st+"일 연속 공부 중");
   L.push(shareURL(res));
   return L.join("\n");
@@ -232,7 +272,8 @@ function showResult(res){
     w.addEventListener("click",e=>{ if(e.target===w) closeResult(); const b=e.target.closest("[data-a]"); if(b) act(b.dataset.a); }); }
   const d=DATASETS[res.ds], sp=res.special;
   const title=res.cleared?"🎉 CLEAR!":"🏁 ROUND OVER";
-  let body=`<div class="gmeta">${d.icon} ${esc(d.brand)} · ${esc(modeName(res.mk))}${sp&&sp.type!=="challenge"?"<br>"+esc(sp.title):""}</div>`+
+  let body=`<div class="masresult"><div id="gmascat"></div><div id="gstampbox"></div></div>`+
+    `<div class="gmeta">${d.icon} ${esc(d.brand)} · ${esc(modeName(res.mk))}${sp&&sp.type!=="challenge"?"<br>"+esc(sp.title):""}</div>`+
     `<div class="gbig">${fmt(res.ms)}</div>`+
     `<div class="gstats"><span>✅ ${res.found}/${res.round}</span><span>🎯 정답률 ${acc(res)}%</span><span>🔥 최고 연속 ${res.live.peak}</span></div>`;
   if(res.grid) body+=`<div class="ggrid" aria-label="문제별 결과">${res.grid}</div>`;
@@ -240,6 +281,7 @@ function showResult(res){
     body+=`<div class="gvs ${res.win?"win":"lose"}">⚔️ ${esc(f.n)} ${fmt(f.t)} (${f.f}/${f.r}) → ${res.win?"승리! 🎉":"아쉬워요, 다시 도전!"}</div>`; }
   if(res.newBest) body+=`<div class="gnew">NEW RECORD!</div>`;
   const st=streakNow(); if(st>0) body+=`<div class="gstk">🔥 ${st}일 연속 공부 중</div>`;
+  const tt=titleNow(); if(tt) body+=`<div class="gtitle">🎖️ 칭호 <b>${esc(tt.t)}</b></div>`;
   if(res.fresh.length) body+=`<div class="gachnew">${res.fresh.map(a=>`<div><span>${a.i}</span>새 업적: ${esc(a.n)}</div>`).join("")}</div>`;
   if(!P.name) body+=`<label class="gname">도전장에 표시할 이름 <input id="gname" maxlength="12" placeholder="이름" autocomplete="off"></label>`;
   w.innerHTML=`<div class="gbox" role="dialog" aria-modal="true" aria-label="라운드 결과"><div class="ghead"><h2>${title}</h2><button type="button" class="btn" data-a="close" aria-label="닫기">✕</button></div>`+
@@ -250,6 +292,13 @@ function showResult(res){
   const ni=$("gname");
   if(ni) ni.addEventListener("input",()=>{ P.name=ni.value.trim(); $("pname").value=P.name; persist(); });
   w.classList.add("open");
+  /* 역장 고양이가 도장을 찍는다 */
+  try{
+    const holder=$("gmascat"), m=MAS.make({bubble:false});
+    holder.appendChild(m.el);
+    m.face(res.cleared?"happy":"base");
+    MAS.pressStamp($("gstampbox"),stampOf(res),m);
+  }catch(e){ const r=$("gmascat"); if(r) r.parentNode.style.display="none"; }
   announce(res.fresh);
   const first=w.querySelector('[data-a="share"]'); if(first) first.focus();
 }
@@ -310,7 +359,16 @@ async function drawCard(res){
   if(res.grid){ g.font="72px "+kr; g.fillText(res.grid,W/2,760); }
   else { g.font="700 36px "+kr; g.fillStyle="#ffd6f0"; g.fillText("🔥 최고 연속 "+res.live.peak+"문제",W/2,740); }
   const st=streakNow(); if(st>0){ g.font="900 40px "+kr; g.fillStyle="#ffe14d"; g.fillText("🔥 "+st+"일 연속 공부 중",W/2,850); }
-  if(P.name){ g.font="700 34px "+kr; g.fillStyle="#fff"; g.fillText("PLAYER · "+P.name,W/2,930); }
+  const tt=titleNow(); if(tt){ g.font="900 36px "+kr; g.fillStyle="#9fe8ff"; g.fillText("🎖️ "+tt.t,W/2,902); }
+  // 역장 고양이와 도장 (SVG를 그림으로 바꿔 올린다 — 실패해도 카드는 그대로 나간다)
+  try{
+    const [kitty,stamp]=await Promise.all([
+      MAS.image({e:res.cleared?"happy":"base"}),
+      MAS.stampImage(Object.assign(stampOf(res),{ink:"#ff7a5c"}))]);   // 어두운 카드 위라 밝은 잉크
+    g.drawImage(kitty,42,946,260,319);
+    g.save(); g.translate(W-210,1080); g.rotate(-6*Math.PI/180); g.drawImage(stamp,-115,-115,230,230); g.restore();
+  }catch(e){}
+  if(P.name){ g.font="700 34px "+kr; g.fillStyle="#fff"; g.fillText("PLAYER · "+P.name,W/2,H-150); }
   g.font="700 30px "+kr; g.fillStyle="rgba(255,255,255,.85)"; g.fillText("snowater121.github.io/for-my-cat",W/2,H-80);
   g.font="700 24px "+kr; g.fillStyle="rgba(255,255,255,.6)"; g.fillText("제작자 @konomiwosawagou",W/2,H-38);
   return new Promise(r=>c.toBlob(r,"image/png"));
@@ -332,12 +390,18 @@ async function saveImage(res){
   note("🖼️ 이미지를 내려받았어요."); counted();
 }
 
-/* ---------- 기록 패널: 업적 탭 + 연속 공부 통계 ---------- */
+/* ---------- 기록 패널: 스탬프 수첩 + 연속 공부 통계 ----------
+   업적을 역 스탬프 한 칸씩으로 보여 준다. 아직이면 빈 칸(점선 원)만 찍혀 있다. */
 function renderAch(){
   const el=$("pane-ach"); if(!el) return; ensure();
-  const got=ACH.filter(a=>P.ach[a.id]).length;
-  el.innerHTML=`<div class="gachhead">${got} / ${ACH.length} 달성</div><div class="gachs">`+
-    ACH.map(a=>`<div class="gach${P.ach[a.id]?" on":""}"><span class="i">${a.i}</span><div><b>${esc(a.n)}</b><small>${esc(a.d)}</small></div></div>`).join("")+`</div>`;
+  const got=ACH.filter(a=>P.ach[a.id]).length, tt=titleNow();
+  const stamp=a=>{ try{ return MAS.stampSVG({top:"GEO ARCADE",mid:a.s,sub:"",date:""}); }catch(e){ return a.i; } };
+  el.innerHTML=
+    `<div class="gstampnote">🐾 스탬프 ${got} / ${ACH.length}<span class="bar"><i style="width:${Math.round(got/ACH.length*100)}%"></i></span>`+
+    (tt?`<span>🎖️ ${esc(tt.t)}</span>`:"")+`</div>`+
+    `<div class="gstampbook">`+
+    ACH.map(a=>`<div class="gstamp${P.ach[a.id]?" on":""}"><div class="sc">${P.ach[a.id]?stamp(a):a.i}</div>`+
+      `<b>${esc(a.n)}</b><small>${esc(a.d)}</small></div>`).join("")+`</div>`;
 }
 const _rs=renderStat;
 renderStat=function(){
@@ -355,7 +419,7 @@ renderRecords=function(){ _rr(); renderAch(); };
 function init(){
   ensure();
   const tabs=document.querySelector(".rectabs"), body=document.querySelector(".recbody");
-  tabs.insertAdjacentHTML("beforeend",'<button data-t="ach">업적</button>');
+  tabs.insertAdjacentHTML("beforeend",'<button data-t="ach">🐾 스탬프</button>');
   body.insertAdjacentHTML("beforeend",'<div class="recpane" id="pane-ach"></div>');
   tabs.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; $("pane-ach").classList.toggle("on",b.dataset.t==="ach"); });
   const ss=$("startscreen"), box=document.createElement("div");

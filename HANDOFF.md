@@ -364,3 +364,66 @@ og.png, icon-192/512.png, apple-touch-icon.png   생성물
 - 접근성: 로비에 `prefers-reduced-motion`, 지도 출처 대비 3.05→7.63:1, 전체화면 버튼 포커스 링,
   제작자 표기를 고정 배치 → 본문 흐름으로(스크롤 시 카드 글자를 가렸음), 쓰지 않던 VT323 글꼴 요청 제거.
 - 헤드리스 크롬은 창 폭 500px 미만을 제대로 재현하지 못한다 → 모바일 확인은 앱 미리보기로.
+
+---
+
+## 16. 2026-09-28 — 고양이 역장 마스코트 (마케팅 6번)
+
+와카야마 기시역의 고양이 역장 '타마'에서 온 설정. 사용자가 준 캐릭터 시트를 그대로 옮겨
+게임·로비·공유 이미지에 같은 고양이가 나온다. **외부 이미지 없음 — 전부 인라인 SVG.**
+
+### 16.1 파일
+```
+src/mascot.js    고양이 SVG + 인스턴스 API(MAS) + 역 스탬프 + 게임 반응 연결
+src/mascot.css   배치·표정 전환·동작 애니메이션·스탬프·스탬프 수첩
+```
+`build_artifact.py` 7b 단계에서 **growth.js 보다 먼저** 붙인다(growth가 `MAS`를 쓴다).
+로비는 `build_all.py`가 `index.html`의 `/*MASCOTCSS*/…/*END*/`, `/*MASCOTJS*/…/*END*/`에 같은 내용을 채운다.
+
+### 16.2 캐릭터 시트에서 가져온 값
+팔레트 스와치를 그대로 읽어 썼다 — 네이비 `#2b254b` / 크림 `#efe2d4` / 핑크 `#fc468f` /
+옐로 `#fddb4e` / 시안 `#42cfd4` / 퍼플 `#702df6`. 귀 안쪽 `#fc6c9c`, 발바닥 `#f2a3b4`,
+꼬리는 몸통색→핑크→시안 그라데이션, 목걸이는 노란 링 + 픽셀 지구.
+시트에 없는 **역장 모자**는 6번 요청대로 새로 그렸다 (`opt.cap:false`로 벗길 수 있다).
+
+### 16.3 API
+```js
+const c = MAS.make({cap:true, bubble:true});   // 인스턴스 (DOM은 c.el)
+c.face("happy", 1200);   // base·wink·happy·focus·surprise·panic
+c.pose("jump", 700);     // idle·jump·hop·run·spin·shake·point·stamp
+c.say("한마디", 0);       // 0이면 계속 띄움
+c.react("ok"|"wrong"|"hint"|"combo"|"clear"|"surprise");
+MAS.stampSVG({top,mid,sub,date,ink})   // 역 스탬프 SVG 문자열
+MAS.pressStamp(box, opt, cat)          // "쾅" 찍는 연출
+MAS.image(opt) / MAS.stampImage(opt)   // 캔버스용 비트맵 (Promise<Image>)
+MAS.stage                              // 게임 페이지의 상주 고양이
+```
+
+### 16.4 어디에 나오는가
+- **게임 화면**: 지도 왼쪽 아래 상주. 시작 화면에서 말풍선으로 안내(연속 공부·오늘의 문제),
+  정답→점프/신남, 5연속→회전, 오답→당황, 힌트→집중, 완주→환호.
+- **결과 창**: 고양이가 **역 스탬프를 찍는다.** 도장 글자는 승리 > 만점 > 완주 > 신기록 > 오늘 > 하차 순으로 고름.
+- **스탬프 수첩**: 기록 패널의 '업적' 탭을 역 스탬프 수첩으로 바꿨다. 딴 것은 주홍 도장, 아직이면 점선 빈 칸.
+- **칭호**: 딴 업적 중 가장 어려운 것이 칭호가 된다(`TITLE_RANK`). 시작 화면·결과 창·공유 텍스트에 붙는다.
+- **결과 이미지(1080×1350)**: 왼쪽 아래 고양이, 오른쪽 아래 도장.
+- **로비**: 제목 아래에서 인사. 카드에 마우스를 올리면 한마디 거든다.
+- **브랜드**: `og.png`(오른쪽에 고양이), 앱 아이콘 3종(고양이 얼굴). `src/brand/og.html`·`icon.html`이 `../mascot.js`를 읽는다.
+
+### 16.5 다시 밟지 말 것
+14. **mascot.js / mascot.css 안에 `/*END*/` 와 `</body>` 문자열을 쓰면 빌드가 깨진다.**
+    앞은 로비 자리 표시, 뒤는 `build_artifact.py`의 남은 토큰 검사에 걸린다.
+15. 정답·오답 반응은 `flash()`가 아니라 **`sCorrect()`/`sWrong()`을 감쌌다.** EJU·특산물의 4지선다는
+    `flash()`를 지나가지 않기 때문이다.
+16. 말풍선은 `position:absolute`라 `width:max-content`가 없으면 부모(고양이) 폭에 눌려 한 글자씩 줄바꿈된다.
+17. 결과 이미지에 쓰는 SVG는 페이지 CSS가 따라가지 않는다 → `svgMarkup(opt.standalone)`이
+    표정 선택 규칙을 `<style>`로 안에 넣고 `width/height`도 직접 박는다.
+18. 도장 잉크색은 `currentColor`다. 밤 화면에서는 `#d9452f`가 가라앉아 `body.dark`에서 `#ff6e50`으로 올린다.
+19. 도장 안쪽은 좁다 — 아래쪽 글자는 8~9px, 데이터셋은 `brand`(길다) 대신 `label`을 쓴다.
+
+### 16.6 미리보기 서버
+`.claude/launch.json` + `.claude/serve.mjs` (node 정적 서버, 4173). 빌드한 HTML을 앱 미리보기로 열어 볼 때 쓴다.
+`python3 -m http.server`는 이 샌드박스에서 `os.getcwd()` 권한 오류로 뜨지 않는다.
+
+### 16.7 마케팅 7항목 현황
+1 결과 공유 텍스트 ✅ · 2 링크 미리보기 ✅(고양이 반영) · 3 도전장 ✅ · 4 데일리 ✅ ·
+5 칭호·업적 ✅(칭호 추가, 스탬프 수첩으로 개편) · 6 고양이 역장 ✅ · 7 커뮤니티 공략 — 사이트 밖 활동이라 미착수.

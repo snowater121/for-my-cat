@@ -34,8 +34,18 @@ run("build_artifact.py", "specialty")
 if not all(os.path.exists(os.path.join("..", f)) for f in ("og.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png")):
     run("build_brand.py")
 
-# 로비에 이달의 특집 데이터 넣기
+# 로비에 고양이 역장 붙이기 (게임 페이지와 같은 mascot.css / mascot.js 를 그대로 넣는다)
 import io, json, re, hashlib
+lobby = io.open(os.path.join("..", "index.html"), encoding="utf-8").read()
+for mark, src in (("MASCOTCSS", "mascot.css"), ("MASCOTJS", "mascot.js")):
+    body = io.open(src, encoding="utf-8").read()
+    assert "/*END*/" not in body, "%s 안에 /*END*/ 가 있으면 자리 표시가 깨진다" % src
+    lobby, n = re.subn(r"/\*%s\*/.*?/\*END\*/" % mark,
+                       lambda m, b=body, k=mark: "/*%s*/" % k + b + "/*END*/", lobby, flags=re.S)
+    assert n == 1, "index.html에 /*%s*/…/*END*/ 표시가 없음" % mark
+io.open(os.path.join("..", "index.html"), "w", encoding="utf-8").write(lobby)
+
+# 로비에 이달의 특집 데이터 넣기
 lobby = io.open(os.path.join("..", "index.html"), encoding="utf-8").read()
 season = json.dumps(json.load(io.open("season.json", encoding="utf-8")), ensure_ascii=False)
 lobby, n = re.subn(r"/\*SEASON\*/.*?/\*END\*/", lambda m: "/*SEASON*/" + season + "/*END*/", lobby, flags=re.S)
