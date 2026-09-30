@@ -35,7 +35,14 @@ SPRITES = {
     "map_jp":    ("map_japan.png",               360),   # 일본
     "map_kr":    ("map_korea.png",               360),   # 한국 (시·도·시·군 공용)
     "map_world": ("map_global.png",              360),   # 세계
+    # 로비 히어로 — 사용자가 만든 로고와 배너 캐릭터
+    "logo":      ("banner_logo.png",             480),   # GEO ARCADE / TYPE THE WORLD!
+    "hero":      ("banner_hero.png",             520),   # 달려나가는 고양이
 }
+
+# 배경을 지우면 안 되는 그림. 로고는 흰 외곽선이 바깥 투명 영역과 맞닿아 있어서
+# 배경 제거를 돌리면 외곽선을 타고 들어가 글자를 갉아먹는다.
+NO_CUT = {"banner_logo.png", "banner_hero.png"}
 
 
 def version():
@@ -60,9 +67,11 @@ def prepare(src):
     path = os.path.join(SRC, src)
     assert os.path.exists(path), "원본이 없다: " + path
     w, h, px = pngtool.read_rgba(path)
-    before = sum(1 for i in range(0, w * h, 11) if px[i * 4 + 3] > 200)
-    pngtool.cut_background(w, h, px)
-    after = sum(1 for i in range(0, w * h, 11) if px[i * 4 + 3] > 200)
+    before = after = 0
+    if src not in NO_CUT:
+        before = sum(1 for i in range(0, w * h, 11) if px[i * 4 + 3] > 200)
+        pngtool.cut_background(w, h, px)
+        after = sum(1 for i in range(0, w * h, 11) if px[i * 4 + 3] > 200)
     w, h, px = pngtool.trim(w, h, px)          # 투명 여백을 남기면 화면에서 작게 보인다
     tmp = os.path.join(tempfile.gettempdir(), "cat_cut_" + src)
     pngtool.write_rgba(tmp, w, h, px)
