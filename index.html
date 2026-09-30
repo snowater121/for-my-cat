@@ -288,6 +288,19 @@ body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
 }
 /*END*/
 /* 고양이는 제목 오른쪽에 겹쳐 세운다 — 흐름에서 높이를 차지하면 카드가 화면 밖으로 밀린다 */
+/* 카드 그림 앞에 서 있는 고양이 — 그림 칸 안에 두어 카드 높이를 건드리지 않는다 */
+.shot{position:relative}
+/* .shot img 규칙(width/height 100%)보다 셀렉터가 세야 한다 */
+.shot .cabcat{position:absolute;bottom:-1%;height:38%;width:auto;z-index:2;opacity:0;
+  object-fit:contain;filter:drop-shadow(0 5px 8px rgba(0,0,0,.6));
+  transition:opacity .4s ease,transform .22s cubic-bezier(.2,.9,.2,1)}
+.shot .cabcat.on{opacity:1}
+.shot .cabcat.right{right:-2%}
+/* 특산물 화면은 아래쪽이 단서 칸이라 왼쪽 위 빈 곳에 세운다 */
+.shot .cabcat.left{left:-3%;top:1%;bottom:auto}
+.cab:hover .shot .cabcat{transform:translateY(-5px) scale(1.05)}
+@media(max-width:560px){ .shot .cabcat{height:34%} }
+
 .lobbycat{position:absolute;right:0;top:18px;width:184px;z-index:22;
   --panel:#1b1242; --panel2:#251a52; --line:#3b2f6b; --text:#ffffff; --sub:#c9bbef;
   --accent:var(--blue); --gold:var(--yellow); --miss:var(--pink)}
@@ -318,7 +331,7 @@ body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
 
   <div class="cards">
     <a class="cab" href="arcade.html">
-      <figure class="shot"><img src="shot-arcade.jpg" width="780" height="600" alt="지도 타이핑 실제 화면: 일본 지도에서 맞힌 도도부현이 지방별 색으로 채워지고 이름이 표시된 모습"></figure>
+      <figure class="shot"><img src="shot-arcade.jpg" width="780" height="600" alt="지도 타이핑 실제 화면: 일본 지도에서 맞힌 도도부현이 지방별 색으로 채워지고 이름이 표시된 모습"><img class="cabcat right" id="cabcat-arcade" alt="" aria-hidden="true" draggable="false"></figure>
       <div class="name">지도 타이핑</div>
       <p class="say">지도에 뜬 곳의 이름을 입력하면 <b>그 자리가 색으로 채워져요</b></p>
       <div class="lv">JP 47 · KR 16 · <span class="k">시·군</span> 167 · WORLD 256</div>
@@ -326,7 +339,7 @@ body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
       <div class="sel">▶ SELECT</div>
     </a>
     <a class="cab alt" href="specialty.html">
-      <figure class="shot"><img src="shot-specialty.jpg" width="780" height="600" alt="지역 특산물 실제 화면: 전국 지도에서 이천이 노랗게 표시되고, 쌀·도자기 분류와 '임금님께 진상하던 쌀(지리적표시)' 단서가 뜬 모습"></figure>
+      <figure class="shot"><img src="shot-specialty.jpg" width="780" height="600" alt="지역 특산물 실제 화면: 전국 지도에서 이천이 노랗게 표시되고, 쌀·도자기 분류와 '임금님께 진상하던 쌀(지리적표시)' 단서가 뜬 모습"><img class="cabcat left" id="cabcat-specialty" alt="" aria-hidden="true" draggable="false"></figure>
       <div class="name">지역 특산물</div>
       <p class="say">"임금님께 진상하던 쌀"을 보고 <b>이천</b>을 맞히는 퀴즈</p>
       <div class="lv"><span class="k">시·군</span> 167 · KR 16 · JP 47</div>
@@ -607,7 +620,17 @@ document.querySelectorAll(".cab").forEach(function(c){
 <script>
 /* ---- 고양이 역장: 로비 인사 ---- */
 (function(){
-  var box=document.getElementById("lobbycat"); if(!box||typeof MAS==="undefined") return;
+  if(typeof MAS==="undefined") return;
+
+  /* 카드 그림 앞에 지도별 고양이를 세운다 — 지도 타이핑은 지구본, 특산물은 한국 */
+  [["cabcat-arcade","map_world"],["cabcat-specialty","map_kr"]].forEach(function(p){
+    var el=document.getElementById(p[0]), url=MAS.SPR&&MAS.SPR[p[1]];
+    if(!el||!url) return;
+    el.onload=function(){ el.classList.add("on"); };
+    el.src=url;
+  });
+
+  var box=document.getElementById("lobbycat"); if(!box) return;
   var cat=MAS.make({full:"full3q",cls:"sayleft"}); box.appendChild(cat.el);
   var streak=0, name="";
   try{
