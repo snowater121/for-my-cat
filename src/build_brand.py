@@ -43,7 +43,12 @@ def serve():
 
 import sys
 if "--shots-only" not in sys.argv:
-    shot("og.html", os.path.join(ROOT, "og.png"), 1200, 630)
+    # 링크 미리보기는 사용자가 직접 만든 배너를 그대로 쓴다 (brand/source/og-banner.webp)
+    banner = os.path.join(HERE, "brand", "source", "og-banner.webp")
+    assert os.path.exists(banner), "brand/source/og-banner.webp 가 없다"
+    subprocess.check_call(["sips", "-s", "format", "png", banner,
+                           "--out", os.path.join(ROOT, "og.png")], stdout=subprocess.DEVNULL)
+    print("written og.png (사용자 배너)")
     icon512 = os.path.join(ROOT, "icon-512.png")
     shot("icon.html", icon512, 512, 512)
     for size, name in ((192, "icon-192.png"), (180, "apple-touch-icon.png")):

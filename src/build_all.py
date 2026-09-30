@@ -9,6 +9,7 @@ build_all.py — 배포 파일을 전부 다시 만든다. src/ 폴더에서 실
   arcade.html + artifact/       ← build_artifact.py arcade     (지도 타이핑: 일본·한국·세계)
   specialty.html                ← build_artifact.py specialty  (지역 특산물: 한국·일본)
   index.html (로비)는 손으로 관리한다 — 이달의 특집 데이터만 season.json에서 채운다.
+  mascot/*.png                  ← build_cat.py     (고양이 역장 그림, brand/cat 원본에서)
   sw.js                         ← sw.template.js  (앱 설치·오프라인용 서비스워커)
   og.png / icon-*.png           ← build_brand.py  (없을 때만)
 """
@@ -23,6 +24,7 @@ def run(*args):
 
 if not os.path.exists("korea.json"):
     run("build_korea_data.py")
+run("build_cat.py")
 run("build_html2.py")
 run("build_world.py")
 for f in ("japan_prefectures_metro.html", "world_countries_metro.html"):
@@ -34,8 +36,20 @@ run("build_artifact.py", "specialty")
 if not all(os.path.exists(os.path.join("..", f)) for f in ("og.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png")):
     run("build_brand.py")
 
-# 로비에 이달의 특집 데이터 넣기
+# 로비에 고양이 역장 붙이기 (게임 페이지와 같은 mascot.css / mascot.js 를 그대로 넣는다)
 import io, json, re, hashlib
+lobby = io.open(os.path.join("..", "index.html"), encoding="utf-8").read()
+import build_cat
+SPRITE_URL = json.dumps(build_cat.urls())
+for mark, src in (("MASCOTCSS", "mascot.css"), ("MASCOTJS", "mascot.js")):
+    body = io.open(src, encoding="utf-8").read().replace("__SPRITES__", SPRITE_URL)
+    assert "/*END*/" not in body, "%s 안에 /*END*/ 가 있으면 자리 표시가 깨진다" % src
+    lobby, n = re.subn(r"/\*%s\*/.*?/\*END\*/" % mark,
+                       lambda m, b=body, k=mark: "/*%s*/" % k + b + "/*END*/", lobby, flags=re.S)
+    assert n == 1, "index.html에 /*%s*/…/*END*/ 표시가 없음" % mark
+io.open(os.path.join("..", "index.html"), "w", encoding="utf-8").write(lobby)
+
+# 로비에 이달의 특집 데이터 넣기
 lobby = io.open(os.path.join("..", "index.html"), encoding="utf-8").read()
 season = json.dumps(json.load(io.open("season.json", encoding="utf-8")), ensure_ascii=False)
 lobby, n = re.subn(r"/\*SEASON\*/.*?/\*END\*/", lambda m: "/*SEASON*/" + season + "/*END*/", lobby, flags=re.S)
@@ -61,6 +75,8 @@ h = hashlib.sha1()
 for f in ("index.html", "arcade.html", "specialty.html", "manifest.webmanifest",
           "terms.html", "privacy.html", "legal.css", "shot-arcade.jpg", "shot-specialty.jpg"):
     h.update(io.open(os.path.join("..", f), "rb").read())
+for f in sorted(os.listdir(os.path.join("..", "mascot"))):
+    h.update(io.open(os.path.join("..", "mascot", f), "rb").read())
 sw = io.open("sw.template.js", encoding="utf-8").read().replace("__BUILD__", h.hexdigest()[:10])
 io.open(os.path.join("..", "sw.js"), "w", encoding="utf-8").write(sw)
 print("sw.js — 캐시 " + h.hexdigest()[:10])

@@ -14,7 +14,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#1a0f42">
+<meta name="theme-color" content="#0b1026">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -25,174 +25,462 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --yellow:#ffe14d; --pink:#ff2e93; --cyan:#59ffd0; --blue:#2bd3ff; --purple:#7c5cff;
-  --ink:#0a0620;
+  /* 밤바다 같은 네이비 + 네온 3색 */
+  --navy0:#070b1c; --navy1:#0c1230; --navy2:#141c46; --navy3:#1d2a63;
+  --cyan:#38f0e4; --magenta:#ff3ea5; --yellow:#ffe14d; --blue:#2bd3ff; --violet:#7c5cff;
+  --ink:#050814;
   --pix:"Press Start 2P", ui-monospace, monospace;
   --kr:"Noto Sans KR", sans-serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%}
+html,body{height:100%}
 body{
-  min-height:100vh;overflow-x:hidden;overflow-y:auto;position:relative;color:#fff;
-  font-family:var(--kr);
-  background:linear-gradient(180deg,#2a0f4e 0%,#3d1163 40%,#5b1670 70%,#7a1e63 100%);
-  display:flex;flex-direction:column;align-items:center;
+  margin:0;background:var(--navy0);color:#fff;font-family:var(--kr);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
 }
-/* 하늘 광원 (정적) */
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(120% 80% at 50% -10%,#ff2e9333,transparent 60%),
-             radial-gradient(100% 70% at 50% 120%,#2bd3ff22,transparent 60%);}
-/* synthwave grid floor */
-.floor{position:fixed;left:50%;bottom:0;width:200%;height:46vh;transform:translateX(-50%) perspective(320px) rotateX(66deg);transform-origin:bottom center;z-index:1;pointer-events:none;
-  background-image:linear-gradient(#ff2e9366 2px,transparent 2px),linear-gradient(90deg,#ff2e9355 2px,transparent 2px);
-  background-size:44px 44px;animation:road 1.1s linear infinite;
-  mask-image:linear-gradient(180deg,transparent,#000 55%);-webkit-mask-image:linear-gradient(180deg,transparent,#000 55%);}
-@keyframes road{to{background-position:0 44px}}
-/* sun */
-.sun{position:fixed;left:50%;bottom:30vh;transform:translateX(-50%);width:220px;height:220px;border-radius:50%;z-index:0;pointer-events:none;
-  background:linear-gradient(180deg,#ffe14d,#ff6ec7 60%,#ff2e93);opacity:.9;
-  filter:drop-shadow(0 0 40px #ff2e9377);
-  -webkit-mask:repeating-linear-gradient(#000 0 12px,transparent 12px 17px);mask:repeating-linear-gradient(#000 0 12px,transparent 12px 17px);}
-/* CRT scanlines + flicker + vignette */
-.crt{position:fixed;inset:0;z-index:40;pointer-events:none;
-  background:repeating-linear-gradient(0deg,#0000 0 3px,#00000016 3px 4px);
-  animation:flick 9s steps(80) infinite;}
-@keyframes flick{0%,98%{opacity:.5}99%{opacity:.42}100%{opacity:.5}}
-.vig{position:fixed;inset:0;z-index:41;pointer-events:none;box-shadow:inset 0 0 160px #000a, inset 0 0 40px #0006;}
-/* stars */
-.star{position:fixed;width:3px;height:3px;background:#fff;z-index:0;border-radius:1px;animation:tw 2.4s ease-in-out infinite;}
-@keyframes tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
 
-.wrap{position:relative;z-index:20;width:100%;max-width:860px;padding:22px;text-align:center;margin:auto}
+/* ===== 배경: 네이비 그라데이션 · 네온 글로우 · 도시 실루엣 · 원근 격자 ===== */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-grad{position:absolute;inset:0;
+  background:linear-gradient(180deg,var(--navy0) 0%,var(--navy1) 38%,var(--navy2) 72%,var(--navy3) 100%)}
+.bg-glow{position:absolute;inset:0;
+  background:
+    radial-gradient(60vw 42vh at 12% 8%, rgba(56,240,228,.20), transparent 70%),
+    radial-gradient(55vw 40vh at 88% 22%, rgba(255,62,165,.22), transparent 70%),
+    radial-gradient(70vw 34vh at 50% 100%, rgba(124,92,255,.22), transparent 72%)}
+/* 글자 뒤로 물러나 있어야 한다 — 진하면 모드 버튼·문구와 싸운다 */
+.bg-city{position:absolute;left:-2%;bottom:30vh;width:104%;height:min(150px,17vh);opacity:.5}
+.bg-city .blk{fill:#080d22}
+.bg-city .edge{fill:none;stroke:var(--cyan);stroke-width:2;opacity:.3}
+.bg-city .win{fill:var(--yellow);opacity:.38}
+.bg-city .win.c{fill:var(--cyan);opacity:.42}
+.bg-city .win.m{fill:var(--magenta);opacity:.38}
+.bg-grid{position:absolute;left:50%;bottom:0;width:230%;height:34vh;
+  transform:translateX(-50%) perspective(340px) rotateX(70deg);transform-origin:bottom center;
+  background-image:
+    linear-gradient(rgba(255,62,165,.42) 2px,transparent 2px),
+    linear-gradient(90deg,rgba(56,240,228,.30) 2px,transparent 2px);
+  background-size:52px 52px;
+  -webkit-mask:linear-gradient(180deg,transparent,#000 42%);mask:linear-gradient(180deg,transparent,#000 42%)}
+.bg-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 3px,#00000018 3px 4px);
+  animation:flick 9s steps(80) infinite}
+@keyframes flick{0%,98%{opacity:.55}99%{opacity:.45}100%{opacity:.55}}
+.bg-vig{position:absolute;inset:0;box-shadow:inset 0 0 180px #000a, inset 0 0 50px #0007}
+.star{position:fixed;width:3px;height:3px;background:#fff;z-index:0;border-radius:1px;
+  animation:tw 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes tw{0%,100%{opacity:.14;transform:scale(.6)}50%{opacity:.9;transform:scale(1)}}
 
-.coin{font-family:var(--pix);font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:18px;animation:blink 1.1s steps(2) infinite}
-@keyframes blink{50%{opacity:0}}
+/* ===== 공통 ===== */
+.wrap{position:relative;z-index:20;width:100%;max-width:1160px;padding:20px 22px 0;margin:auto}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fsbtn{position:fixed;top:14px;right:14px;z-index:80;width:42px;height:42px;border-radius:11px;
+  background:#070b1caa;border:2px solid var(--cyan);color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 var(--magenta)}
+.fsbtn:hover{filter:brightness(1.15)}
+.fsbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--magenta)}
+.fsbtn:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
 
-.title{font-family:var(--pix);line-height:1.15;margin:0;font-size:clamp(24px,6.5vw,46px);color:var(--yellow);
-  text-shadow:3px 3px 0 var(--pink), 6px 6px 0 #00000055;letter-spacing:1px;animation:bob 3s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-6px)}}
-.sub{font-family:var(--kr);font-weight:900;font-size:clamp(15px,3.4vw,20px);margin:14px 0 4px;color:#fff;text-shadow:2px 2px 0 #00000066}
-.tagline{font-family:var(--kr);font-weight:700;color:#ffd6f0;opacity:.85;font-size:13px;margin:0 0 26px}
+/* ===== HERO: 데스크톱 좌 55 / 우 45 ===== */
+.hero{display:grid;gap:0 clamp(16px,3vw,44px);align-items:center;
+  grid-template-columns:55fr 45fr;
+  grid-template-areas:
+    "coin cat"
+    "logo cat"
+    "copy cat"
+    "cta  cat"
+    "mode cat"
+    "strk cat";
+  padding:clamp(10px,3vh,34px) 0 clamp(14px,3vh,30px)}
+.coin{grid-area:coin;font-family:var(--pix);font-size:10px;letter-spacing:2px;color:var(--cyan);
+  margin-bottom:12px;animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
 
-/* 문제 예시 띠: 실제 단서 → 정답 (build_all.py가 데이터에서 채운다) */
+.logo{grid-area:logo;width:min(440px,100%);height:auto;display:block;object-fit:contain;
+  margin:0 0 6px;filter:drop-shadow(0 6px 18px rgba(255,62,165,.35))}
+
+.copy{grid-area:copy;margin:6px 0 0}
+.copy h2{margin:0;font-size:clamp(19px,2.6vw,27px);font-weight:900;line-height:1.35;
+  text-shadow:0 2px 0 #0009}
+.copy .lead{margin:10px 0 0;font-size:clamp(13px,1.5vw,15px);font-weight:700;color:#cfe4ff}
+.copy .lead b{color:var(--yellow)}
+.copy .sub{margin:5px 0 0;font-size:clamp(12px,1.4vw,14px);font-weight:700;color:#9fb6da}
+
+.cta{grid-area:cta;display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 0}
+.btn-start,.btn-how{font-family:var(--pix);font-size:13px;letter-spacing:1px;text-decoration:none;
+  border-radius:12px;padding:16px 24px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:transform .15s cubic-bezier(.2,.9,.2,1),box-shadow .15s,filter .15s}
+.btn-start{background:linear-gradient(180deg,#ffe97a,var(--yellow));color:#1b1200;
+  border:3px solid #fff6c9;box-shadow:6px 6px 0 var(--magenta)}
+.btn-start:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--magenta);filter:brightness(1.05)}
+.btn-start:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--magenta)}
+.btn-how{background:#0b1230cc;color:var(--cyan);border:3px solid var(--cyan);box-shadow:6px 6px 0 #1b2a6b}
+.btn-how:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 #1b2a6b;filter:brightness(1.12)}
+.btn-how:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #1b2a6b}
+.btn-start:focus-visible,.btn-how:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+/* 모드 선택 — 고르면 캐릭터가 바뀐다 */
+.mode{grid-area:mode;margin:22px 0 0}
+.mode .lab{font-family:var(--pix);font-size:8px;letter-spacing:2px;color:#a8bee0;margin-bottom:9px;text-shadow:0 2px 6px #050814}
+.mode .row{display:flex;gap:10px;flex-wrap:wrap}
+.mode button{font-family:var(--pix);font-size:11px;letter-spacing:1px;color:#cfe4ff;cursor:pointer;
+  background:#0b1230cc;border:2px solid #2c3a74;border-radius:10px;padding:12px 16px;
+  display:inline-flex;align-items:center;gap:8px;transition:.16s}
+.mode button .dot{width:9px;height:9px;border-radius:2px;background:#3a4a86;transition:.16s}
+.mode button:hover{border-color:var(--cyan);color:#fff;transform:translateY(-2px)}
+.mode button[aria-pressed="true"]{border-color:var(--yellow);color:#fff;background:#1a1430cc;
+  box-shadow:0 0 0 1px var(--yellow) inset, 0 6px 18px rgba(255,225,77,.18)}
+.mode button[aria-pressed="true"] .dot{background:var(--yellow)}
+.mode button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+
+.strk{grid-area:strk;margin:18px 0 0;min-height:1px;font-size:14px;font-weight:900;color:var(--yellow);
+  text-shadow:0 2px 0 #0008}
+
+/* 캐릭터: 뒤에 radial glow, 그림 자체에는 필터를 거의 걸지 않는다 */
+.cat{grid-area:cat;position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:clamp(240px,42vh,430px)}
+.cat .halo{position:absolute;left:50%;top:50%;width:min(112%,540px);aspect-ratio:1;transform:translate(-50%,-50%);
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(56,240,228,.30) 0%,rgba(124,92,255,.22) 42%,rgba(255,62,165,.14) 62%,transparent 72%);
+  animation:halo 5.5s ease-in-out infinite}
+@keyframes halo{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
+.cat .ring{position:absolute;left:50%;top:50%;width:min(86%,410px);aspect-ratio:1;transform:translate(-50%,-50%);
+  border-radius:50%;border:2px dashed rgba(56,240,228,.28);animation:spin 24s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.cat .stage{position:relative;width:min(100%,430px);aspect-ratio:1/.92}
+.cat img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  opacity:0;transform:scale(.94);transition:opacity .26s ease,transform .26s ease;
+  filter:drop-shadow(0 16px 26px rgba(0,0,0,.45))}
+.cat img.on{opacity:1;transform:scale(1)}
+.cat .float{animation:float 4.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ===== 이달의 특집 · 문제 예시 띠 ===== */
+.season{display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 auto 20px;max-width:680px;
+  text-decoration:none;color:#fff;font-weight:900;font-size:15px;background:#0b1230cc;
+  border:3px dashed var(--yellow);border-radius:12px;padding:11px 16px;transition:transform .15s}
+.season.show{display:flex}
+.season:hover{transform:translateY(-2px)}
+.season small{font-weight:700;color:#cfe4ff;font-size:12px}
+.season .go{font-family:var(--pix);font-size:9px;color:var(--yellow)}
+.season:focus-visible,.cab:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+
 .ticker{overflow:hidden;white-space:nowrap;margin:0 0 24px;
   -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .ticker .run{display:inline-flex;gap:28px;padding-right:28px;animation:slide 60s linear infinite}
 .ticker:hover .run{animation-play-state:paused}
-.ticker .it{display:inline-flex;align-items:baseline;gap:8px;font-size:14px;font-weight:700;color:#ffd6f0}
+.ticker .it{display:inline-flex;align-items:baseline;gap:8px;font-size:14px;font-weight:700;color:#cfe4ff}
 .ticker .tag{font-family:var(--pix);font-size:8px;color:var(--cyan)}
 .ticker .ans{font-weight:900;color:var(--yellow)}
 @keyframes slide{to{transform:translateX(-50%)}}
 
+/* ===== 두 게임 카드 ===== */
+.pick{font-family:var(--pix);font-size:9px;letter-spacing:2px;color:#8fa6cc;text-align:center;margin:0 0 12px}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:560px){.cards{grid-template-columns:1fr}}
-
-.cab{position:relative;text-decoration:none;color:#fff;border-radius:12px;padding:16px 16px 18px;
-  border:4px solid var(--yellow);box-shadow:7px 7px 0 var(--pink);
-  background:linear-gradient(180deg,#2a1a5c,#1a0f42);overflow:hidden;
+@media(max-width:620px){.cards{grid-template-columns:1fr}}
+.cab{position:relative;text-decoration:none;color:#fff;border-radius:14px;padding:15px 15px 17px;
+  border:3px solid var(--cyan);box-shadow:6px 6px 0 rgba(56,240,228,.28);
+  background:linear-gradient(180deg,#121a42,#0b1130);overflow:hidden;
   transition:transform .16s cubic-bezier(.2,.9,.2,1),box-shadow .16s;display:flex;flex-direction:column;align-items:center;gap:6px}
-.cab.alt{border-color:var(--cyan);box-shadow:7px 7px 0 var(--blue)}
+.cab.alt{border-color:var(--magenta);box-shadow:6px 6px 0 rgba(255,62,165,.3)}
 .cab::after{content:"";position:absolute;top:-60%;left:-30%;width:60%;height:220%;transform:rotate(20deg);
-  background:linear-gradient(90deg,transparent,#ffffff33,transparent);transition:.5s}
-.cab:hover{transform:translate(-3px,-3px) rotate(-1deg);box-shadow:11px 11px 0 var(--pink)}
-.cab.alt:hover{box-shadow:11px 11px 0 var(--blue)}
+  background:linear-gradient(90deg,transparent,#ffffff26,transparent);transition:.5s}
+.cab:hover{transform:translate(-3px,-3px);box-shadow:10px 10px 0 rgba(56,240,228,.32)}
+.cab.alt:hover{box-shadow:10px 10px 0 rgba(255,62,165,.34)}
 .cab:hover::after{left:130%}
-.cab.pressed{transform:translate(4px,4px) scale(.97);box-shadow:2px 2px 0 var(--pink)}
-.cab.alt.pressed{box-shadow:2px 2px 0 var(--blue)}
-/* 실제 게임 화면 (build_brand.py가 게임을 조작한 상태로 찍는다) */
-.shot{margin:0 0 6px;width:100%;aspect-ratio:13/10;border:3px solid #0a0620;border-radius:6px;overflow:hidden;background:#0d1420}
+.cab.pressed{transform:translate(4px,4px) scale(.98);box-shadow:2px 2px 0 rgba(56,240,228,.3)}
+.shot{position:relative;margin:0 0 6px;width:100%;aspect-ratio:13/10;border:3px solid #050814;border-radius:8px;overflow:hidden;background:#0a1022}
 .shot img{display:block;width:100%;height:100%;object-fit:cover}
-.cab .say{font-family:var(--kr);font-size:13px;font-weight:700;color:#fff;line-height:1.55}
+/* 카드 그림 앞 고양이 — .shot img 규칙보다 셀렉터가 세야 크기가 먹는다 */
+.shot .cabcat{position:absolute;bottom:-1%;height:38%;width:auto;z-index:2;opacity:0;object-fit:contain;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.6));transition:opacity .4s ease,transform .22s cubic-bezier(.2,.9,.2,1)}
+.shot .cabcat.on{opacity:1}
+.shot .cabcat.right{right:-2%}
+/* 특산물 화면은 아래쪽이 단서 칸이라 왼쪽 위 빈 곳에 세운다 */
+.shot .cabcat.left{left:-3%;top:1%;bottom:auto}
+.cab:hover .shot .cabcat{transform:translateY(-5px) scale(1.05)}
+.cab .name{font-weight:900;font-size:21px;margin-top:3px}
+.cab .say{font-size:13px;font-weight:700;color:#dce9ff;line-height:1.55;margin:0}
 .cab .say b{color:var(--yellow);font-weight:900}
 .cab.alt .say b{color:var(--cyan)}
-.name{font-family:var(--kr);font-weight:900;font-size:22px;margin-top:4px}
-.lv{font-family:var(--pix);font-size:9px;color:var(--yellow);letter-spacing:1px;line-height:1.8}
-.lv .k{font-family:var(--kr);font-size:12px;font-weight:900;letter-spacing:0}
+.cab .lv{font-family:var(--pix);font-size:9px;color:var(--yellow);letter-spacing:1px;line-height:1.8}
+.cab .lv .k{font-family:var(--kr);font-size:12px;font-weight:900;letter-spacing:0}
 .cab.alt .lv{color:var(--cyan)}
-.modes{font-family:var(--kr);font-size:12px;color:#ffd6f0;opacity:.8;font-weight:700}
-.sel{font-family:var(--pix);font-size:9px;letter-spacing:1px;color:#fff;margin-top:8px;opacity:0;transform:translateY(4px);transition:.2s}
+.cab .modes{font-size:12px;color:#9fb6da;font-weight:700}
+.cab .sel{font-family:var(--pix);font-size:9px;letter-spacing:1px;color:#fff;margin-top:8px;opacity:0;transform:translateY(4px);transition:.2s}
 .cab:hover .sel{opacity:1;transform:none;animation:blink 1s steps(2) infinite}
 
-.foot{margin-top:26px;display:flex;justify-content:center;gap:6px 18px;flex-wrap:wrap;font-family:var(--kr);font-size:13px;font-weight:700}
+/* ===== HOW TO PLAY ===== */
+.howwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:16px;
+  background:rgba(4,7,20,.82);backdrop-filter:blur(3px)}
+.howwrap.open{display:flex}
+.howbox{width:min(560px,100%);max-height:88dvh;overflow:auto;background:#0c1230;border:3px solid var(--cyan);
+  border-radius:14px;box-shadow:7px 7px 0 var(--magenta)}
+.howhead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid #222e64}
+.howhead h3{flex:1;margin:0;font-family:var(--pix);font-size:12px;color:var(--cyan);letter-spacing:1px;line-height:1.5}
+.howhead button{background:none;border:2px solid #2c3a74;color:#cfe4ff;border-radius:9px;width:34px;height:34px;
+  font-size:16px;cursor:pointer}
+.howhead button:hover{border-color:var(--magenta);color:#fff}
+.howbody{padding:14px 16px 18px;display:flex;flex-direction:column;gap:11px}
+.howrow{display:flex;gap:11px;align-items:flex-start;background:#111a44;border:2px solid #222e64;border-radius:10px;padding:10px 12px}
+.howrow .i{font-size:20px;line-height:1.2}
+.howrow b{display:block;font-size:13.5px;color:#fff}
+.howrow small{display:block;font-size:12px;color:#a9bde0;font-weight:600;line-height:1.55;margin-top:3px}
+.hownote{font-size:12px;color:#8fa6cc;font-weight:700;line-height:1.6;padding:2px 2px 0}
+
+/* ===== 바닥 ===== */
+.foot{margin-top:26px;display:flex;justify-content:center;gap:6px 18px;flex-wrap:wrap;font-size:13px;font-weight:700}
 .foot a{color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#ffffff80;padding:4px 2px}
 .foot a:hover{text-decoration-color:var(--yellow)}
 .foot a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:3px}
-.attrib{margin-top:10px;font-family:var(--kr);font-size:11px;font-weight:500;color:#ffffffc7;line-height:1.6}
-/* 이달의 특집 배너 · 연속 공부 */
-.season{display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 auto 22px;max-width:620px;
-  text-decoration:none;color:#fff;font-family:var(--kr);font-weight:900;font-size:15px;background:#0a0620b3;
-  border:3px dashed var(--yellow);border-radius:12px;padding:11px 16px;transition:transform .15s}
-.season.show{display:flex}
-.season:hover{transform:translateY(-2px)}
-.season:focus-visible,.cab:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
-.season small{font-weight:700;color:#ffd6f0;font-size:12px}
-.season .go{font-family:var(--pix);font-size:9px;color:var(--yellow)}
-.streak{font-family:var(--kr);font-weight:900;font-size:14px;color:#ffe14d;margin:-12px 0 18px;min-height:1px;text-shadow:2px 2px 0 #0008}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.credit{position:relative;z-index:20;margin:4px 0 18px;font-family:var(--pix);font-size:8px;line-height:1.4;color:#fff;opacity:.8;text-shadow:1px 1px 0 #000,0 0 6px var(--cyan)}
+.attrib{margin-top:10px;font-size:11px;font-weight:500;color:#ffffffc0;line-height:1.6;text-align:center}
+.credit{position:relative;z-index:20;margin:4px 0 18px;font-family:var(--pix);font-size:8px;line-height:1.4;color:#fff;
+  opacity:.8;text-shadow:1px 1px 0 #000,0 0 6px var(--cyan);text-align:center}
+
+/* ===== 태블릿: 캐릭터를 줄인다 ===== */
+@media(max-width:1000px){
+  .hero{grid-template-columns:57fr 43fr;gap:0 18px}
+  .cat{min-height:clamp(200px,32vh,320px)}
+  .cat .stage{width:min(100%,320px)}
+  .logo{width:min(360px,100%)}
+}
+/* ===== 모바일: 로고 → 캐릭터 → 카피 → START → 모드 ===== */
+@media(max-width:760px){
+  .wrap{padding:16px 16px 0}
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center;gap:0;
+    grid-template-areas:"coin" "logo" "cat" "copy" "cta" "mode" "strk"}
+  .logo{width:min(320px,86%);margin-bottom:2px}
+  .cat{min-height:0;margin:2px 0 6px}
+  .cat .stage{width:min(88vw,300px)}
+  .cat .halo{width:min(120%,360px)}
+  .cat .ring{display:none}
+  .cta{justify-content:center;margin-top:16px;width:100%}
+  .btn-start,.btn-how{flex:1 1 auto;justify-content:center;font-size:12px;padding:15px 14px}
+  .mode{margin-top:18px;width:100%}
+  .mode .row{justify-content:center}
+  .mode button{flex:1 1 30%;justify-content:center;font-size:10px;padding:11px 8px}
+  .strk{margin-top:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  #crton{display:none}
+  .ticker{overflow-x:auto;-webkit-mask:none;mask:none}
+  .ticker .run{flex-wrap:nowrap}
+}
+
 /* ===== CRT power-on intro ===== */
 #crton{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
 #crton .bar{position:absolute;left:0;right:0;height:51%;background:#000}
 #crton .bar.top{top:0;transform-origin:top;animation:crtBar 1.15s cubic-bezier(.7,0,.25,1) forwards}
 #crton .bar.bot{bottom:0;transform-origin:bottom;animation:crtBar 1.15s cubic-bezier(.7,0,.25,1) forwards}
 @keyframes crtBar{0%,18%{transform:scaleY(1)}52%{transform:scaleY(0)}100%{transform:scaleY(0)}}
-#crton .seam{position:absolute;top:50%;left:50%;right:50%;height:3px;transform:translateY(-50%);background:#fff;box-shadow:0 0 22px 6px #fff,0 0 60px 12px #bfefff;animation:crtSeam 1.15s ease-out forwards}
+#crton .seam{position:absolute;top:50%;left:50%;right:50%;height:3px;transform:translateY(-50%);background:#fff;
+  box-shadow:0 0 22px 6px #fff,0 0 60px 12px #bfefff;animation:crtSeam 1.15s ease-out forwards}
 @keyframes crtSeam{0%{left:50%;right:50%;opacity:0;height:3px}9%{left:0;right:0;opacity:1;height:3px}18%{opacity:1;height:3px}33%{opacity:1;height:100%}45%{opacity:0;height:100%}100%{opacity:0}}
-#crton .noise{position:absolute;inset:0;mix-blend-mode:screen;opacity:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation:crtNoiseOp 1.15s steps(1) forwards, crtNoiseMv .11s steps(4) infinite}
-@keyframes crtNoiseOp{0%,28%{opacity:0}33%{opacity:.55}42%{opacity:.2}50%{opacity:.45}60%{opacity:.12}72%{opacity:.3}85%{opacity:.05}100%{opacity:0}}
-@keyframes crtNoiseMv{0%{background-position:0 0}25%{background-position:40px -30px}50%{background-position:-25px 20px}75%{background-position:15px 35px}100%{background-position:-40px -10px}}
 .wrap{animation:crtWrap 1.15s ease-out}
 @keyframes crtWrap{0%,28%{opacity:0;transform:scaleY(.55);filter:brightness(3)}38%{opacity:1;transform:none;filter:brightness(2.2) contrast(1.3)}42%{transform:translateX(-7px);filter:contrast(1.5) hue-rotate(12deg)}45%{transform:translateX(6px)}48%{transform:translateX(-3px);filter:contrast(1.2)}51%{transform:translateX(0)}100%{opacity:1;transform:none;filter:none}}
 body.crtdone #crton{display:none}
-/* fullscreen button (top-right) */
-.fsbtn{position:fixed;top:14px;right:14px;z-index:80;width:42px;height:42px;border-radius:11px;
-  background:#0a0620aa;border:2px solid var(--yellow);color:#fff;font-size:18px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 var(--pink)}
-.fsbtn:hover{filter:brightness(1.1)}
-.fsbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--pink)}
-.fsbtn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
-/* 움직임 줄이기 설정: 장식 애니메이션을 멈추고, 문제 예시 띠는 손으로 넘겨 보게 */
-@media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation:none !important;transition:none !important}
-  #crton{display:none}
-  .ticker{overflow-x:auto;-webkit-mask:none;mask:none}
-  .ticker .run{flex-wrap:nowrap}
+
+/* ---- 고양이 역장 (src/mascot.css 를 build_all.py 가 채운다) ---- */
+/*MASCOTCSS*//* ===================== MASCOT — 고양이 역장 =====================
+   원본 PNG(mascot/*.png)를 상태별로 겹쳐 두고 하나만 보여 준다.
+   움직임은 CSS로만 준다 — 그림 자체는 건드리지 않는다. */
+
+.mas{position:relative;width:96px;flex:0 0 auto;user-select:none;pointer-events:none}
+.mas.off{display:none}
+.mas-fig{width:100%;transform-origin:50% 92%;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.25))}
+.mas-fig img{display:block;width:100%;height:auto}
+
+/* 게임 화면: 지도 왼쪽 아래에 선다 */
+.mas-stage{position:absolute;left:10px;bottom:10px;width:112px;z-index:11}
+
+/* ---- 표정 전환 (data-e) ---- */
+.mas .s{display:none}
+.mas[data-e="base"] .s-base,
+.mas[data-e="happy"] .s-happy,
+.mas[data-e="combo"] .s-combo,
+.mas[data-e="wink"] .s-wink,
+.mas[data-e="focus"] .s-focus,
+.mas[data-e="surprise"] .s-surprise,
+.mas[data-e="panic"] .s-panic{display:block}
+.mas.full .s{display:block}            /* 전신 컷은 한 장뿐 */
+
+/* ---- 동작 (data-p) ---- */
+.mas[data-p="idle"] .mas-fig{animation:masBob 3.4s ease-in-out infinite}
+.mas[data-p="jump"] .mas-fig{animation:masJump .62s cubic-bezier(.3,1.5,.5,1)}
+.mas[data-p="hop"] .mas-fig{animation:masHop .5s ease-out}
+.mas[data-p="spin"] .mas-fig{animation:masSpin .8s ease-in-out}
+.mas[data-p="shake"] .mas-fig{animation:masShake .5s ease-in-out}
+.mas[data-p="point"] .mas-fig{animation:masPoint .9s ease-in-out}
+.mas[data-p="stamp"] .mas-fig{animation:masStamp .8s ease-in}
+
+@keyframes masBob{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-3px) scaleY(1.015)}}
+@keyframes masJump{0%{transform:translateY(0) scaleY(.92) scaleX(1.06)}
+  35%{transform:translateY(-22px) scaleY(1.08) scaleX(.95)}
+  70%{transform:translateY(0) scaleY(.94) scaleX(1.05)}100%{transform:none}}
+@keyframes masHop{0%{transform:translateY(0)}45%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+@keyframes masSpin{0%{transform:translateY(0) rotate(0)}
+  40%{transform:translateY(-20px) rotate(200deg)}
+  75%{transform:translateY(0) rotate(360deg) scaleY(.94)}100%{transform:none}}
+@keyframes masShake{0%,100%{transform:translateX(0) rotate(0)}
+  20%{transform:translateX(-6px) rotate(-5deg)}45%{transform:translateX(6px) rotate(5deg)}
+  70%{transform:translateX(-4px) rotate(-3deg)}}
+@keyframes masPoint{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-8deg) translateY(-4px)}}
+@keyframes masStamp{0%{transform:none}
+  35%,60%{transform:translateY(-13px) rotate(-6deg)}
+  80%{transform:translateY(5px) scaleY(.93) rotate(2deg)}100%{transform:none}}
+
+/* ---- 말풍선 ---- */
+.mas-say{position:absolute;left:78%;bottom:68%;width:max-content;min-width:104px;max-width:210px;
+  background:var(--panel);border:2px solid var(--accent);border-radius:11px;padding:7px 10px;
+  font-size:12px;font-weight:800;line-height:1.45;color:var(--text);box-shadow:3px 3px 0 rgba(0,0,0,.28);
+  opacity:0;transform:translateY(6px) scale(.92);transform-origin:0 100%;transition:opacity .2s,transform .2s;z-index:2}
+.mas-say.on{opacity:1;transform:none}
+.mas-say::after{content:"";position:absolute;left:-9px;bottom:9px;width:0;height:0;
+  border:6px solid transparent;border-right-color:var(--accent)}
+.mas-say b{color:var(--gold)}
+/* 오른쪽 끝에 세울 때는 말풍선을 왼쪽으로 */
+.mas.sayleft .mas-say{left:auto;right:78%;transform-origin:100% 100%}
+.mas.sayleft .mas-say::after{left:auto;right:-9px;border-right-color:transparent;border-left-color:var(--accent)}
+
+/* ---- 역 스탬프 ----
+   잉크색은 color 로 내려보낸다 (도장 SVG가 currentColor를 쓴다).
+   밤 화면에서는 같은 주홍이 가라앉아 보여서 한 단계 밝게 쓴다. */
+.mas-stamp,.gstamp.on .sc{color:#d9452f}
+body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
+.mas-stamp{width:124px;margin:0 auto;position:relative;opacity:0}
+.mas-stamp.on{opacity:1}
+.mas-stamp-svg{display:block;width:100%;height:auto}
+.mas-stamp-t{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700;letter-spacing:2px}
+.mas-stamp-m{font-family:"Noto Sans KR",sans-serif;font-size:17px;font-weight:900;letter-spacing:1px}
+.mas-stamp-s{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700}
+.mas-stamp.hit{animation:masPress .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes masPress{0%{opacity:0;transform:scale(2.4) rotate(-20deg)}
+  55%{opacity:1;transform:scale(.94) rotate(-7deg)}
+  70%{transform:scale(1.03) rotate(-5deg)}100%{opacity:1;transform:scale(1) rotate(-6deg)}}
+
+/* 결과 창 안에서 고양이와 스탬프를 나란히 */
+.masresult{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;margin:2px 0 4px}
+.masresult .mas{width:104px}
+.masresult .mas-say{display:none}
+
+/* 칭호 — 스탬프 수첩에서 가장 어려운 걸 딴 것이 따라온다 */
+.gtitle{font-size:12.5px;font-weight:800;color:var(--sub)}
+.gtitle b{color:var(--gold);font-size:13.5px}
+
+/* ---- 스탬프 수첩 (업적 탭) ---- */
+.gstampbook{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.gstamp{text-align:center}
+.gstamp .sc{position:relative;width:88px;height:88px;margin:0 auto 6px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  border:2px dashed var(--sub);background:var(--panel2);opacity:.42;filter:grayscale(1)}
+.gstamp.on .sc{border:none;background:none;opacity:1;filter:none;transform:rotate(-6deg)}
+.gstamp.on .sc svg{width:100%;height:100%}
+.gstamp b{display:block;font-size:12px;color:var(--text)}
+.gstamp small{display:block;font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.35;margin-top:2px}
+.gstamp:not(.on) b{color:var(--sub)}
+.gstampnote{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.gstampnote .bar{flex:1;height:7px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.gstampnote .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold))}
+
+/* ---- 좁은 화면 ---- */
+@media(max-width:820px){ .mas-stage{width:88px;left:6px;bottom:4px} .mas-say{font-size:11px;max-width:150px} }
+@media(max-width:600px){ .mas-stage{width:66px} .mas-stage .mas-say{display:none}
+  .masresult .mas{width:80px} .mas-stamp{width:104px}
+  .gstampbook{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+  .gstamp .sc{width:72px;height:72px;font-size:24px} }
+@media(max-height:520px) and (orientation:landscape){ .mas-stage{display:none} }
+
+@media(prefers-reduced-motion:reduce){
+  .mas-fig{animation:none!important}
+  .mas-stamp.hit{animation:none}
+  .mas-say{transition:none}
 }
-/* mobile / short screens: allow scroll, shrink decor so cards never get squished */
-@media(max-width:560px),(max-height:660px){
-  body{padding:64px 16px 24px}
-  .sun{display:none}   /* 휴대폰에는 제목 뒤 말고 둘 빈자리가 없다 — 글자 대비를 우선한다 (바닥 격자·별은 유지) */
-  .floor{height:36vh}
-  .ticker{margin-bottom:18px}
-  .cab{padding:14px 12px 16px}
-  .fsbtn{width:38px;height:38px;font-size:16px}
-}
+/*END*/
 </style>
 </head>
 <body>
-<div id="crton"><div class="bar top"></div><div class="bar bot"></div><div class="seam"></div><div class="noise"></div></div>
+<div id="crton"><div class="bar top"></div><div class="bar bot"></div><div class="seam"></div></div>
 <button id="fsbtn" class="fsbtn" title="전체화면 전환" aria-label="전체화면">⛶</button>
 <h1 class="sr-only">GEO ARCADE 로비: 지도 타이핑과 지역 특산물 중 게임을 고르세요</h1>
-<div class="sun"></div>
-<div class="floor"></div>
-<div class="crt"></div>
-<div class="vig"></div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg-grad"></div>
+  <div class="bg-glow"></div>
+  <svg class="bg-city" viewBox="0 0 1200 170" preserveAspectRatio="none">
+    <path class="blk" d="M0,170 V112 H44 V78 H82 V124 H118 V62 H160 V100 H196 V48 H238 V92 H276 V70 H318 V118 H356 V56 H398 V96 H436 V80 H478 V124 H514 V66 H558 V104 H598 V42 H640 V86 H676 V114 H716 V70 H758 V98 H796 V54 H838 V92 H878 V76 H918 V118 H956 V64 H998 V100 H1036 V84 H1078 V112 H1116 V72 H1158 V106 H1200 V170 Z"/>
+    <path class="edge" d="M0,112 H44 V78 H82 V124 H118 V62 H160 V100 H196 V48 H238 V92 H276 V70 H318 V118 H356 V56 H398 V96 H436 V80 H478 V124 H514 V66 H558 V104 H598 V42 H640 V86 H676 V114 H716 V70 H758 V98 H796 V54 H838 V92 H878 V76 H918 V118 H956 V64 H998 V100 H1036 V84 H1078 V112 H1116 V72 H1158 V106 H1200"/>
+    <g>
+      <rect class="win c" x="18" y="126" width="6" height="8"/><rect class="win" x="54" y="92" width="6" height="8"/>
+      <rect class="win" x="66" y="106" width="6" height="8"/><rect class="win m" x="128" y="78" width="6" height="8"/>
+      <rect class="win" x="144" y="96" width="6" height="8"/><rect class="win c" x="206" y="62" width="6" height="8"/>
+      <rect class="win" x="222" y="80" width="6" height="8"/><rect class="win" x="286" y="86" width="6" height="8"/>
+      <rect class="win m" x="366" y="70" width="6" height="8"/><rect class="win" x="382" y="88" width="6" height="8"/>
+      <rect class="win c" x="446" y="94" width="6" height="8"/><rect class="win" x="524" y="82" width="6" height="8"/>
+      <rect class="win" x="540" y="100" width="6" height="8"/><rect class="win m" x="608" y="58" width="6" height="8"/>
+      <rect class="win" x="624" y="76" width="6" height="8"/><rect class="win c" x="688" y="128" width="6" height="8"/>
+      <rect class="win" x="726" y="86" width="6" height="8"/><rect class="win" x="806" y="70" width="6" height="8"/>
+      <rect class="win m" x="822" y="88" width="6" height="8"/><rect class="win c" x="886" y="92" width="6" height="8"/>
+      <rect class="win" x="966" y="80" width="6" height="8"/><rect class="win" x="1008" y="116" width="6" height="8"/>
+      <rect class="win c" x="1088" y="96" width="6" height="8"/><rect class="win m" x="1126" y="88" width="6" height="8"/>
+    </g>
+  </svg>
+  <div class="bg-grid"></div>
+  <div class="bg-scan"></div>
+  <div class="bg-vig"></div>
+</div>
 
 <div class="wrap">
-  <div class="coin">◆ INSERT COIN ◆</div>
-  <h2 class="title">GEO<br>ARCADE</h2>
-  <div class="sub">지리 메모리</div>
-  <p class="tagline">게임을 골라 스테이지를 클리어하세요 ▶</p>
-  <div class="streak" id="streak"></div>
-  <a class="season" id="season" href="specialty.html"></a>
 
+  <section class="hero">
+    <div class="coin">◆ INSERT COIN ◆</div>
+
+    <img class="logo" id="logo" width="480" height="284"
+         alt="GEO ARCADE — TYPE THE WORLD!" draggable="false">
+
+    <div class="copy">
+      <h2>타이핑으로 외우는 세계 지리</h2>
+      <p class="lead">일본 <b>47</b>개 도도부현 · 한국 시·군 <b>167</b>곳 · 세계 <b>256</b>개국</p>
+      <p class="sub">지목 퀴즈 · 타자 연습 · EJU 모드</p>
+    </div>
+
+    <div class="cta">
+      <a class="btn-start" id="startbtn" href="arcade.html">▶ GAME START</a>
+      <button class="btn-how" id="howbtn" type="button">HOW TO PLAY</button>
+    </div>
+
+    <div class="mode" id="mode">
+      <div class="lab">SELECT MAP</div>
+      <div class="row" role="group" aria-label="지도 고르기">
+        <button type="button" data-ds="jp"     data-art="map_jp"    aria-pressed="false"><span class="dot"></span>JAPAN</button>
+        <button type="button" data-ds="kr_sgg" data-art="map_kr"    aria-pressed="false"><span class="dot"></span>KOREA</button>
+        <button type="button" data-ds="world"  data-art="map_world" aria-pressed="false"><span class="dot"></span>WORLD</button>
+      </div>
+    </div>
+
+    <div class="strk" id="streak"></div>
+
+    <div class="cat">
+      <div class="halo" aria-hidden="true"></div>
+      <div class="ring" aria-hidden="true"></div>
+      <div class="stage float" id="catstage">
+        <img id="cat-hero" alt="GEO ARCADE 마스코트 고양이" draggable="false">
+        <img id="cat-map_jp" alt="" aria-hidden="true" draggable="false">
+        <img id="cat-map_kr" alt="" aria-hidden="true" draggable="false">
+        <img id="cat-map_world" alt="" aria-hidden="true" draggable="false">
+      </div>
+    </div>
+  </section>
+
+  <a class="season" id="season" href="specialty.html"></a>
   <div class="ticker" id="ticker" role="region" aria-label="실제 문제 예시: 단서와 정답"></div>
 
+  <div class="pick">◆ CHOOSE YOUR GAME ◆</div>
   <div class="cards">
     <a class="cab" href="arcade.html">
-      <figure class="shot"><img src="shot-arcade.jpg" width="780" height="600" alt="지도 타이핑 실제 화면: 일본 지도에서 맞힌 도도부현이 지방별 색으로 채워지고 이름이 표시된 모습"></figure>
+      <figure class="shot"><img src="shot-arcade.jpg" width="780" height="600" alt="지도 타이핑 실제 화면: 일본 지도에서 맞힌 도도부현이 지방별 색으로 채워지고 이름이 표시된 모습"><img class="cabcat right" id="cabcat-arcade" alt="" aria-hidden="true" draggable="false"></figure>
       <div class="name">지도 타이핑</div>
       <p class="say">지도에 뜬 곳의 이름을 입력하면 <b>그 자리가 색으로 채워져요</b></p>
       <div class="lv">JP 47 · KR 16 · <span class="k">시·군</span> 167 · WORLD 256</div>
@@ -200,7 +488,7 @@ body.crtdone #crton{display:none}
       <div class="sel">▶ SELECT</div>
     </a>
     <a class="cab alt" href="specialty.html">
-      <figure class="shot"><img src="shot-specialty.jpg" width="780" height="600" alt="지역 특산물 실제 화면: 전국 지도에서 이천이 노랗게 표시되고, 쌀·도자기 분류와 '임금님께 진상하던 쌀(지리적표시)' 단서가 뜬 모습"></figure>
+      <figure class="shot"><img src="shot-specialty.jpg" width="780" height="600" alt="지역 특산물 실제 화면: 전국 지도에서 이천이 노랗게 표시되고, 쌀·도자기 분류와 '임금님께 진상하던 쌀(지리적표시)' 단서가 뜬 모습"><img class="cabcat left" id="cabcat-specialty" alt="" aria-hidden="true" draggable="false"></figure>
       <div class="name">지역 특산물</div>
       <p class="say">"임금님께 진상하던 쌀"을 보고 <b>이천</b>을 맞히는 퀴즈</p>
       <div class="lv"><span class="k">시·군</span> 167 · KR 16 · JP 47</div>
@@ -214,17 +502,222 @@ body.crtdone #crton{display:none}
 </div>
 <div class="credit">제작자 : @konomiwosawagou</div>
 
+<div class="howwrap" id="howwrap">
+  <div class="howbox" role="dialog" aria-modal="true" aria-labelledby="howtitle">
+    <div class="howhead"><h3 id="howtitle">HOW TO PLAY</h3><button type="button" id="howclose" aria-label="닫기">✕</button></div>
+    <div class="howbody">
+      <div class="howrow"><span class="i">🔍</span><div><b>지목 퀴즈</b><small>지도가 한 곳을 짚어 줍니다. 그곳의 이름을 입력하고 Enter. 모르겠으면 힌트를 누르세요.</small></div></div>
+      <div class="howrow"><span class="i">🗺️</span><div><b>자유 채우기</b><small>아는 곳부터 마음대로 입력합니다. 맞힐 때마다 그 자리가 색으로 채워집니다.</small></div></div>
+      <div class="howrow"><span class="i">⌨️</span><div><b>타자 연습</b><small>이름이 보이는 상태로 따라 칩니다. 지리를 몰라도 손이 먼저 외웁니다.</small></div></div>
+      <div class="howrow"><span class="i">🎓</span><div><b>EJU 지역</b><small>일본 유학시험 대비. 지역의 특징을 보고 지역을 맞히거나, 반대로 특징을 고릅니다.</small></div></div>
+      <div class="howrow"><span class="i">🍊</span><div><b>지역 특산물</b><small>"임금님께 진상하던 쌀" 같은 단서를 보고 시·군을 맞힙니다. 한국 167곳과 일본 47곳.</small></div></div>
+      <div class="hownote">📅 <b>오늘의 문제</b>는 매일 바뀌고 모두가 같은 5문제를 풉니다 · ⚔️ <b>도전장</b>을 보내면 친구가 같은 순서로 풉니다 ·
+        🐾 라운드를 끝내면 고양이 역장이 <b>역 스탬프</b>를 찍어 줍니다. 기록은 이 브라우저에 저장됩니다.</div>
+    </div>
+  </div>
+</div>
+
+<script>/*MASCOTJS*//* =======================================================================
+   MASCOT — 고양이 역장 (build_artifact.py가 growth.js 앞에 붙인다)
+
+   와카야마 기시역의 고양이 역장 '타마'에서 온 설정. 고양이가 플레이어 옆에 서서
+   반응하고, 라운드가 끝나면 역 스탬프(駅スタンプ)를 찍어 준다.
+
+   - 그림: 사용자가 만든 캐릭터 원본 PNG (src/brand/cat → build_cat.py → mascot/).
+     표정 7장 + 전신 2장. 동작은 CSS 애니메이션으로 준다.
+   - 도장만 SVG로 그린다 (고무 도장이라 선화가 맞고, 글자가 매번 바뀐다).
+   - API: MAS.make() 로 인스턴스를 만들고 face/pose/say 로 조종한다.
+     게임 페이지에서는 MAS.stage 하나가 지도 왼쪽 아래에 자동으로 선다.
+   ======================================================================= */
+const MAS=(function(){
+
+/* 캐릭터 시트에서 뽑은 색 (말풍선·도장처럼 그림 밖 요소를 맞출 때 쓴다) */
+const C={
+  navy:"#2b254b", cream:"#efe2d4", pink:"#fc468f", earPink:"#fc6c9c",
+  yellow:"#fddb4e", cyan:"#42cfd4", purple:"#702df6", stamp:"#d9452f"
+};
+const REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+let seq=0;
+function E(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function beep(f,d,v){ try{ if(typeof soundOn!=="undefined"&&soundOn&&typeof tone==="function"){ AC(); tone(f,d,"square",v||0.045); } }catch(e){} }
+
+/* ------------------------------------------------------------------ 그림
+   사용자가 만든 캐릭터 원본 PNG를 그대로 쓴다. 상태별로 한 장씩 겹쳐 두고
+   CSS(data-e)로 하나만 보여 준다 — 바꿀 때 새로 받지 않아 깜빡임이 없다.
+   경로는 빌드가 정한다: 사이트는 mascot/*.png, Artifact 본문은 data URI. */
+const SPR={"base": "mascot/base.png?v=07ee599c", "happy": "mascot/happy.png?v=07ee599c", "combo": "mascot/combo.png?v=07ee599c", "wink": "mascot/wink.png?v=07ee599c", "focus": "mascot/focus.png?v=07ee599c", "surprise": "mascot/surprise.png?v=07ee599c", "panic": "mascot/panic.png?v=07ee599c", "full": "mascot/full.png?v=07ee599c", "full3q": "mascot/full3q.png?v=07ee599c", "map_jp": "mascot/map_jp.png?v=07ee599c", "map_kr": "mascot/map_kr.png?v=07ee599c", "map_world": "mascot/map_world.png?v=07ee599c", "logo": "mascot/logo.png?v=07ee599c", "hero": "mascot/hero.png?v=07ee599c"};
+const FACES=["base","happy","combo","wink","focus","surprise","panic"];
+
+function figure(opt){
+  if(opt.full) return `<img class="s on" src="${SPR[opt.full===true?"full":opt.full]}" alt="고양이 역장" draggable="false">`;
+  return FACES.map(f=>`<img class="s s-${f}" src="${SPR[f]}" alt="${f==="base"?"고양이 역장":""}"`+
+                      ` draggable="false"${f==="base"?"":' aria-hidden="true"'}>`).join("");
+}
+
+/* ------------------------------------------------------------------ 인스턴스 */
+function make(opt){
+  opt=opt||{};
+  const el=document.createElement("div");
+  el.className="mas"+(opt.full?" full":"")+(opt.cls?" "+opt.cls:"");
+  el.dataset.e="base"; el.dataset.p="idle";
+  el.innerHTML=(opt.bubble===false?"":'<div class="mas-say" role="status"></div>')+
+               '<div class="mas-fig">'+figure(opt)+'</div>';
+  const bub=el.querySelector(".mas-say");
+  let faceTimer=0, poseTimer=0, sayTimer=0;
+
+  const api={
+    el,
+    /* 표정: base·happy·combo·wink·focus·surprise·panic. ms를 주면 그 뒤 base로 */
+    face(e,ms){
+      clearTimeout(faceTimer);
+      el.dataset.e=FACES.indexOf(e)>=0?e:"base";
+      if(ms) faceTimer=setTimeout(()=>{ el.dataset.e="base"; },ms);
+      return api;
+    },
+    /* 동작: idle·jump·hop·spin·shake·point·stamp (CSS 애니메이션) */
+    pose(p,ms){
+      clearTimeout(poseTimer); el.dataset.p="idle";
+      void el.offsetWidth;                       // 같은 동작을 연달아 줘도 다시 재생되도록
+      el.dataset.p=p;
+      if(ms) poseTimer=setTimeout(()=>{ el.dataset.p="idle"; },ms);
+      return api;
+    },
+    /* 말풍선. ms가 0이면 계속 띄워 둔다 */
+    say(html,ms){
+      if(!bub) return api;
+      clearTimeout(sayTimer);
+      if(!html){ bub.classList.remove("on"); bub.innerHTML=""; return api; }
+      bub.innerHTML=html; bub.classList.add("on");
+      if(ms) sayTimer=setTimeout(()=>bub.classList.remove("on"),ms);
+      return api;
+    },
+    hush(){ return api.say(""); },
+    show(on){ el.classList.toggle("off",on===false); return api; },
+    /* 자주 쓰는 반응 묶음 */
+    react(kind){
+      if(kind==="ok")      return api.face("happy",1200).pose("jump",700);
+      if(kind==="combo")   return api.face("combo",1600).pose("spin",800);
+      if(kind==="wrong")   return api.face("panic",1400).pose("shake",600);
+      if(kind==="hint")    return api.face("focus",1600).pose("point",900);
+      if(kind==="surprise")return api.face("surprise",1400).pose("hop",600);
+      if(kind==="clear")   return api.face("combo",3000).pose("spin",1200);
+      return api.face("base");
+    }
+  };
+  return api;
+}
+
+/* ------------------------------------------------------------------ 역 스탬프
+   라운드가 끝나면 고양이가 찍어 주는 도장. 기시역 스탬프처럼 둥근 테두리 안에
+   고양이 얼굴과 문구를 넣는다. 색은 주홍 잉크 한 가지. */
+function stampSVG(o){
+  o=o||{};
+  const top=(o.top||"GEO ARCADE").toUpperCase();
+  const mid=o.mid||"완주";
+  const sub=o.sub||"";
+  const date=o.date||"";
+  const ms=mid.length<=2?18:(mid.length===3?15:12);   // 글자 수에 맞춰 크기를 줄인다
+  const ink=o.ink||"currentColor";                    // 기본은 CSS의 color (테마별로 다름)
+  const u=++seq;
+  return `<svg class="mas-stamp-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${E(mid)} 스탬프">
+<defs><path id="sa${u}" d="M60,60 m-45,0 a45,45 0 1,1 90,0"/></defs>
+<circle cx="60" cy="60" r="55.5" fill="none" stroke="${ink}" stroke-width="3.4"/>
+<circle cx="60" cy="60" r="49" fill="none" stroke="${ink}" stroke-width="1.5"/>
+<text class="mas-stamp-t" fill="${ink}"><textPath href="#sa${u}" startOffset="50%" text-anchor="middle">${E(top)}</textPath></text>
+<g stroke="${ink}" stroke-width="2.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M42,40 L38.5,25 L53,32.5"/><path d="M78,40 L81.5,25 L67,32.5"/>
+  <path d="M60,28.5 a20,17.5 0 1,1 -0.1,0z"/>
+  <path d="M52,39.5 q3,-3.6 6,0"/><path d="M62,39.5 q3,-3.6 6,0"/>
+  <path d="M57,46.5 q3,3.4 6,0"/>
+  <path d="M40.5,44 h-8 M40.5,48.5 h-7.5 M79.5,44 h8 M79.5,48.5 h7.5"/>
+</g>
+<text class="mas-stamp-m" x="60" y="79" text-anchor="middle" fill="${ink}" style="font-size:${ms}px">${E(mid)}</text>
+${sub?`<text class="mas-stamp-s" x="60" y="90" text-anchor="middle" fill="${ink}">${E(sub)}</text>`:""}
+${date?`<text class="mas-stamp-s" x="60" y="101.5" style="font-size:8px" text-anchor="middle" fill="${ink}" opacity=".85">${E(date)}</text>`:""}
+</svg>`;
+}
+
+/* 결과 창에서 "쾅" 찍는 연출 */
+function pressStamp(box,o,cat){
+  if(!box) return;
+  box.innerHTML=`<div class="mas-stamp">${stampSVG(o)}</div>`;
+  const s=box.firstChild;
+  if(REDUCED){ s.classList.add("on"); return; }
+  if(cat) cat.pose("stamp",900).face("focus",600);
+  setTimeout(()=>{ s.classList.add("hit"); beep(180,0.09,0.07); beep(120,0.16,0.05); if(cat) cat.face("happy",1600); },260);
+  setTimeout(()=>s.classList.add("on"),260);
+}
+
+/* 결과 이미지(캔버스)용 비트맵 */
+function loadURL(u){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>res(img); img.onerror=rej;
+    setTimeout(()=>rej(new Error("timeout")),6000);
+    img.src=u;
+  });
+}
+function image(opt){
+  opt=opt||{};
+  const key=opt.full?(opt.full===true?"full":opt.full):(opt.e||"base");
+  return loadURL(SPR[key]||SPR.base);
+}
+function stampImage(o){
+  return loadURL("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(stampSVG(o)
+    .replace('class="mas-stamp-svg"','width="250" height="250"')
+    .replace(/class="mas-stamp-t"/g,'font-family="sans-serif" font-size="9" font-weight="700" letter-spacing="2"')
+    .replace(/class="mas-stamp-m"/g,'font-family="sans-serif" font-weight="900"')
+    .replace(/class="mas-stamp-s"/g,'font-family="sans-serif" font-size="9" font-weight="700"')));
+}
+
+/* ------------------------------------------------------------------ 게임 붙이기 */
+const api={make,stampSVG,pressStamp,image,stampImage,SPR,C,stage:null};
+
+function attach(){
+  const wrap=document.querySelector(".mapwrap");
+  if(!wrap||typeof sCorrect!=="function") return;           // 게임 페이지가 아니면 아무것도 안 한다
+  const cat=make({cls:"mas-stage"});
+  wrap.appendChild(cat.el); api.stage=cat;
+
+  /* 정답·오답 효과음은 타이핑·4지선다 어느 쪽이든 반드시 지나간다 — 여기만 감싸면 전부 잡힌다 */
+  const _ok=sCorrect, _no=sWrong;
+  sCorrect=function(st){
+    _ok(st);
+    if(st>0&&st%5===0){ cat.react("combo"); cat.say("🔥 "+st+"연속!",1700); }
+    else cat.react("ok");
+  };
+  sWrong=function(){ _no(); cat.react("wrong"); };
+  const _win=winGame;
+  winGame=function(){ _win(); cat.react("clear"); cat.say("전 구간 완주! 도장 찍어 줄게 🐾",3200); };
+  /* 힌트는 같이 고민하는 표정, 정답 보기·넘어가기는 시무룩 */
+  const hb=document.getElementById("hintbtn"), rb=document.getElementById("revealbtn"), sb=document.getElementById("skipbtn");
+  if(hb) hb.addEventListener("click",()=>{ cat.react("hint"); cat.say("이 근처였는데…",1800); });
+  if(rb) rb.addEventListener("click",()=>{ cat.face("panic",1600).pose("shake",600); });
+  if(sb) sb.addEventListener("click",()=>{ cat.face("focus",1400); });
+
+  /* 라운드 시작 카운트다운에 맞춰 준비 자세 */
+  const stbtn=document.getElementById("startbtn");
+  if(stbtn) stbtn.addEventListener("click",()=>{ cat.hush(); cat.face("focus",2600).pose("hop",600); });
+}
+
+/* 이 파일은 게임 스크립트 맨 끝(문서 마지막)에 붙으므로 DOM은 이미 있다.
+   혹시 더 앞에서 실행되더라도 한 번 더 시도한다. */
+try{ attach(); }catch(e){}
+if(!api.stage) document.addEventListener("DOMContentLoaded",()=>{ try{ attach(); }catch(e){} });
+
+return api;
+})();
+/*END*/</script>
 <script>
 // 문제 예시 띠 (build_all.py가 특산물 데이터에서 채운다: [지역표시, 단서, 정답])
 var TICKER = /*TICKER*/[["KR", "임금님께 진상하던 쌀(지리적표시)", "이천"], ["JP", "사과(りんご) 생산량 일본 1위", "아오모리"], ["KR", "녹차(지리적표시 제1호)", "보성"], ["JP", "귤(みかん)·매실(梅) 생산량 일본 1위", "와카야마"], ["KR", "참외(지리적표시), 전국 최대 산지", "성주"], ["JP", "굴(カキ) 양식 생산량 일본 1위", "히로시마"], ["KR", "전복(지리적표시), 전국 최대 산지", "완도"], ["JP", "금박(金箔): 일본 생산량의 대부분", "이시카와"], ["KR", "하회마을(세계유산)", "안동"], ["JP", "짚불로 겉만 구운 가다랑어 다타키(カツオのたたき)", "고치"], ["KR", "부석사 무량수전(세계유산 산사)", "영주"], ["JP", "백도(白桃)와 머스캣(マスカット): '과일 왕국'", "오카야마"]]/*END*/;
 (function(){
   var box=document.getElementById("ticker"); if(!TICKER.length){ box.remove(); return; }
-  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+  function esc(t){ return String(t).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
   var items=TICKER.map(function(t){ return '<span class="it"><span class="tag">'+t[0]+'</span>'+esc(t[1])+' <span aria-hidden="true">→</span> <span class="ans">'+esc(t[2])+'</span></span>'; }).join("");
-  // 끊김 없이 흐르도록 한 번 더 붙이되, 두 번째 묶음은 화면낭독기가 읽지 않게
-  box.innerHTML='<div class="run">'+items+'<span aria-hidden="true" style="display:contents">'+items+'</span></div>';
+  box.innerHTML='<div class="run">'+items+'</div><div class="run" aria-hidden="true">'+items+'</div>';
 })();
-// 이달의 특집 (build_all.py가 src/season.json으로 채운다)
+// 이달의 특집 (build_all.py가 season.json에서 채운다)
 var SEASON = /*SEASON*/[{"m": 1, "emoji": "❄️", "title": "겨울 축제", "desc": "산천어·빙어·송어·눈축제", "ds": "kr_sgg_sp", "names": ["화천", "인제", "평창", "태백"]}, {"m": 2, "emoji": "🦀", "title": "겨울 바다의 맛", "desc": "대게·과메기·굴", "ds": "kr_sgg_sp", "names": ["영덕", "울진", "포항", "통영"]}, {"m": 3, "emoji": "🌼", "title": "봄꽃 마중", "desc": "매화·산수유", "ds": "kr_sgg_sp", "names": ["광양", "구례", "의성", "양산"]}, {"m": 4, "emoji": "🌸", "title": "벚꽃과 튤립", "desc": "군항제 벚꽃·튤립·철쭉", "ds": "kr_sgg_sp", "names": ["창원", "하동", "태안", "군포"]}, {"m": 5, "emoji": "🦋", "title": "초록의 계절", "desc": "나비·녹차·대나무·장미·철쭉", "ds": "kr_sgg_sp", "names": ["함평", "보성", "담양", "곡성", "합천"]}, {"m": 6, "emoji": "🍉", "title": "초여름 제철", "desc": "단오제·참외·수박", "ds": "kr_sgg_sp", "names": ["강릉", "성주", "고령", "함안"]}, {"m": 7, "emoji": "🏖️", "title": "여름 바다", "desc": "머드·연꽃·서핑", "ds": "kr_sgg_sp", "names": ["보령", "부여", "양양", "속초"]}, {"m": 8, "emoji": "🍇", "title": "포도와 반딧불", "desc": "반딧불·포도·자두", "ds": "kr_sgg_sp", "names": ["무주", "영동", "영천", "김천"]}, {"m": 9, "emoji": "🍄", "title": "가을의 문턱", "desc": "송이·인삼·탈춤", "ds": "kr_sgg_sp", "names": ["봉화", "금산", "영주", "안동"]}, {"m": 10, "emoji": "🍁", "title": "단풍과 축제", "desc": "유등·단풍·쌀 축제", "ds": "kr_sgg_sp", "names": ["진주", "정읍", "장성", "이천"]}, {"m": 11, "emoji": "🍊", "title": "가을걷이", "desc": "곶감·반시·장류", "ds": "kr_sgg_sp", "names": ["상주", "산청", "청도", "순창"]}, {"m": 12, "emoji": "🦪", "title": "겨울 별미", "desc": "굴·김·매생이·미역", "ds": "kr_sgg_sp", "names": ["여수", "완도", "장흥", "기장"]}]/*END*/;
 (function(){
   var m=new Date().getMonth()+1, s=null;
@@ -236,15 +729,20 @@ var SEASON = /*SEASON*/[{"m": 1, "emoji": "❄️", "title": "겨울 축제", "d
   a.classList.add("show");
 })();
 // 연속 공부 — 게임 페이지가 localStorage에 남긴 기록을 읽는다
-(function(){
+function lobbyStreak(){
   try{
-    var p=JSON.parse(localStorage.getItem("geoarcade.player.v2")||"null"); if(!p||!p.days||!p.days.length) return;
+    var p=JSON.parse(localStorage.getItem("geoarcade.player.v2")||"null");
+    if(!p||!p.days||!p.days.length) return {n:0,name:(p&&p.name)||""};
     var set={}; p.days.forEach(function(d){set[d]=1;});
     function key(t){ return t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2); }
     var d=new Date(), n=0; if(!set[key(d)]) d.setDate(d.getDate()-1);
     while(set[key(d)]){ n++; d.setDate(d.getDate()-1); }
-    if(n>0) document.getElementById("streak").textContent=(p.name?p.name+", ":"")+"🔥 "+n+"일째 연속 공부 중";
-  }catch(e){}
+    return {n:n,name:p.name||""};
+  }catch(e){ return {n:0,name:""}; }
+}
+(function(){
+  var s=lobbyStreak();
+  if(s.n>0) document.getElementById("streak").textContent=(s.name?s.name+", ":"")+"🔥 "+s.n+"일째 연속 공부 중";
 })();
 // fullscreen toggle
 (function(){
@@ -262,30 +760,90 @@ var SEASON = /*SEASON*/[{"m": 1, "emoji": "❄️", "title": "겨울 축제", "d
 setTimeout(function(){ document.body.classList.add("crtdone"); var c=document.getElementById("crton"); if(c) c.remove(); }, 1250);
 // twinkling pixel stars
 (function(){
-  const n=26;
-  for(let i=0;i<n;i++){
-    const s=document.createElement("div"); s.className="star";
+  for(var i=0;i<26;i++){
+    var s=document.createElement("div"); s.className="star";
     s.style.left=Math.random()*100+"vw";
-    s.style.top=(Math.random()*62)+"vh";
+    s.style.top=(Math.random()*58)+"vh";
     s.style.animationDelay=(Math.random()*2.4)+"s";
     s.style.opacity=Math.random()*.6+.2;
     document.body.appendChild(s);
   }
 })();
 // arcade blips (Web Audio, no files)
-let ac=null;
+var ac=null;
 function AC(){ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}} if(ac.state==="suspended")ac.resume(); return ac; }
-function blip(f,d,g){ const a=AC(); if(!a)return; const o=a.createOscillator(),v=a.createGain(); o.type="square"; o.frequency.value=f; v.gain.setValueAtTime(0.0001,a.currentTime); v.gain.exponentialRampToValueAtTime(g||0.05,a.currentTime+0.01); v.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d); o.connect(v).connect(a.destination); o.start(); o.stop(a.currentTime+d+0.02); }
+function blip(f,d,g){ var a=AC(); if(!a)return; var o=a.createOscillator(),v=a.createGain(); o.type="square"; o.frequency.value=f; v.gain.setValueAtTime(0.0001,a.currentTime); v.gain.exponentialRampToValueAtTime(g||0.05,a.currentTime+0.01); v.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d); o.connect(v).connect(a.destination); o.start(); o.stop(a.currentTime+d+0.02); }
+function press(href){ blip(880,0.08,0.06); setTimeout(function(){blip(1320,0.12,0.06);},90); setTimeout(function(){ window.location.href=href; },300); }
 document.querySelectorAll(".cab").forEach(function(c){
   c.addEventListener("mouseenter",function(){ blip(660,0.05,0.03); });
   c.addEventListener("click",function(e){
-    e.preventDefault();
-    const href=c.getAttribute("href");
-    blip(880,0.08,0.06); setTimeout(()=>blip(1320,0.12,0.06),90);
-    c.classList.add("pressed");
-    setTimeout(()=>{ window.location.href=href; },320);
+    e.preventDefault(); c.classList.add("pressed"); press(c.getAttribute("href"));
   });
 });
+// HOW TO PLAY
+(function(){
+  var w=document.getElementById("howwrap"), open=document.getElementById("howbtn"), close=document.getElementById("howclose");
+  function set(on){ w.classList.toggle("open",on); if(on) close.focus(); else open.focus(); }
+  open.addEventListener("click",function(){ blip(784,0.06,0.05); set(true); });
+  close.addEventListener("click",function(){ set(false); });
+  w.addEventListener("click",function(e){ if(e.target===w) set(false); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&w.classList.contains("open")) set(false); });
+})();
+</script>
+<script>
+/* ---- 로비 히어로: 로고·캐릭터·모드 선택 ---- */
+(function(){
+  var SPR=(typeof MAS!=="undefined"&&MAS.SPR)||{};
+
+  /* 로고 */
+  var logo=document.getElementById("logo");
+  if(logo&&SPR.logo) logo.src=SPR.logo;
+
+  /* 캐릭터 넉 장을 겹쳐 두고 하나만 보여 준다 — 바꿀 때 새로 받지 않아 깜빡임이 없다 */
+  var KEYS=["hero","map_jp","map_kr","map_world"], imgs={};
+  KEYS.forEach(function(k){
+    var el=document.getElementById("cat-"+k); if(!el||!SPR[k]) return;
+    imgs[k]=el; el.src=SPR[k];
+  });
+  var picked="hero";                       // 고른 모드 (없으면 기본 배너 캐릭터)
+  function show(k){
+    if(!imgs[k]) k="hero";
+    KEYS.forEach(function(x){ if(imgs[x]) imgs[x].classList.toggle("on",x===k); });
+  }
+  if(imgs.hero&&imgs.hero.complete) show("hero");
+  else if(imgs.hero) imgs.hero.onload=function(){ show("hero"); };
+
+  /* 모드 선택 — 올리면 미리 보여 주고, 고르면 유지한다 */
+  var start=document.getElementById("startbtn");
+  var btns=[].slice.call(document.querySelectorAll("#mode button"));
+  btns.forEach(function(b){
+    var art=b.dataset.art, ds=b.dataset.ds;
+    b.addEventListener("mouseenter",function(){ show(art); });
+    b.addEventListener("focus",function(){ show(art); });
+    b.addEventListener("mouseleave",function(){ show(picked); });
+    b.addEventListener("blur",function(){ show(picked); });
+    b.addEventListener("click",function(){
+      var already=b.getAttribute("aria-pressed")==="true";
+      btns.forEach(function(x){ x.setAttribute("aria-pressed","false"); });
+      blip(already?523:784,0.06,0.05);
+      if(already){ picked="hero"; start.href="arcade.html"; }
+      else { b.setAttribute("aria-pressed","true"); picked=art; start.href="arcade.html?ds="+ds; }
+      show(picked);
+    });
+  });
+  document.getElementById("mode").addEventListener("mouseleave",function(){ show(picked); });
+
+  /* GAME START */
+  start.addEventListener("click",function(e){ e.preventDefault(); press(start.getAttribute("href")); });
+
+  /* 카드 그림 앞에 지도별 고양이 — 지도 타이핑은 지구본, 특산물은 한국 */
+  [["cabcat-arcade","map_world"],["cabcat-specialty","map_kr"]].forEach(function(p){
+    var el=document.getElementById(p[0]), url=SPR[p[1]];
+    if(!el||!url) return;
+    el.onload=function(){ el.classList.add("on"); };
+    el.src=url;
+  });
+})();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
 </body>

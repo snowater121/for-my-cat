@@ -1,0 +1,116 @@
+/* ===================== MASCOT — 고양이 역장 =====================
+   원본 PNG(mascot/*.png)를 상태별로 겹쳐 두고 하나만 보여 준다.
+   움직임은 CSS로만 준다 — 그림 자체는 건드리지 않는다. */
+
+.mas{position:relative;width:96px;flex:0 0 auto;user-select:none;pointer-events:none}
+.mas.off{display:none}
+.mas-fig{width:100%;transform-origin:50% 92%;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.25))}
+.mas-fig img{display:block;width:100%;height:auto}
+
+/* 게임 화면: 지도 왼쪽 아래에 선다 */
+.mas-stage{position:absolute;left:10px;bottom:10px;width:112px;z-index:11}
+
+/* ---- 표정 전환 (data-e) ---- */
+.mas .s{display:none}
+.mas[data-e="base"] .s-base,
+.mas[data-e="happy"] .s-happy,
+.mas[data-e="combo"] .s-combo,
+.mas[data-e="wink"] .s-wink,
+.mas[data-e="focus"] .s-focus,
+.mas[data-e="surprise"] .s-surprise,
+.mas[data-e="panic"] .s-panic{display:block}
+.mas.full .s{display:block}            /* 전신 컷은 한 장뿐 */
+
+/* ---- 동작 (data-p) ---- */
+.mas[data-p="idle"] .mas-fig{animation:masBob 3.4s ease-in-out infinite}
+.mas[data-p="jump"] .mas-fig{animation:masJump .62s cubic-bezier(.3,1.5,.5,1)}
+.mas[data-p="hop"] .mas-fig{animation:masHop .5s ease-out}
+.mas[data-p="spin"] .mas-fig{animation:masSpin .8s ease-in-out}
+.mas[data-p="shake"] .mas-fig{animation:masShake .5s ease-in-out}
+.mas[data-p="point"] .mas-fig{animation:masPoint .9s ease-in-out}
+.mas[data-p="stamp"] .mas-fig{animation:masStamp .8s ease-in}
+
+@keyframes masBob{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-3px) scaleY(1.015)}}
+@keyframes masJump{0%{transform:translateY(0) scaleY(.92) scaleX(1.06)}
+  35%{transform:translateY(-22px) scaleY(1.08) scaleX(.95)}
+  70%{transform:translateY(0) scaleY(.94) scaleX(1.05)}100%{transform:none}}
+@keyframes masHop{0%{transform:translateY(0)}45%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+@keyframes masSpin{0%{transform:translateY(0) rotate(0)}
+  40%{transform:translateY(-20px) rotate(200deg)}
+  75%{transform:translateY(0) rotate(360deg) scaleY(.94)}100%{transform:none}}
+@keyframes masShake{0%,100%{transform:translateX(0) rotate(0)}
+  20%{transform:translateX(-6px) rotate(-5deg)}45%{transform:translateX(6px) rotate(5deg)}
+  70%{transform:translateX(-4px) rotate(-3deg)}}
+@keyframes masPoint{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-8deg) translateY(-4px)}}
+@keyframes masStamp{0%{transform:none}
+  35%,60%{transform:translateY(-13px) rotate(-6deg)}
+  80%{transform:translateY(5px) scaleY(.93) rotate(2deg)}100%{transform:none}}
+
+/* ---- 말풍선 ---- */
+.mas-say{position:absolute;left:78%;bottom:68%;width:max-content;min-width:104px;max-width:210px;
+  background:var(--panel);border:2px solid var(--accent);border-radius:11px;padding:7px 10px;
+  font-size:12px;font-weight:800;line-height:1.45;color:var(--text);box-shadow:3px 3px 0 rgba(0,0,0,.28);
+  opacity:0;transform:translateY(6px) scale(.92);transform-origin:0 100%;transition:opacity .2s,transform .2s;z-index:2}
+.mas-say.on{opacity:1;transform:none}
+.mas-say::after{content:"";position:absolute;left:-9px;bottom:9px;width:0;height:0;
+  border:6px solid transparent;border-right-color:var(--accent)}
+.mas-say b{color:var(--gold)}
+/* 오른쪽 끝에 세울 때는 말풍선을 왼쪽으로 */
+.mas.sayleft .mas-say{left:auto;right:78%;transform-origin:100% 100%}
+.mas.sayleft .mas-say::after{left:auto;right:-9px;border-right-color:transparent;border-left-color:var(--accent)}
+
+/* ---- 역 스탬프 ----
+   잉크색은 color 로 내려보낸다 (도장 SVG가 currentColor를 쓴다).
+   밤 화면에서는 같은 주홍이 가라앉아 보여서 한 단계 밝게 쓴다. */
+.mas-stamp,.gstamp.on .sc{color:#d9452f}
+body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
+.mas-stamp{width:124px;margin:0 auto;position:relative;opacity:0}
+.mas-stamp.on{opacity:1}
+.mas-stamp-svg{display:block;width:100%;height:auto}
+.mas-stamp-t{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700;letter-spacing:2px}
+.mas-stamp-m{font-family:"Noto Sans KR",sans-serif;font-size:17px;font-weight:900;letter-spacing:1px}
+.mas-stamp-s{font-family:"Noto Sans KR",sans-serif;font-size:9px;font-weight:700}
+.mas-stamp.hit{animation:masPress .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes masPress{0%{opacity:0;transform:scale(2.4) rotate(-20deg)}
+  55%{opacity:1;transform:scale(.94) rotate(-7deg)}
+  70%{transform:scale(1.03) rotate(-5deg)}100%{opacity:1;transform:scale(1) rotate(-6deg)}}
+
+/* 결과 창 안에서 고양이와 스탬프를 나란히 */
+.masresult{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;margin:2px 0 4px}
+.masresult .mas{width:104px}
+.masresult .mas-say{display:none}
+
+/* 칭호 — 스탬프 수첩에서 가장 어려운 걸 딴 것이 따라온다 */
+.gtitle{font-size:12.5px;font-weight:800;color:var(--sub)}
+.gtitle b{color:var(--gold);font-size:13.5px}
+
+/* ---- 스탬프 수첩 (업적 탭) ---- */
+.gstampbook{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.gstamp{text-align:center}
+.gstamp .sc{position:relative;width:88px;height:88px;margin:0 auto 6px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  border:2px dashed var(--sub);background:var(--panel2);opacity:.42;filter:grayscale(1)}
+.gstamp.on .sc{border:none;background:none;opacity:1;filter:none;transform:rotate(-6deg)}
+.gstamp.on .sc svg{width:100%;height:100%}
+.gstamp b{display:block;font-size:12px;color:var(--text)}
+.gstamp small{display:block;font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.35;margin-top:2px}
+.gstamp:not(.on) b{color:var(--sub)}
+.gstampnote{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.gstampnote .bar{flex:1;height:7px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.gstampnote .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold))}
+
+/* ---- 좁은 화면 ---- */
+@media(max-width:820px){ .mas-stage{width:88px;left:6px;bottom:4px} .mas-say{font-size:11px;max-width:150px} }
+@media(max-width:600px){ .mas-stage{width:66px} .mas-stage .mas-say{display:none}
+  .masresult .mas{width:80px} .mas-stamp{width:104px}
+  .gstampbook{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+  .gstamp .sc{width:72px;height:72px;font-size:24px} }
+@media(max-height:520px) and (orientation:landscape){ .mas-stage{display:none} }
+
+@media(prefers-reduced-motion:reduce){
+  .mas-fig{animation:none!important}
+  .mas-stamp.hit{animation:none}
+  .mas-say{transition:none}
+}
