@@ -1,6 +1,6 @@
-/* GEO ARCADE 서비스워커 — build_all.py가 cd666ac484를 채워 ../sw.js로 쓴다.
+/* GEO ARCADE 서비스워커 — build_all.py가 9082766bfd를 채워 ../sw.js로 쓴다.
    HTML은 '네트워크 먼저'(새 버전이 바로 보이게), 폰트·이미지는 '캐시 먼저'(오프라인에서도 동작). */
-const CACHE = "geo-arcade-cd666ac484";
+const CACHE = "geo-arcade-9082766bfd";
 const CORE = ["./", "index.html", "arcade.html", "specialty.html", "manifest.webmanifest",
               "terms.html", "privacy.html", "legal.css", "shot-arcade.jpg", "shot-specialty.jpg",
               "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
@@ -17,6 +17,9 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // 실시간 대결: 스트림과 DB 호출은 절대 캐시하지 않는다 (캐시하면 옛 방 상태가 계속 돌아온다)
+  if (url.pathname.includes("/mock-db/")) return;
+  if ((req.headers.get("accept") || "").includes("text/event-stream")) return;
   const isPage = req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
   if (url.origin === location.origin && isPage) {
     e.respondWith(fetch(req).then(res => {

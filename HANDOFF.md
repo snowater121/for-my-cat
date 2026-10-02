@@ -541,3 +541,86 @@ MAS.stage                              // 게임 페이지의 상주 고양이
 27. 로비를 다시 쓸 때 `/*SEASON*/…/*END*/` 같은 자리 표시 넷을 **빈 채로 남겨 두면 된다** —
     `build_all.py`가 매번 다시 채운다. 내용까지 손으로 옮길 필요가 없다.
 28. 배너 로고·캐릭터에 `pngtool.cut_background`를 돌리지 마라 (§18.3).
+
+
+---
+
+## 19. 2026-10-02 — 1:1 실시간 대결방
+
+둘이 **같은 문제를 같은 순서로** 동시에 풀고, 맞힌 개수(같으면 걸린 시간)로 승부를 가린다.
+
+### 19.1 파일
+```
+src/versus.js / versus.css   대결방 전체 (방 만들기·입장·준비·동시 시작·진행도·승패)
+src/versus.json              Firebase Realtime Database 주소. 비면 기능이 통째로 꺼진다
+.claude/serve.mjs            개발용 모의 RTDB (/mock-db) — 배포에는 들어가지 않는다
+```
+`build_artifact.py` 7b 단계에서 **growth.js 뒤에** 붙는다(대결 라운드가 growth의 특별 라운드를 쓴다).
+
+### 19.2 SDK를 쓰지 않는다
+Firebase Realtime Database를 **REST로만** 쓴다.
+- 읽기(실시간): `EventSource(<db>/rooms/<코드>.json)` → `put` / `patch` 이벤트
+- 쓰기: `fetch`의 `PUT` / `PATCH` / `DELETE`
+
+RTDB REST가 EventSource를 그대로 받아 주므로 100KB짜리 SDK가 필요 없고, "단일 HTML 한 장" 원칙도 지켜진다.
+
+### 19.3 방 구조
+```
+/rooms/{코드}/cfg       {ds,mode,dir,n,seed,host,at}   방장이 한 번 쓴다
+/rooms/{코드}/p/{id}    {name,ready,found,round,done,ms,grid,at}
+/rooms/{코드}/go        시작 시각(ms). 찍히면 양쪽이 같은 시각에 카운트다운
+```
+흐름: 방 만들기 → 코드·링크 공유 → 상대 입장 → 둘 다 준비 → 방장이 `go`를 찍음 →
+양쪽 동시 3·2·1 → 같은 시드로 같은 문제 → 진행도 실시간 공유 → 둘 다 끝나면 승패·🟩🟨🟥 비교 → 다시 대결.
+
+### 19.4 Firebase 붙이는 법 (사용자가 해야 하는 한 단계)
+1. [console.firebase.google.com](https://console.firebase.google.com) → **프로젝트 추가**. 이름은 아무거나,
+   Google 애널리틱스는 **사용 안 함**으로 둬도 된다.
+2. 왼쪽 **빌드 → Realtime Database → 데이터베이스 만들기**. (Firestore가 아니다. 둘 다 있고 이름이 비슷하다.)
+   위치는 아무 곳이나. 시작 모드는 **잠금 모드**를 고른다 — 테스트 모드는 30일 뒤 막혀서 어느 날 갑자기 안 된다.
+3. 데이터 탭 맨 위에 있는 주소를 복사해 `src/versus.json`의 `url`에 넣는다.
+   - `us-central1`이면 `https://<프로젝트>-default-rtdb.firebaseio.com`
+   - 다른 지역이면 `https://<프로젝트>-default-rtdb.<지역>.firebasedatabase.app`
+4. **규칙** 탭에 `src/versus-rules.json`을 통째로 붙여넣고 **게시**. 잠금 모드로 시작했으면 이걸 해야 열린다.
+5. `cd src && python3 build_all.py` → 시작 화면에 `⚔️ 1:1 대결` 버튼이 생긴다.
+
+주소는 공개돼도 되는 값이다(클라이언트용 식별자지 비밀번호가 아니다). 다만 **로그인이 없으므로 규칙이
+유일한 방어선**이다 — 4번을 건너뛰면 안 된다. 무료 요금제(Spark)로 충분하다.
+방은 6시간이 지나면 클라이언트가 "오래된 방"으로 거절한다. 실제 삭제는 콘솔 데이터 탭에서 가끔 비우면 된다.
+
+### 19.4-1 실제로 붙인 주소 (2026-10-03)
+`https://geo-arcade-default-rtdb.asia-southeast1.firebasedatabase.app` — `src/versus.json`에 들어가 있다.
+규칙은 `src/versus-rules.json` 그대로 게시됨. 붙인 뒤 확인한 것:
+
+| 검사 | 결과 |
+|---|---|
+| 방 만들기·참가자·go 쓰기 | 통과 (200) |
+| 문제 수 9999처럼 범위 밖 값 | 거부 (401) |
+| 규칙에 없는 칸 추가 | 거부 (401) |
+| `/rooms` 밖에 쓰기 | 거부 (401) |
+| 방 목록 훑기(`/rooms.json`) | 거부 (401) |
+| 두 탭 대결 전 과정 | 통과 (동시 시작·같은 문제 순서·실시간 진행도·승패·재대결) |
+
+### 19.5 개발용 모의 DB
+`.claude/serve.mjs`가 `/mock-db`에서 RTDB REST의 쓰는 부분만 흉내 낸다(GET·PUT·PATCH·DELETE·EventSource).
+`versus.json`의 `url`을 `"/mock-db"`로 두고 빌드하면 **Firebase 없이 두 탭으로** 대결을 끝까지 확인할 수 있다.
+확인이 끝나면 `url`을 다시 비우고 빌드한다.
+
+### 19.6 다시 밟지 말 것
+29. **`const VS`는 `typeof`로도 못 막는다(TDZ).** growth.js가 먼저 평가되므로 이름으로 보면
+    "Cannot access 'VS' before initialization"으로 페이지 전체가 죽는다 → `window.VS`로 본다.
+    그리고 `window.VS=api`는 `init()`보다 **먼저** 걸어야 한다(init이 시작 화면을 다시 그린다).
+30. **참가자 id는 `sessionStorage`에 둔다.** localStorage에 두면 같은 브라우저의 두 탭이 한 사람이 되어
+    혼자 방에 들어간 꼴이 된다(테스트도 못 한다).
+31. **서비스워커가 실시간 요청을 캐시하면 안 된다.** 같은 출처의 GET을 '캐시 먼저'로 돌려주므로
+    방 상태가 옛것으로 고정된다 → `sw.template.js`에서 `/mock-db/`와 `text/event-stream`을 건너뛴다.
+    (배포에서는 Firebase가 다른 출처라 원래 안 걸리지만, 모의 DB로 확인할 때 걸린다.)
+32. **재대결은 준비 상태를 먼저 내리고 `go`를 지운다.** 순서를 바꾸면 지우는 사이에 "둘 다 준비됨"이
+    잠깐 성립해 `go`가 다시 찍히고 라운드가 혼자 시작된다. `maybeGo()`도 `phase==="lobby"`일 때만 찍는다.
+33. 대결 라운드는 `SPECIAL.n`으로 문제 수를 자르므로 **최고 기록에서 빠진다**(§14.3 11번과 같은 이유).
+
+### 19.7 아직 안 한 것
+- 상대가 중간에 나갔을 때의 처리(지금은 그대로 기다린다). 창을 닫을 때 알리는 코드가 있었으나
+  sendBeacon은 POST라 RTDB에서는 자식이 하나 생길 뿐이라 지웠다 — 제대로 하려면 다른 방법이 필요하다.
+- 3판 2선승 같은 누적 전적
+- 로비에서 바로 방 만들기 (지금은 게임 화면의 시작 화면에서 연다)

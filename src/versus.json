@@ -1,0 +1,5 @@
+{
+  "_": "Firebase Realtime Database 주소. 비어 있으면 1:1 대결 기능이 통째로 꺼진다.",
+  "_설정법": "Firebase 콘솔에서 Realtime Database를 만들고 'https://<이름>-default-rtdb.<지역>.firebasedatabase.app' 주소를 url에 넣는다. 보안 규칙은 HANDOFF.md 참고.",
+  "url": "https://geo-arcade-default-rtdb.asia-southeast1.firebasedatabase.app"
+}

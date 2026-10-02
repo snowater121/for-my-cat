@@ -129,6 +129,14 @@ function applyChallenge(o){
   switchDs(o.ds);
 }
 function exitSpecial(){ SPECIAL=null; resetGame(); }
+/* 1:1 대결: 방이 정한 지도·모드·시드·문제 수로 라운드를 준비한다 (versus.js가 부른다) */
+function startVersus(o){
+  if(!o||!DATASETS[o.ds]) return;
+  setModeUI(o.mode); if(o.dir) setDirUI(o.dir);
+  SPECIAL={type:"versus",codes:null,seed:(o.seed>>>0)||1,n:o.n||10,
+           title:o.title||"⚔️ 1:1 대결",sub:"상대와 같은 문제를 같은 순서로"};
+  switchDs(o.ds);
+}
 
 /* 라운드 준비: 모든 라운드의 순서를 시드로 만든다 (그래야 도전장이 같은 순서를 재현한다) */
 const _reset=resetGame;
@@ -142,6 +150,7 @@ resetGame=function(){
   } else {
     SEED=(SPECIAL&&SPECIAL.seed)||((Math.random()*4294967295)>>>0)||1;
     queue=seeded(pool(),SEED);
+    if(SPECIAL&&SPECIAL.n){ queue=queue.slice(0,SPECIAL.n); ROUND=queue.length; }   // 대결: 정해진 문제 수
   }
   ROUND_CODES=queue.slice(); updateStats(); renderStart();
 };
@@ -187,11 +196,14 @@ REC.finish=function(cleared){
   _finish(cleared);                                   // 최고 기록 갱신 + 저장
   // 오늘의 문제·특집처럼 문제가 정해진 짧은 라운드는 전체 라운드 기록과 섞이지 않게 최고 기록에서 뺀다
   // (플레이 횟수·연속 공부·업적에는 그대로 반영)
-  if(sp&&sp.codes){ if(prev) P.best[key]=prev; else delete P.best[key]; renderBestStrip(); }
+  if(sp&&(sp.codes||sp.n)){ if(prev) P.best[key]=prev; else delete P.best[key]; renderBestStrip(); }
   const now=P.best[key]; res.newBest=!!(now&&prev&&now.at!==prev.at);
   res.fresh=checkAch();
   persist();
   LAST=res;
+  if(sp&&sp.type==="versus"&&window.VS&&window.VS.on()){
+    window.VS.finish(res); announce(res.fresh); return;        // 승패 비교는 대결방 창이 맡는다
+  }
   setTimeout(()=>showResult(res), cleared?1300:450);
 };
 
@@ -210,7 +222,8 @@ function renderStart(){
   } else {
     const done=!!P.daily[dailyKey()], s=seasonNow(), canSeason=s&&seasonTarget(s);
     html+=`<div class="gbtns"><button type="button" class="gbtn${done?" done":""}" data-g="daily">📅 오늘의 문제 <small>${done?"완료 ✓":DAILY_N+"문제"}</small></button>`+
-          (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+`</div>`;
+          (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+
+          ((window.VS&&window.VS.on())?`<button type="button" class="gbtn" data-g="versus">⚔️ 1:1 대결 <small>실시간</small></button>`:"")+`</div>`;
   }
   const tt=titleNow();
   if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
@@ -429,6 +442,7 @@ function init(){
     if(soundOn){AC();tone(784,0.05,"square",0.05);}
     if(b.dataset.g==="daily") startDaily();
     else if(b.dataset.g==="season"){ const s=seasonNow(); if(s) startSeason(s.m); }
+    else if(b.dataset.g==="versus"){ if(window.VS) window.VS.openNew(); }
     else if(b.dataset.g==="exit") exitSpecial();
   });
   // 링크로 들어온 경우: ?c=도전장  ?season=월  ?daily=1  ?ds=데이터셋
@@ -447,5 +461,5 @@ function init(){
   const f=checkAch(); if(f.length){ persist(); }      // 예전 기록으로 이미 달성한 업적은 조용히 채운다
 }
 init();
-return {startDaily,startSeason,exitSpecial,streakNow,bestDays};
+return {startDaily,startSeason,exitSpecial,startVersus,renderStart,streakNow,bestDays};
 })();

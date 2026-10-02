@@ -1,0 +1,77 @@
+/* ===================== VERSUS — 1:1 실시간 대결방 ===================== */
+.vswrap{position:fixed;inset:0;z-index:128;display:none;align-items:center;justify-content:center;padding:14px;
+  background:rgba(6,4,22,.76);backdrop-filter:blur(3px)}
+body:not(.dark) .vswrap{background:rgba(226,233,243,.84)}
+.vswrap.open{display:flex}
+.vsbox{width:min(420px,100%);max-height:min(90dvh,720px);overflow:auto;background:var(--panel);
+  border:3px solid var(--accent);border-radius:12px;box-shadow:7px 7px 0 var(--miss);display:flex;flex-direction:column}
+.vshead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:2px solid var(--line);
+  background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
+.vshead h2{flex:1;margin:0;font-family:"Press Start 2P",monospace;font-size:13px;color:var(--accent);letter-spacing:0;line-height:1.5}
+.vshead button{background:none;border:2px solid var(--line);color:var(--sub);border-radius:9px;width:34px;height:34px;
+  font-size:15px;cursor:pointer}
+.vshead button:hover{border-color:var(--miss);color:var(--text)}
+.vsbody{padding:14px 15px 16px;display:flex;flex-direction:column;gap:10px}
+.vsintro{margin:0;font-size:12.5px;font-weight:700;color:var(--sub);line-height:1.6}
+.vsintro b{color:var(--text)}
+.vscfg{font-size:12px;font-weight:800;color:var(--sub);text-align:center}
+
+.vsfield{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:800;color:var(--sub)}
+.vsfield select,.vsfield input{background:var(--inputbg1);border:2px solid var(--line);border-radius:8px;color:var(--text);
+  padding:8px 10px;font:inherit;font-size:14px;font-weight:800;min-width:132px}
+.vsfield input{letter-spacing:3px;text-transform:uppercase;text-align:center}
+.vsfield select:focus,.vsfield input:focus{outline:none;border-color:var(--accent)}
+.vsor{text-align:center;font-size:11px;font-weight:800;color:var(--sub);opacity:.7}
+
+.vsbtn{font:inherit;font-size:13px;font-weight:800;color:var(--text);background:var(--panel2);border:2px solid var(--line);
+  border-radius:9px;padding:11px 12px;cursor:pointer;box-shadow:2px 2px 0 #0006}
+.vsbtn.primary{background:var(--gold);color:#04121a;border-color:var(--gold)}
+.vsbtn.ghost{background:none;color:var(--sub);box-shadow:none}
+.vsbtn:active{transform:translate(2px,2px);box-shadow:none}
+.vsbtn:disabled{opacity:.55;cursor:default;transform:none}
+.vsbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* 참가자 줄 — 아래 띠가 진행도 */
+.vsp{position:relative;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:9px 11px 12px;overflow:hidden}
+.vsp b{display:block;font-size:13.5px;color:var(--text)}
+.vsp small{display:block;font-size:11.5px;color:var(--sub);font-weight:700;margin-top:2px}
+.vsp i{position:absolute;left:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--ok));
+  transition:width .3s ease}
+.vsp.ready{border-color:var(--ok)}
+.vsp.empty{opacity:.6;border-style:dashed}
+
+.vsend{text-align:center;font-family:"Press Start 2P",monospace;font-size:11px;line-height:1.6;padding:10px;
+  border-radius:9px;border:2px solid var(--line)}
+.vsend.win{color:var(--ok);border-color:var(--ok)}
+.vsend.lose{color:var(--miss);border-color:var(--miss)}
+.vsend.draw{color:var(--gold);border-color:var(--gold)}
+.vsgrid{display:flex;flex-direction:column;gap:5px;font-size:19px;letter-spacing:2px}
+.vsgrid div{display:flex;align-items:center;gap:8px}
+.vsgrid span{font-size:11px;font-weight:800;color:var(--sub);letter-spacing:0;min-width:28px}
+.vsact{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vsact .vsbtn:first-child{grid-column:1/-1}
+.vsnote{font-size:11.5px;font-weight:700;color:var(--sub);text-align:center;line-height:1.5;min-height:1px}
+
+/* 플레이 중: 지도 위쪽에 두 사람 진행도 */
+.vshud{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:9;display:none;gap:8px;
+  background:var(--glass);border:2px solid var(--line);border-radius:10px;padding:7px 10px;
+  max-width:calc(100% - 24px);pointer-events:none}
+.vshud.on{display:flex}
+.vsb{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--text)}
+.vsb span{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vsb i{display:block;width:70px;height:7px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.vsb i b{display:block;height:100%;background:var(--accent);transition:width .3s ease}
+.vsb.foe i b{background:var(--miss)}
+.vsb em{font-style:normal;font-variant-numeric:tabular-nums;min-width:18px;text-align:right;color:var(--sub)}
+
+/* 방에 들어와 있고 아직 시작 전이면 혼자 먼저 시작하지 못하게 한다 */
+body.vswait #startbtn{display:none}
+body.vswait .gstart{opacity:.5;pointer-events:none}
+
+@media(max-width:600px){
+  .vshud{top:4px;padding:5px 8px;gap:6px}
+  .vsb i{width:52px}
+  .vsb span{max-width:54px}
+  .vsgrid{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){ .vsp i,.vsb i b{transition:none} }

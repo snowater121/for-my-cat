@@ -1,0 +1,44 @@
+// Firebase Realtime Database 보안 규칙 — 콘솔의 Realtime Database → '규칙' 탭에 통째로 붙여넣고 [게시].
+//
+// 로그인이 없으므로 /rooms/<코드> 가지 밖은 전부 막는다. /rooms 자체에는 권한을 주지 않아서
+// 방 목록을 훑거나 한꺼번에 지울 수 없고, 방 안에서도 쓸 수 있는 칸과 자료형을 못 박는다.
+{
+  "rules": {
+    "rooms": {
+      "$code": {
+        ".read": "$code.length <= 8",
+        ".write": "$code.length <= 8",
+
+        "cfg": {
+          ".validate": "newData.hasChildren(['ds','mode','n','seed','host','at'])",
+          "ds":   { ".validate": "newData.isString() && newData.val().length <= 16" },
+          "mode": { ".validate": "newData.isString() && newData.val().length <= 8" },
+          "dir":  { ".validate": "newData.isString() && newData.val().length <= 8" },
+          "n":    { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 300" },
+          "seed": { ".validate": "newData.isNumber()" },
+          "host": { ".validate": "newData.isString() && newData.val().length <= 24" },
+          "at":   { ".validate": "newData.isNumber()" },
+          "$other": { ".validate": false }
+        },
+
+        "p": {
+          "$pid": {
+            ".validate": "$pid.length <= 24 && newData.hasChild('name')",
+            "name":  { ".validate": "newData.isString() && newData.val().length <= 20" },
+            "ready": { ".validate": "newData.isBoolean()" },
+            "found": { ".validate": "newData.isNumber()" },
+            "round": { ".validate": "newData.isNumber()" },
+            "done":  { ".validate": "newData.isBoolean()" },
+            "ms":    { ".validate": "newData.isNumber()" },
+            "grid":  { ".validate": "newData.isString() && newData.val().length <= 400" },
+            "at":    { ".validate": "newData.isNumber()" },
+            "$other": { ".validate": false }
+          }
+        },
+
+        "go": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
