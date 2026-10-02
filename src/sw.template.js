@@ -17,6 +17,9 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // 실시간 대결: 스트림과 DB 호출은 절대 캐시하지 않는다 (캐시하면 옛 방 상태가 계속 돌아온다)
+  if (url.pathname.includes("/mock-db/")) return;
+  if ((req.headers.get("accept") || "").includes("text/event-stream")) return;
   const isPage = req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
   if (url.origin === location.origin && isPage) {
     e.respondWith(fetch(req).then(res => {

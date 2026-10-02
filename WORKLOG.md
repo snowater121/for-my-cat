@@ -182,3 +182,11 @@
 > 각각 로고 파일과 배너 캐릭터 파일은 banner 폴더에 만들어놨어
 
 > → `index.html` 재작성. 게임 로직·라우팅·데이터는 그대로. `HANDOFF.md` §18.
+
+**35.**
+
+> 혹시 일대일 플레이어 간의 대결 시스템 제작도 가능할까? 대결 방을 만들어서.
+> → 실시간 방(Firebase) · 같은 문제 풀고 기록 비교
+
+> → `src/versus.js`로 구현. Firebase RTDB를 SDK 없이 REST+EventSource로 쓴다.
+> Firebase 주소만 넣으면 켜진다. 개발용 모의 DB로 두 탭 검증 완료. `HANDOFF.md` §19.
