@@ -574,28 +574,19 @@ RTDB REST가 EventSource를 그대로 받아 주므로 100KB짜리 SDK가 필요
 양쪽 동시 3·2·1 → 같은 시드로 같은 문제 → 진행도 실시간 공유 → 둘 다 끝나면 승패·🟩🟨🟥 비교 → 다시 대결.
 
 ### 19.4 Firebase 붙이는 법 (사용자가 해야 하는 한 단계)
-1. [console.firebase.google.com](https://console.firebase.google.com) 에서 프로젝트를 만든다.
-2. **Realtime Database**를 만든다(Firestore 아님). 지역은 아무 곳이나.
-3. 주소(`https://<이름>-default-rtdb.<지역>.firebasedatabase.app`)를 `src/versus.json`의 `url`에 넣는다.
-4. 규칙(Rules)을 아래로 바꾼다. 로그인이 없으므로 **방 가지 아래로만** 읽고 쓰게 막는다.
-```json
-{
-  "rules": {
-    "rooms": {
-      "$code": {
-        ".read": "$code.length <= 8",
-        ".write": "$code.length <= 8",
-        "p": { "$pid": { ".validate": "$pid.length <= 24" } },
-        "go": { ".validate": "newData.isNumber()" }
-      }
-    }
-  }
-}
-```
-5. `cd src && python3 build_all.py` → 대결 버튼이 시작 화면에 생긴다.
+1. [console.firebase.google.com](https://console.firebase.google.com) → **프로젝트 추가**. 이름은 아무거나,
+   Google 애널리틱스는 **사용 안 함**으로 둬도 된다.
+2. 왼쪽 **빌드 → Realtime Database → 데이터베이스 만들기**. (Firestore가 아니다. 둘 다 있고 이름이 비슷하다.)
+   위치는 아무 곳이나. 시작 모드는 **잠금 모드**를 고른다 — 테스트 모드는 30일 뒤 막혀서 어느 날 갑자기 안 된다.
+3. 데이터 탭 맨 위에 있는 주소를 복사해 `src/versus.json`의 `url`에 넣는다.
+   - `us-central1`이면 `https://<프로젝트>-default-rtdb.firebaseio.com`
+   - 다른 지역이면 `https://<프로젝트>-default-rtdb.<지역>.firebasedatabase.app`
+4. **규칙** 탭에 `src/versus-rules.json`을 통째로 붙여넣고 **게시**. 잠금 모드로 시작했으면 이걸 해야 열린다.
+5. `cd src && python3 build_all.py` → 시작 화면에 `⚔️ 1:1 대결` 버튼이 생긴다.
 
-주소는 공개돼도 되는 값이다(클라이언트용). 다만 로그인이 없어 규칙 밖의 경로는 반드시 막아야 한다.
-방은 6시간 지나면 클라이언트가 "오래된 방"으로 거절한다. 실제 삭제는 Firebase 콘솔에서 가끔 비우면 된다.
+주소는 공개돼도 되는 값이다(클라이언트용 식별자지 비밀번호가 아니다). 다만 **로그인이 없으므로 규칙이
+유일한 방어선**이다 — 4번을 건너뛰면 안 된다. 무료 요금제(Spark)로 충분하다.
+방은 6시간이 지나면 클라이언트가 "오래된 방"으로 거절한다. 실제 삭제는 콘솔 데이터 탭에서 가끔 비우면 된다.
 
 ### 19.5 개발용 모의 DB
 `.claude/serve.mjs`가 `/mock-db`에서 RTDB REST의 쓰는 부분만 흉내 낸다(GET·PUT·PATCH·DELETE·EventSource).
@@ -616,6 +607,7 @@ RTDB REST가 EventSource를 그대로 받아 주므로 100KB짜리 SDK가 필요
 33. 대결 라운드는 `SPECIAL.n`으로 문제 수를 자르므로 **최고 기록에서 빠진다**(§14.3 11번과 같은 이유).
 
 ### 19.7 아직 안 한 것
-- 상대가 중간에 나갔을 때의 처리(지금은 그대로 기다린다)
+- 상대가 중간에 나갔을 때의 처리(지금은 그대로 기다린다). 창을 닫을 때 알리는 코드가 있었으나
+  sendBeacon은 POST라 RTDB에서는 자식이 하나 생길 뿐이라 지웠다 — 제대로 하려면 다른 방법이 필요하다.
 - 3판 2선승 같은 누적 전적
 - 로비에서 바로 방 만들기 (지금은 게임 화면의 시작 화면에서 연다)

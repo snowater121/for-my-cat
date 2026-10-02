@@ -1,6 +1,6 @@
-/* GEO ARCADE 서비스워커 — build_all.py가 6f6924d1d7를 채워 ../sw.js로 쓴다.
+/* GEO ARCADE 서비스워커 — build_all.py가 fe64606951를 채워 ../sw.js로 쓴다.
    HTML은 '네트워크 먼저'(새 버전이 바로 보이게), 폰트·이미지는 '캐시 먼저'(오프라인에서도 동작). */
-const CACHE = "geo-arcade-6f6924d1d7";
+const CACHE = "geo-arcade-fe64606951";
 const CORE = ["./", "index.html", "arcade.html", "specialty.html", "manifest.webmanifest",
               "terms.html", "privacy.html", "legal.css", "shot-arcade.jpg", "shot-specialty.jpg",
               "icon-192.png", "icon-512.png", "apple-touch-icon.png"];

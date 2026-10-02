@@ -2723,7 +2723,6 @@ function init(){
     updateStats=function(){ _u(); pushProgress(); drawHud(); };
   }
   if(typeof GROW!=="undefined"&&GROW.renderStart) GROW.renderStart();   // ⚔️ 버튼을 뒤늦게 붙인다
-  window.addEventListener("beforeunload",()=>{ if(room&&me) navigator.sendBeacon&&navigator.sendBeacon(url("/rooms/"+room+"/p/"+me),JSON.stringify({gone:true})); });
 }
 init();
 return api;
