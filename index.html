@@ -387,7 +387,8 @@ body.dark .mas-stamp,body.dark .gstamp.on .sc{color:#ff6e50}
 
 /* ---- 좁은 화면 ---- */
 @media(max-width:820px){ .mas-stage{width:88px;left:6px;bottom:4px} .mas-say{font-size:11px;max-width:150px} }
-@media(max-width:600px){ .mas-stage{width:66px} .mas-stage .mas-say{display:none}
+/* 좁은 화면에서는 '전체 위치' 미니맵이 왼쪽 아래로 내려온다 — 고양이는 오른쪽으로 비킨다 */
+@media(max-width:600px){ .mas-stage{width:66px;left:auto;right:10px} .mas-stage .mas-say{display:none}
   .masresult .mas{width:80px} .mas-stamp{width:104px}
   .gstampbook{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
   .gstamp .sc{width:72px;height:72px;font-size:24px} }
