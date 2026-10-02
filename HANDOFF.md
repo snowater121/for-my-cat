@@ -588,6 +588,19 @@ RTDB REST가 EventSource를 그대로 받아 주므로 100KB짜리 SDK가 필요
 유일한 방어선**이다 — 4번을 건너뛰면 안 된다. 무료 요금제(Spark)로 충분하다.
 방은 6시간이 지나면 클라이언트가 "오래된 방"으로 거절한다. 실제 삭제는 콘솔 데이터 탭에서 가끔 비우면 된다.
 
+### 19.4-1 실제로 붙인 주소 (2026-10-03)
+`https://geo-arcade-default-rtdb.asia-southeast1.firebasedatabase.app` — `src/versus.json`에 들어가 있다.
+규칙은 `src/versus-rules.json` 그대로 게시됨. 붙인 뒤 확인한 것:
+
+| 검사 | 결과 |
+|---|---|
+| 방 만들기·참가자·go 쓰기 | 통과 (200) |
+| 문제 수 9999처럼 범위 밖 값 | 거부 (401) |
+| 규칙에 없는 칸 추가 | 거부 (401) |
+| `/rooms` 밖에 쓰기 | 거부 (401) |
+| 방 목록 훑기(`/rooms.json`) | 거부 (401) |
+| 두 탭 대결 전 과정 | 통과 (동시 시작·같은 문제 순서·실시간 진행도·승패·재대결) |
+
 ### 19.5 개발용 모의 DB
 `.claude/serve.mjs`가 `/mock-db`에서 RTDB REST의 쓰는 부분만 흉내 낸다(GET·PUT·PATCH·DELETE·EventSource).
 `versus.json`의 `url`을 `"/mock-db"`로 두고 빌드하면 **Firebase 없이 두 탭으로** 대결을 끝까지 확인할 수 있다.
