@@ -21,7 +21,11 @@ function dayNum(s){ const [y,m,d]=s.split("-").map(Number); return Math.round(Da
 function hash(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
 function rng(seed){ let a=seed>>>0; return function(){ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
 function seeded(arr,seed){ const a=arr.slice().sort(), r=rng(seed); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function pool(){ return mode==="eju"?EJU_CODES:CODES; }
+/* rawPool = 지도에 있는 전부. pool = 거기서 PICK 이 거른 것(대륙·난이도·빼놓기).
+   오늘의 문제·도전장·대결은 **모두가 같은 문제**를 같은 순서로 풀어야 하므로
+   각자의 고르기를 적용하면 안 된다 → 그쪽은 rawPool 을 쓴다. */
+function rawPool(){ return mode==="eju"?EJU_CODES:CODES; }
+function pool(){ const all=rawPool(); return window.PICK?window.PICK.filter(all):all; }
 function b64e(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
 function b64d(s){ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; return decodeURIComponent(escape(atob(s))); }
 function $(id){ return document.getElementById(id); }
@@ -100,7 +104,7 @@ function switchDs(ds){
 }
 function startDaily(){
   if(mode==="free") setModeUI(PAGE_MODES.includes("quiz")?"quiz":PAGE_MODES[0]);
-  const codes=seeded(pool(),hash(ymd()+"|"+CURRENT+"|"+(mode==="eju"?"eju":mode))).slice(0,DAILY_N);
+  const codes=seeded(rawPool(),hash(ymd()+"|"+CURRENT+"|"+(mode==="eju"?"eju":mode))).slice(0,DAILY_N);
   SPECIAL={type:"daily",codes,seed:0,title:"📅 "+monthDay()+" 오늘의 문제"};
   resetGame();
 }
@@ -145,12 +149,13 @@ resetGame=function(){
   OUT={};
   if(mode==="free"){ ROUND_CODES=[]; SEED=0; renderStart(); return; }
   if(SPECIAL&&SPECIAL.codes){
-    const p=new Set(pool());
+    const p=new Set(rawPool());
     queue=SPECIAL.codes.filter(c=>p.has(c)); ROUND=queue.length; SEED=0;
   } else {
     SEED=(SPECIAL&&SPECIAL.seed)||((Math.random()*4294967295)>>>0)||1;
-    queue=seeded(pool(),SEED);
-    if(SPECIAL&&SPECIAL.n){ queue=queue.slice(0,SPECIAL.n); ROUND=queue.length; }   // 대결: 정해진 문제 수
+    queue=seeded(SPECIAL?rawPool():pool(),SEED);      // 특별 라운드는 모두 같은 문제여야 한다
+    if(SPECIAL&&SPECIAL.n) queue=queue.slice(0,SPECIAL.n);                          // 대결: 정해진 문제 수
+    ROUND=queue.length;              // 대륙·난이도·빼놓기로 걸러졌으면 그만큼만 센다
   }
   ROUND_CODES=queue.slice(); updateStats(); renderStart();
 };

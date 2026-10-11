@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const PORT = Number(process.env.PORT) || 4173;   // 앱이 포트를 정해 주면 그걸 쓴다
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const TYPE = {".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",
   ".css":"text/css; charset=utf-8",".json":"application/json; charset=utf-8",
@@ -100,4 +101,4 @@ http.createServer((req, res) => {
   res.writeHead(200, {"content-type": TYPE[path.extname(file)] || "application/octet-stream",
                       "cache-control":"no-store"});
   fs.createReadStream(file).pipe(res);
-}).listen(4173, () => console.log("http://localhost:4173  (모의 DB: /mock-db)"));
+}).listen(PORT, () => console.log("http://localhost:" + PORT + "  (모의 DB: /mock-db)"));
