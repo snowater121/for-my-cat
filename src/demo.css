@@ -1,0 +1,19 @@
+/* ===================== DEMO — 소개 영상용 자동 시연 ===================== */
+.demoveil{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,8,20,.86);backdrop-filter:blur(4px)}
+.demobox{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
+  background:var(--panel);border:3px solid var(--accent);border-radius:14px;padding:26px 30px;
+  box-shadow:7px 7px 0 var(--miss)}
+.demobox b{font-family:"Press Start 2P",monospace;font-size:13px;color:var(--accent);line-height:1.6}
+.demobox small{font-size:12.5px;font-weight:700;color:var(--sub)}
+.demobox em{font-size:11px;font-style:normal;font-weight:700;color:var(--sub);opacity:.75}
+.demobox button{font:inherit;font-size:14px;font-weight:900;background:var(--gold);color:#04121a;
+  border:3px solid var(--gold);border-radius:10px;padding:12px 22px;cursor:pointer;box-shadow:3px 3px 0 #0007}
+.demobox button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0007}
+
+/* 시연이 '누른' 곳은 한 번 튄다 — 가짜 커서보다 깔끔하다 */
+.demopress{animation:demoPress .42s cubic-bezier(.2,.9,.2,1)}
+@keyframes demoPress{0%{transform:scale(1)}35%{transform:scale(.93);filter:brightness(1.5)}100%{transform:scale(1)}}
+
+/* 시연 중에는 눈에 거슬리는 것만 잠깐 숨긴다 */
+body.demorun .fsbtn,body.demorun .gearwrap{opacity:0;transition:opacity .3s}
