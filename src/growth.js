@@ -230,6 +230,7 @@ function renderStart(){
           (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+
           ((window.VS&&window.VS.on())?`<button type="button" class="gbtn" data-g="versus">⚔️ 1:1 대결 <small>실시간</small></button>`:"")+`</div>`;
   }
+  if(!SPECIAL&&window.PICK&&PICK.startRow) html+=PICK.startRow();   // 🏝️ 속령 넣기/빼기
   const tt=titleNow();
   if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
   box.innerHTML=html;
@@ -447,6 +448,7 @@ function init(){
     if(soundOn){AC();tone(784,0.05,"square",0.05);}
     if(b.dataset.g==="daily") startDaily();
     else if(b.dataset.g==="season"){ const s=seasonNow(); if(s) startSeason(s.m); }
+    else if(b.dataset.g==="minor"){ if(window.PICK) window.PICK.toggleMinor(); }
     else if(b.dataset.g==="versus"){ if(window.VS) window.VS.openNew(); }
     else if(b.dataset.g==="exit") exitSpecial();
   });

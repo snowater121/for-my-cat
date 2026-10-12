@@ -20,6 +20,12 @@ def load(path):
     return json.load(io.open(path, encoding='utf-8'))
 
 jp, eju, world = load('data.json'), load('eju.json'), load('world.json')
+
+# 세계지도의 '주권국가가 아닌 곳' (속령·해외영토·무인도). 시작 화면 체크 하나로 넣고 뺀다.
+_wm = load('world_minor.json')
+WORLD_MINOR = sorted(c for k, v in _wm.items() if not k.startswith('_') for c in v)
+_unknown = [c for c in WORLD_MINOR if c not in world]
+assert not _unknown, "world.json에 없는 코드: %s" % _unknown
 korea, korea_sgg = load('korea.json'), load('korea_sgg.json')
 
 JP_REGIONS = ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"]
@@ -65,7 +71,7 @@ CATALOG = {
   "kr_sgg": {"label": "시·군", "icon": "🏘️", "brand": "한국 시·군 메모리", "zoomMin": 0.2, "vb": [0, 0, 900, 972],
             "altLang": "정식 명칭", "altHint": "정식 명칭으로 입력 (이천시, 가평군 …)", "dense": True,
             "regionOrder": SGG_REGIONS, "regionColor": SGG_COLORS, "data": korea_sgg, "eju": {}},
-  "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "zoomMin": 0.3, "vb": [0, 0, 1010, 666],
+  "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "zoomMin": 0.3, "minor": WORLD_MINOR, "vb": [0, 0, 1010, 666],
             "altLang": "English", "altHint": "영어(English)로 입력", "dense": True,
             "regionOrder": ["아시아","유럽","아프리카","북·중미","남아메리카","오세아니아","기타"],
             "regionColor": {"아시아":"#E15759","유럽":"#4E79A7","아프리카":"#F28E2B","북·중미":"#59A14F",

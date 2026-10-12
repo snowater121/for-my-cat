@@ -295,6 +295,11 @@ body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.25))}
 
 /* 게임 화면: 지도 왼쪽 아래에 선다 */
 .mas-stage{position:absolute;left:10px;bottom:10px;width:112px;z-index:11}
+/* 지도 화면에서는 말풍선을 고양이 '위'로 올린다 — 옆으로 뻗으면 시작 화면 가운데
+   내용(오늘의 문제·속령 체크 …)과 겹친다 */
+.mas-stage .mas-say{left:2px;right:auto;bottom:calc(100% - 8px);transform-origin:0 100%}
+.mas-stage .mas-say::after{left:20px;right:auto;bottom:-11px;
+  border-color:var(--accent) transparent transparent transparent}
 
 /* ---- 표정 전환 (data-e) ---- */
 .mas .s{display:none}

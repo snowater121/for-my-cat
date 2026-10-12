@@ -25,12 +25,18 @@ function st(key){
   /* 한국 시·군은 군 단위가 처음엔 어렵다는 피드백 → 기본을 '시 단위만'으로 둔다.
      한 번이라도 직접 고르면 그 값을 쓴다(전부는 ""로 저장해 '안 고름'과 구분). */
   if(v.tier===undefined||v.tier===null) v.tier=/^kr_sgg/.test(key)?"si":"";
+  /* 세계지도의 속령·무인도는 기본으로 뺀다 (처음엔 나라만 197곳) */
+  if(v.minor===undefined) v.minor=false;
   return v;
 }
 
 /* 이 지도에 어떤 고르기가 쓸모 있는가 */
 function hasConts(){ return ds()==="world"; }
 function hasTier(){ return /^kr_sgg/.test(ds()); }
+function minorList(){
+  try{ return (DATASETS[ds()]||{}).minor||null; }catch(e){ return null; }
+}
+function hasMinor(){ const m=minorList(); return !!(m&&m.length); }
 function isGun(code){
   const d=(typeof DATA!=="undefined"&&DATA[code])||null;
   return !!(d&&/군$/.test(d.kanji||""));
@@ -43,6 +49,7 @@ function filter(codes){
   let out=codes.filter(c=>!off[c]);
   if(hasConts()&&conts.length) out=out.filter(c=>conts.indexOf((DATA[c]||{}).region)>=0);
   if(hasTier()&&v.tier==="si") out=out.filter(c=>!isGun(c));
+  if(hasMinor()&&!v.minor){ const m=new Set(minorList()); out=out.filter(c=>!m.has(c)); }
   /* 전부 걸러지면 라운드를 만들 수 없다 — 그대로 돌려주고 알린다 */
   if(!out.length){ note("고른 조건에 맞는 문제가 없어서 전체로 풉니다."); return codes; }
   return out;
@@ -110,6 +117,7 @@ function wrap(){
     }
     else if(k==="contall"){ v.conts=[]; save(); apply(); }
     else if(k==="tier"){ v.tier=b.dataset.v||""; save(); apply(); }
+    else if(k==="minor"){ v.minor=!!b.dataset.v; save(); apply(); }
     else if(k==="on"){ setOff(b.dataset.v,false); apply(); }
     else if(k==="onall"){ v.off={}; save(); apply(); }
   });
@@ -144,6 +152,14 @@ function render(){
       '</div></div>';
   }
 
+  if(hasMinor()){
+    const n=minorList().length;
+    body+='<div class="picksec"><h4>속령·작은 섬 <small>괌, 미국령 버진아일랜드, 무인도…</small></h4><div class="pickchips">'+
+      `<button type="button" data-k="minor" data-v="" class="${v.minor?"":"on"}">나라만 <i>${(typeof CODES!=="undefined"?CODES.length:0)-n}</i></button>`+
+      `<button type="button" data-k="minor" data-v="1" class="${v.minor?"on":""}">속령까지 전부 <i>${(typeof CODES!=="undefined"?CODES.length:0)}</i></button>`+
+      '</div></div>';
+  }
+
   const off=Object.keys(v.off).filter(c=>DATA&&DATA[c]);
   body+='<div class="picksec"><h4>빼놓은 문제 <small>지도에서 눌러 뺄 수 있어요</small></h4>';
   if(!off.length) body+='<p class="pickempty">아직 없어요. 플레이 중에 지도에서 누르면 다음부터 안 나와요.</p>';
@@ -162,7 +178,20 @@ function render(){
     </div></div>`;
 }
 
-const api={filter,isOff,setOff,tapOut,open,close,paintChips,count};
+/* 시작 화면에 넣는 체크 한 줄 — growth.js 의 renderStart 가 불러다 붙인다 */
+function startRow(){
+  if(!hasMinor()) return "";
+  const on=st().minor, n=minorList().length;
+  return `<label class="pickminor"><input type="checkbox" data-g="minor"${on?" checked":""}>`+
+         `🏝️ 속령·작은 섬도 함께 <small>${n}곳 · 괌, 미국령 버진아일랜드 같은 곳</small></label>`;
+}
+function toggleMinor(){
+  const v=st(); v.minor=!v.minor; save();
+  if(typeof resetGame==="function") resetGame();
+  render();
+}
+
+const api={filter,isOff,setOff,tapOut,open,close,paintChips,count,startRow,toggleMinor,hasMinor};
 try{ window.PICK=api; }catch(e){}
 
 function init(){

@@ -530,6 +530,16 @@ body:not(.dark) .pickwrap{background:rgba(226,233,243,.84)}
 @media(max-width:600px){ .pickbox{width:100%} .picktoast{font-size:12px;bottom:12px} }
 @media(prefers-reduced-motion:reduce){ .picktoast{transition:none} }
 
+/* 시작 화면의 '속령·작은 섬도 함께' 한 줄 */
+.pickminor{display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:12.5px;font-weight:800;color:var(--text);background:var(--panel);
+  border:2px solid var(--line);border-radius:9px;padding:8px 12px;max-width:100%}
+.pickminor:hover{border-color:var(--accent)}
+.pickminor input{width:17px;height:17px;accent-color:var(--gold);cursor:pointer;flex:0 0 auto;margin:0}
+.pickminor small{font-weight:700;color:var(--sub);font-size:11px}
+.pickminor:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:600px){ .pickminor{font-size:11.5px;padding:7px 10px} .pickminor small{display:none} }
+
 /* ===================== MASCOT — 고양이 역장 =====================
    원본 PNG(mascot/*.png)를 상태별로 겹쳐 두고 하나만 보여 준다.
    움직임은 CSS로만 준다 — 그림 자체는 건드리지 않는다. */
@@ -543,6 +553,11 @@ body:not(.dark) .mas-fig{filter:drop-shadow(0 5px 8px rgba(24,32,54,.25))}
 
 /* 게임 화면: 지도 왼쪽 아래에 선다 */
 .mas-stage{position:absolute;left:10px;bottom:10px;width:112px;z-index:11}
+/* 지도 화면에서는 말풍선을 고양이 '위'로 올린다 — 옆으로 뻗으면 시작 화면 가운데
+   내용(오늘의 문제·속령 체크 …)과 겹친다 */
+.mas-stage .mas-say{left:2px;right:auto;bottom:calc(100% - 8px);transform-origin:0 100%}
+.mas-stage .mas-say::after{left:20px;right:auto;bottom:-11px;
+  border-color:var(--accent) transparent transparent transparent}
 
 /* ---- 표정 전환 (data-e) ---- */
 .mas .s{display:none}
@@ -2096,12 +2111,18 @@ function st(key){
   /* 한국 시·군은 군 단위가 처음엔 어렵다는 피드백 → 기본을 '시 단위만'으로 둔다.
      한 번이라도 직접 고르면 그 값을 쓴다(전부는 ""로 저장해 '안 고름'과 구분). */
   if(v.tier===undefined||v.tier===null) v.tier=/^kr_sgg/.test(key)?"si":"";
+  /* 세계지도의 속령·무인도는 기본으로 뺀다 (처음엔 나라만 197곳) */
+  if(v.minor===undefined) v.minor=false;
   return v;
 }
 
 /* 이 지도에 어떤 고르기가 쓸모 있는가 */
 function hasConts(){ return ds()==="world"; }
 function hasTier(){ return /^kr_sgg/.test(ds()); }
+function minorList(){
+  try{ return (DATASETS[ds()]||{}).minor||null; }catch(e){ return null; }
+}
+function hasMinor(){ const m=minorList(); return !!(m&&m.length); }
 function isGun(code){
   const d=(typeof DATA!=="undefined"&&DATA[code])||null;
   return !!(d&&/군$/.test(d.kanji||""));
@@ -2114,6 +2135,7 @@ function filter(codes){
   let out=codes.filter(c=>!off[c]);
   if(hasConts()&&conts.length) out=out.filter(c=>conts.indexOf((DATA[c]||{}).region)>=0);
   if(hasTier()&&v.tier==="si") out=out.filter(c=>!isGun(c));
+  if(hasMinor()&&!v.minor){ const m=new Set(minorList()); out=out.filter(c=>!m.has(c)); }
   /* 전부 걸러지면 라운드를 만들 수 없다 — 그대로 돌려주고 알린다 */
   if(!out.length){ note("고른 조건에 맞는 문제가 없어서 전체로 풉니다."); return codes; }
   return out;
@@ -2181,6 +2203,7 @@ function wrap(){
     }
     else if(k==="contall"){ v.conts=[]; save(); apply(); }
     else if(k==="tier"){ v.tier=b.dataset.v||""; save(); apply(); }
+    else if(k==="minor"){ v.minor=!!b.dataset.v; save(); apply(); }
     else if(k==="on"){ setOff(b.dataset.v,false); apply(); }
     else if(k==="onall"){ v.off={}; save(); apply(); }
   });
@@ -2215,6 +2238,14 @@ function render(){
       '</div></div>';
   }
 
+  if(hasMinor()){
+    const n=minorList().length;
+    body+='<div class="picksec"><h4>속령·작은 섬 <small>괌, 미국령 버진아일랜드, 무인도…</small></h4><div class="pickchips">'+
+      `<button type="button" data-k="minor" data-v="" class="${v.minor?"":"on"}">나라만 <i>${(typeof CODES!=="undefined"?CODES.length:0)-n}</i></button>`+
+      `<button type="button" data-k="minor" data-v="1" class="${v.minor?"on":""}">속령까지 전부 <i>${(typeof CODES!=="undefined"?CODES.length:0)}</i></button>`+
+      '</div></div>';
+  }
+
   const off=Object.keys(v.off).filter(c=>DATA&&DATA[c]);
   body+='<div class="picksec"><h4>빼놓은 문제 <small>지도에서 눌러 뺄 수 있어요</small></h4>';
   if(!off.length) body+='<p class="pickempty">아직 없어요. 플레이 중에 지도에서 누르면 다음부터 안 나와요.</p>';
@@ -2233,7 +2264,20 @@ function render(){
     </div></div>`;
 }
 
-const api={filter,isOff,setOff,tapOut,open,close,paintChips,count};
+/* 시작 화면에 넣는 체크 한 줄 — growth.js 의 renderStart 가 불러다 붙인다 */
+function startRow(){
+  if(!hasMinor()) return "";
+  const on=st().minor, n=minorList().length;
+  return `<label class="pickminor"><input type="checkbox" data-g="minor"${on?" checked":""}>`+
+         `🏝️ 속령·작은 섬도 함께 <small>${n}곳 · 괌, 미국령 버진아일랜드 같은 곳</small></label>`;
+}
+function toggleMinor(){
+  const v=st(); v.minor=!v.minor; save();
+  if(typeof resetGame==="function") resetGame();
+  render();
+}
+
+const api={filter,isOff,setOff,tapOut,open,close,paintChips,count,startRow,toggleMinor,hasMinor};
 try{ window.PICK=api; }catch(e){}
 
 function init(){
@@ -2496,6 +2540,7 @@ function renderStart(){
           (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+
           ((window.VS&&window.VS.on())?`<button type="button" class="gbtn" data-g="versus">⚔️ 1:1 대결 <small>실시간</small></button>`:"")+`</div>`;
   }
+  if(!SPECIAL&&window.PICK&&PICK.startRow) html+=PICK.startRow();   // 🏝️ 속령 넣기/빼기
   const tt=titleNow();
   if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
   box.innerHTML=html;
@@ -2713,6 +2758,7 @@ function init(){
     if(soundOn){AC();tone(784,0.05,"square",0.05);}
     if(b.dataset.g==="daily") startDaily();
     else if(b.dataset.g==="season"){ const s=seasonNow(); if(s) startSeason(s.m); }
+    else if(b.dataset.g==="minor"){ if(window.PICK) window.PICK.toggleMinor(); }
     else if(b.dataset.g==="versus"){ if(window.VS) window.VS.openNew(); }
     else if(b.dataset.g==="exit") exitSpecial();
   });
