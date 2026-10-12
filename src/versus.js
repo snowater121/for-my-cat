@@ -283,27 +283,74 @@ function render(){
   maybeGo(); watchGo();
 }
 
-/* ---------- 화면: 플레이 중 상대 진행도 ---------- */
+/* ---------- 화면: 플레이 중 경합 게이지 ----------
+   지도 왼쪽 빈 자리에 세로로 세운다. 막대가 아래에서 차오르고, 상대가 한 개
+   맞힐 때마다 상대 쪽이 튀고, 순위가 뒤집히면 게이지 전체가 흔들린다.
+   DOM은 한 번만 만들고 숫자·높이·클래스만 갈아 끼운다 — 그래야 전환이 매끄럽다. */
+let lastFoe=-1, lastLead=null, alarmT=0, bumpT=0;
+function beep(f,d,v){
+  try{ if(typeof soundOn!=="undefined"&&soundOn&&typeof tone==="function"){ AC(); tone(f,d,"square",v||0.04); } }catch(e){}
+}
 function hud(){
   let h=$("vshud");
   if(!h){
     h=document.createElement("div"); h.id="vshud"; h.className="vshud";
+    h.setAttribute("aria-hidden","true");
+    h.innerHTML=
+      '<div class="vsscore"><b id="vsme">0</b><i>:</i><em id="vsfoe">0</em></div>'+
+      '<div class="vsstat" id="vsstat"></div>'+
+      '<div class="vstracks">'+
+        '<div class="vstrack me"><u><i id="vsbarme"></i></u><span id="vsnme">나</span></div>'+
+        '<div class="vstrack foe"><u><i id="vsbarfoe"></i></u><span id="vsnfoe">상대</span></div>'+
+      '</div>';
     const wrap=document.querySelector(".mapwrap");
     (wrap||document.body).appendChild(h);
   }
   return h;
 }
-function showHud(){ hud().classList.add("on"); drawHud(); }
+function showHud(){ lastFoe=-1; lastLead=null; hud().classList.add("on"); drawHud(); }
 function hideHud(){ const h=$("vshud"); if(h) h.classList.remove("on"); }
+
 function drawHud(){
   const h=$("vshud"); if(!h||!h.classList.contains("on")) return;
   const a=mine(), b=foe();
-  const bar=(p,cls)=>{
-    const pct=p&&p.round?Math.round((p.found||0)/p.round*100):0;
-    return `<div class="vsb ${cls}"><span>${p?esc(p.name||"익명"):"상대"}</span>`+
-           `<i><b style="width:${pct}%"></b></i><em>${p?(p.found||0):0}</em></div>`;
-  };
-  h.innerHTML=bar(a,"me")+bar(b,"foe");
+  const af=(a&&a.found)||0, bf=(b&&b.found)||0;
+  const n=(a&&a.round)||(b&&b.round)||1;
+  $("vsme").textContent=af;
+  $("vsfoe").textContent=bf;
+  /* 세로일 때는 height, 좁은 화면에서 눕히면 --w(너비)를 쓴다 */
+  const fill=(id,v)=>{ const el=$(id), pct=Math.round(v/n*100)+"%"; el.style.height=pct; el.style.setProperty("--w",pct); };
+  fill("vsbarme",af); fill("vsbarfoe",bf);
+  if(a) $("vsnme").textContent=(a.name||"나").slice(0,5);
+  if(b) $("vsnfoe").textContent=(b.name||"상대").slice(0,5);
+
+  /* 상태 한 줄 — 앞서는지 쫓기는지가 한눈에 */
+  const gap=af-bf;
+  const lead=gap>0?"lead":(gap<0?"behind":"tie");
+  const left=n-bf;
+  let txt;
+  if(b&&b.done) txt="상대 끝! 서둘러";
+  else if(left<=1&&bf>0) txt="상대 1개 남음!";
+  else if(gap>0) txt="+"+gap+" 앞서는 중";
+  else if(gap<0) txt=(-gap)+"개 뒤처짐";
+  else txt=bf?"동점!":"출발";
+  const st=$("vsstat");
+  st.textContent=txt;
+  st.className="vsstat "+lead+((b&&b.done)||left<=1?" urgent":"");
+
+  /* 상대가 한 개 맞혔다 → 상대 막대가 튄다 */
+  if(lastFoe>=0&&bf>lastFoe){
+    const t=$("vsbarfoe").parentNode.parentNode;
+    t.classList.remove("bump"); void t.offsetWidth; t.classList.add("bump");
+    clearTimeout(bumpT); bumpT=setTimeout(()=>t.classList.remove("bump"),700);
+  }
+  /* 순위가 뒤집혔다 → 게이지 전체가 흔들리고 소리가 난다 */
+  if(lastLead&&lead!==lastLead&&lead!=="lead"&&phase==="play"){
+    h.classList.remove("alarm"); void h.offsetWidth; h.classList.add("alarm");
+    clearTimeout(alarmT); alarmT=setTimeout(()=>h.classList.remove("alarm"),900);
+    beep(lead==="behind"?196:262,0.12,0.05);
+  }
+  lastFoe=bf; lastLead=lead;
 }
 
 /* ---------- 들어오기 ---------- */

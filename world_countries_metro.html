@@ -428,6 +428,7 @@ const TOTAL = CODES.length;
 const EJU_CODES = Object.keys(EJU);
 let ROUND = TOTAL;
 const FULL_VB=[0,0,1010,666];
+let ZOOM_MIN=0.30;   // 클로즈업 최소 넓이(전체 지도 대비). 지도마다 loadDataset이 바꾼다
 function OVU(){ return getComputedStyle(document.body).getPropertyValue('--ovunfound').trim()||'#2a3346'; }
 
 const norm = s => (s||"").toString().trim().toLowerCase().replace(/[\s・·.\-()]/g,"");
@@ -495,6 +496,11 @@ function vbForTarget(code){
   const b=bboxOf(code); if(!b) return FULL_VB.slice();
   const pad=Math.max(b.w,b.h)*0.85+10;
   let w=b.w+pad*2, h=b.h+pad*2;
+  // 여백을 대상 크기에만 맞추면 작은 나라는 화면을 꽉 채우도록 당겨져서
+  // 어느 대륙인지조차 안 보인다 → 전체 지도 대비 최소 넓이를 둔다.
+  const mw=FULL_VB[2]*ZOOM_MIN, mh=FULL_VB[3]*ZOOM_MIN;
+  if(w<mw){ h*=mw/w; w=mw; }
+  if(h<mh){ w*=mh/h; h=mh; }
   const ar=(svg.clientWidth||900)/(svg.clientHeight||600);
   if(w/h<ar) w=h*ar; else h=w/ar;
   const cx=b.x+b.w/2, cy=b.y+b.h/2;

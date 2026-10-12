@@ -21,6 +21,8 @@ HTML = re.sub(r'const REGION_ORDER = \[.*?\];\nconst REGION_COLOR = \{.*?\};', r
 # viewBox + FULL_VB (world)
 HTML = HTML.replace('viewBox="-40 -5 650 546"', 'viewBox="0 0 1010 666"')
 HTML = HTML.replace('const FULL_VB=[-40,-5,650,546];', 'const FULL_VB=[0,0,1010,666];')
+# 세계지도는 나라가 작아 더 넓게 보여 줘야 어디쯤인지 안다
+HTML = HTML.replace('let ZOOM_MIN=0.16;', 'let ZOOM_MIN=0.30;')
 # title / brand
 HTML = HTML.replace('<title>일본 도도부현 메모리 · Japan Prefecture Metro</title>',
                     '<title>세계 국가 이름 메모리 · World Countries Metro</title>')

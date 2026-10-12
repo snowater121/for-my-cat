@@ -1,0 +1,63 @@
+/* ===================== PICK — 문제 고르기 ===================== */
+/* 빼놓은 곳은 지도와 칩 양쪽에서 흐리게 */
+path.pref.pickoff{opacity:.25!important;filter:grayscale(1)}
+.chip.pickoff{opacity:.4;text-decoration:line-through}
+
+.pickwrap{position:fixed;inset:0;z-index:126;display:none;align-items:center;justify-content:center;padding:14px;
+  background:rgba(6,4,22,.76);backdrop-filter:blur(3px)}
+body:not(.dark) .pickwrap{background:rgba(226,233,243,.84)}
+.pickwrap.open{display:flex}
+.pickbox{width:min(440px,100%);max-height:min(88dvh,720px);overflow:auto;background:var(--panel);
+  border:3px solid var(--accent);border-radius:12px;box-shadow:7px 7px 0 var(--miss);display:flex;flex-direction:column}
+.pickhead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:2px solid var(--line);
+  background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
+.pickhead h2{flex:1;margin:0;font-family:"Press Start 2P",monospace;font-size:12px;color:var(--accent);line-height:1.5}
+.pickhead button{background:none;border:2px solid var(--line);color:var(--sub);border-radius:9px;width:34px;height:34px;
+  font-size:15px;cursor:pointer}
+.pickhead button:hover{border-color:var(--miss);color:var(--text)}
+.pickbody{padding:13px 15px 16px;display:flex;flex-direction:column;gap:14px}
+
+.picksec h4{margin:0 0 8px;font-size:13px;color:var(--text);display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.picksec h4 small{font-size:11px;font-weight:600;color:var(--sub)}
+.pickchips{display:flex;flex-wrap:wrap;gap:7px}
+.pickchips button{font:inherit;font-size:12.5px;font-weight:800;color:var(--text);background:var(--panel2);
+  border:2px solid var(--line);border-radius:9px;padding:7px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pickchips button i{font-style:normal;font-size:11px;color:var(--sub);font-variant-numeric:tabular-nums}
+.pickchips button:hover{border-color:var(--accent)}
+.pickchips button.on{border-color:var(--gold);background:var(--gold);color:#04121a}
+.pickchips button.on i{color:#04121a99}
+.pickchips button.back{border-style:dashed;color:var(--sub)}
+.pickchips button.back:hover{border-style:solid;color:var(--text)}
+.pickchips button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.picklink{display:inline-block;margin-top:8px;background:none;border:none;color:var(--sub);font:inherit;font-size:11.5px;
+  font-weight:800;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:2px}
+.picklink:hover{color:var(--text)}
+.pickempty{margin:0;font-size:12px;font-weight:600;color:var(--sub);line-height:1.6}
+.picksum{border-top:2px dashed var(--line);padding-top:11px;font-size:13px;font-weight:800;color:var(--sub);text-align:center}
+.picksum b{color:var(--gold);font-size:16px;font-variant-numeric:tabular-nums}
+.picknote{font-size:11.5px;font-weight:700;color:var(--miss);text-align:center}
+.picknote:empty{display:none}
+
+/* 지도에서 뺐을 때 뜨는 알림 */
+.picktoast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,160%);z-index:131;background:var(--panel);
+  border:2px solid var(--accent);border-radius:11px;box-shadow:4px 4px 0 var(--miss);padding:10px 13px;font-size:13px;
+  font-weight:800;color:var(--text);transition:transform .32s cubic-bezier(.2,.9,.2,1);max-width:calc(100% - 28px);
+  display:flex;align-items:center;gap:10px}
+.picktoast.show{transform:translate(-50%,0)}
+.picktoast b{color:var(--gold)}
+.picktoast button{font:inherit;font-size:12px;font-weight:800;background:var(--panel2);border:2px solid var(--line);
+  color:var(--text);border-radius:8px;padding:5px 9px;cursor:pointer;white-space:nowrap}
+.picktoast button:hover{border-color:var(--accent)}
+
+@media(max-width:600px){ .pickbox{width:100%} .picktoast{font-size:12px;bottom:12px} }
+@media(prefers-reduced-motion:reduce){ .picktoast{transition:none} }
+
+/* 시작 화면의 '속령·작은 섬도 함께' 한 줄 */
+.pickminor{display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:12.5px;font-weight:800;color:var(--text);background:var(--panel);
+  border:2px solid var(--line);border-radius:9px;padding:8px 12px;max-width:100%}
+.pickminor:hover{border-color:var(--accent)}
+.pickminor input{width:17px;height:17px;accent-color:var(--gold);cursor:pointer;flex:0 0 auto;margin:0}
+.pickminor small{font-weight:700;color:var(--sub);font-size:11px}
+.pickminor:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:600px){ .pickminor{font-size:11.5px;padding:7px 10px} .pickminor small{display:none} }

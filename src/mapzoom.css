@@ -1,0 +1,33 @@
+/* ===================== MAPZOOM — 지도 확대·축소·이동 ===================== */
+#map{touch-action:none}            /* 핀치·드래그를 우리가 받는다 */
+.mapwrap.zoomed #map{cursor:grab}
+.mapwrap.zoomed #map:active{cursor:grabbing}
+
+.mzbar{position:absolute;right:12px;bottom:12px;z-index:8;display:flex;flex-direction:column;gap:5px}
+.mzbar button{width:34px;height:34px;border-radius:9px;font-size:16px;line-height:1;cursor:pointer;
+  background:var(--glass);border:2px solid var(--line);color:var(--text);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px #0003}
+.mzbar button:hover{border-color:var(--accent);color:var(--accent)}
+.mzbar button:active{transform:translateY(1px)}
+.mzbar button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* 좁은 화면: 오른쪽 아래는 고양이 자리, 왼쪽 아래는 '전체 위치' 자리 → 단추는 중간 높이로 */
+@media(max-width:600px){
+  .mzbar{right:8px;bottom:auto;top:50%;transform:translateY(-50%);gap:4px}
+  .mzbar button{width:30px;height:30px;font-size:14px}
+}
+@media(max-height:520px) and (orientation:landscape){ .mzbar{right:6px;bottom:6px} }
+
+/* ---- 전체 지도 ↔ 클로즈업 자리 바꾸기 ---- */
+.overview{transition:border-color .2s,box-shadow .2s}
+.overview:hover,.overview:focus-visible{border-color:var(--accent);box-shadow:0 4px 16px #0004}
+.overview:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+/* 누를 수 있다는 표시 */
+.overview::after{content:"⤢";position:absolute;right:6px;top:4px;font-size:10px;color:var(--sub);opacity:.6;pointer-events:none}
+.overview:hover::after{opacity:1;color:var(--accent)}
+/* 뒤집힌 상태: 작은 칸이 '확대 보기'가 된다 */
+.overview.swapped{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset,0 4px 16px #0004}
+.overview.swapped .cap{color:var(--gold);font-weight:800}
+
+.mzbar button[data-z="swap"].on{border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold) inset,0 3px 10px #0003}

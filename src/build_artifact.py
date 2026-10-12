@@ -20,6 +20,12 @@ def load(path):
     return json.load(io.open(path, encoding='utf-8'))
 
 jp, eju, world = load('data.json'), load('eju.json'), load('world.json')
+
+# 세계지도의 '주권국가가 아닌 곳' (속령·해외영토·무인도). 시작 화면 체크 하나로 넣고 뺀다.
+_wm = load('world_minor.json')
+WORLD_MINOR = sorted(c for k, v in _wm.items() if not k.startswith('_') for c in v)
+_unknown = [c for c in WORLD_MINOR if c not in world]
+assert not _unknown, "world.json에 없는 코드: %s" % _unknown
 korea, korea_sgg = load('korea.json'), load('korea_sgg.json')
 
 JP_REGIONS = ["홋카이도","도호쿠","간토","주부","간사이","주고쿠","시코쿠","규슈","오키나와"]
@@ -56,16 +62,16 @@ def specialty(mapdata, path):
 
 
 CATALOG = {
-  "jp":    {"label": "일본", "icon": "🗾", "brand": "일본 도도부현 메모리", "vb": [-40, -5, 650, 546],
+  "jp":    {"label": "일본", "icon": "🗾", "brand": "일본 도도부현 메모리", "zoomMin": 0.16, "vb": [-40, -5, 650, 546],
             "altLang": "日本語", "altHint": "日本語で入力（漢字・かな・ローマ字）",
             "regionOrder": JP_REGIONS, "regionColor": JP_COLORS, "data": jp, "eju": eju},
-  "kr":    {"label": "시·도", "icon": "🇰🇷", "brand": "한국 시·도 메모리", "vb": [0, 0, 524, 631],
+  "kr":    {"label": "시·도", "icon": "🇰🇷", "brand": "한국 시·도 메모리", "zoomMin": 0.18, "vb": [0, 0, 524, 631],
             "altLang": "日本語", "altHint": "日本語で入力（漢字・かな）",
             "regionOrder": KR_REGIONS, "regionColor": KR_COLORS, "data": korea, "eju": {}},
-  "kr_sgg": {"label": "시·군", "icon": "🏘️", "brand": "한국 시·군 메모리", "vb": [0, 0, 900, 972],
+  "kr_sgg": {"label": "시·군", "icon": "🏘️", "brand": "한국 시·군 메모리", "zoomMin": 0.2, "vb": [0, 0, 900, 972],
             "altLang": "정식 명칭", "altHint": "정식 명칭으로 입력 (이천시, 가평군 …)", "dense": True,
             "regionOrder": SGG_REGIONS, "regionColor": SGG_COLORS, "data": korea_sgg, "eju": {}},
-  "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "vb": [0, 0, 1010, 666],
+  "world": {"label": "세계", "icon": "🌍", "brand": "세계 국가 이름 메모리", "zoomMin": 0.3, "minor": WORLD_MINOR, "vb": [0, 0, 1010, 666],
             "altLang": "English", "altHint": "영어(English)로 입력", "dense": True,
             "regionOrder": ["아시아","유럽","아프리카","북·중미","남아메리카","오세아니아","기타"],
             "regionColor": {"아시아":"#E15759","유럽":"#4E79A7","아프리카":"#F28E2B","북·중미":"#59A14F",
@@ -543,7 +549,7 @@ function loadDataset(key){
   const d=DATASETS[key]; if(!d) return;
   CURRENT=key;
   DATA=d.data; EJU=d.eju; REGION_ORDER=d.regionOrder; REGION_COLOR=d.regionColor;
-  FULL_VB=d.vb.slice();
+  FULL_VB=d.vb.slice(); ZOOM_MIN=d.zoomMin||0.16;
   CODES=Object.keys(DATA); TOTAL=CODES.length; EJU_CODES=Object.keys(EJU);
   LOOKUP={}; for(const code in DATA){ for(const a of DATA[code].accepted){ LOOKUP[norm(a)]=code; } }
   vbAnim++; stopTimer();
@@ -585,13 +591,17 @@ connectDB();''')
 # mascot.js 가 먼저 와야 growth.js 가 MAS 를 쓸 수 있다.
 sub('/* start screen + countdown */',
     io.open('mapicon.css', encoding='utf-8').read() + '\n' +
+    io.open('mapzoom.css', encoding='utf-8').read() + '\n' +
+    io.open('pick.css', encoding='utf-8').read() + '\n' +
     io.open('mascot.css', encoding='utf-8').read() + '\n' +
     io.open('growth.css', encoding='utf-8').read() + '\n' +
     io.open('versus.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
 sub("connectDB();\n</script>",
     "connectDB();\n" + io.open('mascot.js', encoding='utf-8').read() + "\n" +
     io.open('mapicon.js', encoding='utf-8').read() + "\n" +
+    io.open('pick.js', encoding='utf-8').read() + "\n" +
     io.open('growth.js', encoding='utf-8').read() + "\n" +
+    io.open('mapzoom.js', encoding='utf-8').read() + "\n" +
     io.open('versus.js', encoding='utf-8').read() + "\n</script>")
 
 # ---------------------------------------------------------------- 8. Artifact 본문으로 변환
