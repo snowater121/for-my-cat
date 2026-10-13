@@ -1,0 +1,49 @@
+/* ===================== AUTH — 계정 창 ===================== */
+/* 문제 고르기 창(pick.css)과 같은 틀을 쓴다 — 창이 두 종류로 보이지 않도록 */
+.auwrap{position:fixed;inset:0;z-index:127;display:none;align-items:center;justify-content:center;padding:14px;
+  background:rgba(6,4,22,.76);backdrop-filter:blur(3px)}
+body:not(.dark) .auwrap{background:rgba(226,233,243,.84)}
+.auwrap.open{display:flex}
+.aubox{width:min(420px,100%);max-height:min(88dvh,720px);overflow:auto;background:var(--panel);
+  border:3px solid var(--accent);border-radius:12px;box-shadow:7px 7px 0 var(--miss);display:flex;flex-direction:column}
+.auhead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:2px solid var(--line);
+  background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
+.auhead h2{flex:1;margin:0;font-family:"Press Start 2P",monospace;font-size:12px;color:var(--accent);line-height:1.5}
+.auhead button{background:none;border:2px solid var(--line);color:var(--sub);border-radius:9px;width:34px;height:34px;
+  font-size:15px;cursor:pointer}
+.auhead button:hover{border-color:var(--miss);color:var(--text)}
+.aubody{padding:13px 15px 16px;display:flex;flex-direction:column;gap:11px}
+
+.auhelp{margin:0;font-size:12px;font-weight:700;line-height:1.75;color:var(--sub)}
+.auhelp b{color:var(--text)}
+.auok{display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:800;color:var(--text);
+  padding:10px 12px;border:2px solid var(--ok);border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.auok small{font-size:11px;font-weight:700;color:var(--sub)}
+
+.aufield{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:800;color:var(--text)}
+.aufield input{font:inherit;font-size:14px;font-weight:700;color:var(--text);background:var(--glass);
+  border:2px solid var(--line);border-radius:9px;padding:10px 11px;width:100%}
+.aufield input:focus{outline:none;border-color:var(--accent)}
+
+.auact{display:flex;gap:7px;flex-wrap:wrap}
+.auact button{flex:1 1 auto;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;padding:10px 12px;border-radius:9px;
+  color:var(--text);background:var(--panel2);border:2px solid var(--line);box-shadow:2px 2px 0 #0005}
+.auact button:hover{border-color:var(--accent)}
+.auact button:active{transform:translate(2px,2px);box-shadow:0 0 0 #0005}
+.auact button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.auact button.primary{color:#04121a;background:var(--gold);border-color:#fff}
+.auact button[disabled]{opacity:.55;cursor:default;transform:none}
+
+.aulink{align-self:flex-start;background:none;border:none;color:var(--sub);font:inherit;font-size:11.5px;font-weight:700;
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:2px 0}
+.aulink:hover{color:var(--text)}
+.ausep{height:2px;background:var(--line);border-radius:2px;margin:2px 0}
+.aunote{font-size:12px;font-weight:700;line-height:1.7;color:var(--sub);min-height:1.2em}
+
+/* 기록판 아래 상태줄의 로그인 단추 */
+.recfoot .aubtn{margin-left:auto;font-size:11px;padding:5px 9px}
+
+@media(max-width:600px){
+  .aubox{width:100%}
+  .auhelp{font-size:11.5px}
+}

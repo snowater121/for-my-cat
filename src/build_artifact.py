@@ -594,6 +594,8 @@ sub('/* start screen + countdown */',
     io.open('mapzoom.css', encoding='utf-8').read() + '\n' +
     io.open('pick.css', encoding='utf-8').read() + '\n' +
     io.open('demo.css', encoding='utf-8').read() + '\n' +
+    io.open('resume.css', encoding='utf-8').read() + '\n' +
+    io.open('auth.css', encoding='utf-8').read() + '\n' +
     io.open('mascot.css', encoding='utf-8').read() + '\n' +
     io.open('growth.css', encoding='utf-8').read() + '\n' +
     io.open('versus.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
@@ -602,6 +604,8 @@ sub("connectDB();\n</script>",
     io.open('mapicon.js', encoding='utf-8').read() + "\n" +
     io.open('pick.js', encoding='utf-8').read() + "\n" +
     io.open('growth.js', encoding='utf-8').read() + "\n" +
+    io.open('resume.js', encoding='utf-8').read() + "\n" +
+    io.open('auth.js', encoding='utf-8').read() + "\n" +
     io.open('mapzoom.js', encoding='utf-8').read() + "\n" +
     io.open('versus.js', encoding='utf-8').read() + "\n" +
     io.open('demo.js', encoding='utf-8').read() + "\n</script>")
@@ -622,6 +626,11 @@ H = H.replace("__PAGE_FILE__", json.dumps(CFG["file"]))
 H = H.replace("__SEASON__", json.dumps(SEASON, ensure_ascii=False))
 VERSUS = json.load(io.open("versus.json", encoding="utf-8"))
 H = H.replace("__VERSUS__", json.dumps({"url": VERSUS.get("url", "")}, ensure_ascii=False))
+# 로그인: apiKey 가 비어 있으면 auth.js 가 통째로 잠잔다. url 을 안 적었으면 대결방과 같은 DB를 쓴다.
+AUTHCFG = json.load(io.open("auth.json", encoding="utf-8"))
+H = H.replace("__AUTH__", json.dumps(
+    {"apiKey": AUTHCFG.get("apiKey", ""), "url": AUTHCFG.get("url", "") or VERSUS.get("url", "")},
+    ensure_ascii=False))
 
 # 고양이 그림: 사이트는 파일을 부르고, Artifact 본문은 한 파일이어야 하니 data URI로 박는다
 import base64, build_cat
@@ -632,7 +641,7 @@ SPRITE_B64 = json.dumps({k: "data:image/png;base64," + base64.b64encode(
     for k in build_cat.SPRITES})
 
 for tok in ["__DATA__", "__EJU__", "__DATASETS__", "__MODE_LABEL__", "__BOARDS__", "__PAGE_MODES__", "__DEFAULT__",
-            "__PAGE_FILE__", "__SEASON__", "__VERSUS__",
+            "__PAGE_FILE__", "__SEASON__", "__VERSUS__", "__AUTH__",
             "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
     assert tok not in H, "남아있는 토큰: " + tok
 

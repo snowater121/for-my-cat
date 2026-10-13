@@ -578,6 +578,76 @@ body:not(.dark) .pickwrap{background:rgba(226,233,243,.84)}
 /* 시연 중에는 눈에 거슬리는 것만 잠깐 숨긴다 */
 body.demorun .fsbtn,body.demorun .gearwrap{opacity:0;transition:opacity .3s}
 
+/* RESUME — 시작 화면의 '이어서 하기' 한 줄 */
+.rsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  width:100%;padding:9px 12px;border:2px solid var(--gold);border-radius:10px;
+  background:color-mix(in srgb,var(--gold) 12%,var(--panel));box-shadow:3px 3px 0 #0005}
+.rstxt{display:flex;flex-direction:column;gap:2px;font-size:12.5px;font-weight:800;color:var(--text);text-align:left}
+.rstxt small{font-weight:700;font-size:11px;color:var(--sub)}
+.rsbtn{display:flex;gap:6px;flex:0 0 auto}
+.rsrow button{font:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:7px 11px;border-radius:8px;
+  color:#04121a;background:var(--gold);border:2px solid #fff;box-shadow:2px 2px 0 #0006}
+.rsrow button:hover{filter:brightness(1.08)}
+.rsrow button:active{transform:translate(2px,2px);box-shadow:0 0 0 #0006}
+.rsrow button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.rsrow button.ghost{color:var(--sub);background:transparent;border-color:var(--line);box-shadow:none}
+.rsrow button.ghost:hover{color:var(--text);border-color:var(--accent)}
+@media(max-width:600px){
+  .rsrow{padding:8px 10px}
+  .rstxt{font-size:11.5px}
+  .rsrow button{font-size:11px;padding:6px 9px}
+}
+
+/* ===================== AUTH — 계정 창 ===================== */
+/* 문제 고르기 창(pick.css)과 같은 틀을 쓴다 — 창이 두 종류로 보이지 않도록 */
+.auwrap{position:fixed;inset:0;z-index:127;display:none;align-items:center;justify-content:center;padding:14px;
+  background:rgba(6,4,22,.76);backdrop-filter:blur(3px)}
+body:not(.dark) .auwrap{background:rgba(226,233,243,.84)}
+.auwrap.open{display:flex}
+.aubox{width:min(420px,100%);max-height:min(88dvh,720px);overflow:auto;background:var(--panel);
+  border:3px solid var(--accent);border-radius:12px;box-shadow:7px 7px 0 var(--miss);display:flex;flex-direction:column}
+.auhead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:2px solid var(--line);
+  background:linear-gradient(90deg,var(--headbg1),var(--headbg2))}
+.auhead h2{flex:1;margin:0;font-family:"Press Start 2P",monospace;font-size:12px;color:var(--accent);line-height:1.5}
+.auhead button{background:none;border:2px solid var(--line);color:var(--sub);border-radius:9px;width:34px;height:34px;
+  font-size:15px;cursor:pointer}
+.auhead button:hover{border-color:var(--miss);color:var(--text)}
+.aubody{padding:13px 15px 16px;display:flex;flex-direction:column;gap:11px}
+
+.auhelp{margin:0;font-size:12px;font-weight:700;line-height:1.75;color:var(--sub)}
+.auhelp b{color:var(--text)}
+.auok{display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:800;color:var(--text);
+  padding:10px 12px;border:2px solid var(--ok);border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.auok small{font-size:11px;font-weight:700;color:var(--sub)}
+
+.aufield{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:800;color:var(--text)}
+.aufield input{font:inherit;font-size:14px;font-weight:700;color:var(--text);background:var(--glass);
+  border:2px solid var(--line);border-radius:9px;padding:10px 11px;width:100%}
+.aufield input:focus{outline:none;border-color:var(--accent)}
+
+.auact{display:flex;gap:7px;flex-wrap:wrap}
+.auact button{flex:1 1 auto;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;padding:10px 12px;border-radius:9px;
+  color:var(--text);background:var(--panel2);border:2px solid var(--line);box-shadow:2px 2px 0 #0005}
+.auact button:hover{border-color:var(--accent)}
+.auact button:active{transform:translate(2px,2px);box-shadow:0 0 0 #0005}
+.auact button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.auact button.primary{color:#04121a;background:var(--gold);border-color:#fff}
+.auact button[disabled]{opacity:.55;cursor:default;transform:none}
+
+.aulink{align-self:flex-start;background:none;border:none;color:var(--sub);font:inherit;font-size:11.5px;font-weight:700;
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:2px 0}
+.aulink:hover{color:var(--text)}
+.ausep{height:2px;background:var(--line);border-radius:2px;margin:2px 0}
+.aunote{font-size:12px;font-weight:700;line-height:1.7;color:var(--sub);min-height:1.2em}
+
+/* 기록판 아래 상태줄의 로그인 단추 */
+.recfoot .aubtn{margin-left:auto;font-size:11px;padding:5px 9px}
+
+@media(max-width:600px){
+  .aubox{width:100%}
+  .auhelp{font-size:11.5px}
+}
+
 /* ===================== MASCOT — 고양이 역장 =====================
    원본 PNG(mascot/*.png)를 상태별로 겹쳐 두고 하나만 보여 준다.
    움직임은 CSS로만 준다 — 그림 자체는 건드리지 않는다. */
@@ -2481,6 +2551,17 @@ function applyChallenge(o){
   switchDs(o.ds);
 }
 function exitSpecial(){ SPECIAL=null; resetGame(); }
+
+/* 이어하기(resume.js)가 들여다보는 라운드 속사정 — 시드·문제 순서·문제별 결과·특별 라운드 */
+function roundState(){
+  return {seed:SEED,codes:ROUND_CODES.slice(),out:Object.assign({},OUT),
+          special:SPECIAL?JSON.parse(JSON.stringify(SPECIAL)):null};
+}
+function setRoundState(o){
+  if(!o) return;
+  SEED=o.seed>>>0; ROUND_CODES=(o.codes||[]).slice();
+  OUT=o.out||{}; SPECIAL=o.special||null;
+}
 /* 1:1 대결: 방이 정한 지도·모드·시드·문제 수로 라운드를 준비한다 (versus.js가 부른다) */
 function startVersus(o){
   if(!o||!DATASETS[o.ds]) return;
@@ -2578,6 +2659,7 @@ function renderStart(){
           (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+
           ((window.VS&&window.VS.on())?`<button type="button" class="gbtn" data-g="versus">⚔️ 1:1 대결 <small>실시간</small></button>`:"")+`</div>`;
   }
+  if(window.RESUME&&RESUME.startRow) html+=RESUME.startRow();          // ⏯️ 풀던 판 이어서
   if(!SPECIAL&&window.PICK&&PICK.startRow) html+=PICK.startRow();   // 🏝️ 속령 넣기/빼기
   const tt=titleNow();
   if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
@@ -2798,6 +2880,8 @@ function init(){
     else if(b.dataset.g==="season"){ const s=seasonNow(); if(s) startSeason(s.m); }
     else if(b.dataset.g==="minor"){ if(window.PICK) window.PICK.toggleMinor(); }
     else if(b.dataset.g==="versus"){ if(window.VS) window.VS.openNew(); }
+    else if(b.dataset.g==="resume"){ if(window.RESUME) RESUME.restore(); }
+    else if(b.dataset.g==="dropresume"){ if(window.RESUME) RESUME.drop(); }
     else if(b.dataset.g==="exit") exitSpecial();
   });
   // 링크로 들어온 경우: ?c=도전장  ?season=월  ?daily=1  ?ds=데이터셋
@@ -2816,7 +2900,564 @@ function init(){
   const f=checkAch(); if(f.length){ persist(); }      // 예전 기록으로 이미 달성한 업적은 조용히 채운다
 }
 init();
-return {startDaily,startSeason,exitSpecial,startVersus,renderStart,streakNow,bestDays};
+const api={startDaily,startSeason,exitSpecial,startVersus,renderStart,streakNow,bestDays,
+        roundState,setRoundState,setModeUI,setDirUI,switchDs,ensure};
+try{ window.GROW=api; }catch(e){}     // 뒤에 붙는 파일들이 typeof 없이 안전하게 쓰도록
+return api;
+})();
+
+/* =======================================================================
+   RESUME — 풀던 판 이어서 하기 (growth.js 뒤에 붙는다)
+
+   중간에 창을 닫거나 전화가 와도 그대로 돌아올 수 있게, 진행 중인 라운드를
+   통째로 localStorage 에 적어 둔다. 다음에 들어오면 시작 화면 맨 위에
+   "⏯️ 풀던 판이 남아 있어요 — 이어서 하기 / 새로 시작" 한 줄이 뜬다.
+
+   되살리는 것: 지도·모드·방향 · 남은 문제와 순서 · 맞힌 곳 · 정답공개한 곳 ·
+                문제별 결과(🟩🟨🟥) · 연속 정답 · 정답/오답 수 · 흘러간 시간.
+   그래서 이어서 끝내도 기록·업적·공유 그림이 한 판 그대로 나온다.
+
+   저장하지 않는 것
+     1:1 실시간 대결 — 상대가 기다려 주지 않으므로 이어 할 수 없다.
+     아직 START 를 누르지 않았거나 이미 끝난 판.
+
+   로그인해 두면 auth.js 가 이 저장본도 계정에 함께 올린다 (다른 기기에서 이어서).
+   ======================================================================= */
+const RESUME=(function(){
+const KEY="geoarcade.resume.v1";
+const MAX_AGE=14*24*3600*1000;          // 2주 지난 저장본은 없는 셈 친다
+const $=id=>document.getElementById(id);
+
+let snap=null;        // 아직 쓰지 않은 저장본 (있으면 시작 화면에 줄이 뜬다)
+let tmr=0;
+let roundDs="";       // 지금 진행 중인 판이 어느 지도의 것인가 (지도를 바꾸는 중에 섞이지 않게)
+
+/* 시연(?demo=1)에서는 저장도 복원도 하지 않는다 — 영상에 엉뚱한 줄이 끼면 안 된다 */
+let DEMO=false;
+try{ DEMO=new URLSearchParams(location.search).get("demo")==="1"; }catch(e){}
+
+/* ---------- 읽고 쓰기 ---------- */
+function read(){
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY)||"null");
+    if(!o||o.v!==1||!o.ds||!DATASETS[o.ds]) return null;
+    if(Date.now()-(o.at||0)>MAX_AGE) return null;
+    return o;
+  }catch(e){ return null; }
+}
+function write(o){
+  try{ if(o) localStorage.setItem(KEY,JSON.stringify(o)); else localStorage.removeItem(KEY); }catch(e){}
+  try{ if(window.AUTH&&AUTH.touch) AUTH.touch(); }catch(e){}     // 계정에도 따라 올린다
+}
+
+/* ---------- 지금 판을 사진 찍기 ---------- */
+function take(){
+  if(DEMO) return null;
+  if(typeof pendingStart==="undefined"||pendingStart||over||!startedAt) return null;
+  const rs=(window.GROW&&GROW.roundState)?GROW.roundState():null;
+  if(!rs) return null;
+  if(rs.special&&rs.special.type==="versus") return null;        // 실시간 대결은 이어 할 수 없다
+  /* 지도를 바꾸는 중에는 DATA 가 벌써 새 지도 것이다 — 이때 찍으면 뒤섞인 사진이 나온다 */
+  if(roundDs&&roundDs!==CURRENT) return null;
+  if(queue.length&&!DATA[queue[0]]) return null;
+  if(found.size===0&&revealed.size===0&&(Date.now()-startedAt)<4000) return null;  // 막 시작한 판은 둘 필요 없다
+  return {v:1,at:Date.now(),
+          ds:CURRENT,mode:mode,dir:(typeof ejuDir!=="undefined"?ejuDir:""),
+          round:ROUND,queue:queue.slice(),
+          found:[...found],revealed:[...revealed],
+          streak:streak|0,ms:Date.now()-startedAt,
+          live:(REC.live?Object.assign({},REC.live):null),
+          seed:rs.seed,codes:rs.codes,out:rs.out,special:rs.special};
+}
+function save(){ const o=take(); if(o) write(o); }
+function schedule(){ clearTimeout(tmr); tmr=setTimeout(save,600); }
+
+/* 한 문제 끝날 때마다 updateStats 가 불린다 — 거기 얹어 두면 빠짐이 없다 */
+if(typeof updateStats==="function"){
+  const _u=updateStats;
+  updateStats=function(){ _u(); schedule(); };
+}
+/* 탭을 닫거나 숨길 때는 기다리지 않고 바로 적는다 */
+addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"){ clearTimeout(tmr); save(); } });
+addEventListener("pagehide",()=>{ clearTimeout(tmr); save(); });
+
+/* 판이 끝나면 저장본은 쓸모가 없다 */
+const _fin=REC.finish.bind(REC);
+REC.finish=function(cleared){ clearTimeout(tmr); write(null); snap=null; return _fin(cleared); };
+
+/* 다 풀기 전에 판을 접었다면(다시하기·지도 바꾸기·모드 바꾸기) 그 판을 붙잡아 둔다.
+   그래야 손이 미끄러져도 시작 화면에서 바로 "이어서 하기" 로 돌아올 수 있다.
+   지도 바꾸기는 loadDataset 이 CURRENT·DATA 를 갈아 끼우기 **전에** 찍어야 한다. */
+if(typeof loadDataset==="function"){
+  const _l=loadDataset;
+  loadDataset=function(k){ keep(); return _l(k); };
+}
+if(typeof resetGame==="function"){
+  const _r=resetGame;
+  resetGame=function(){ keep(); return _r(); };   // renderStart 가 곧 불리면서 줄이 뜬다
+}
+function keep(){ const o=take(); if(o){ write(o); snap=o; } }
+
+/* START 를 눌렀다 = 새로 시작하겠다는 뜻이니 옛 저장본을 버린다 */
+if(typeof beginRound==="function"){
+  const _b=beginRound;
+  beginRound=function(){ drop(); roundDs=CURRENT; return _b(); };
+}
+
+/* ---------- 되살리기 ---------- */
+function fmtAgo(at){
+  const m=Math.round((Date.now()-at)/60000);
+  if(m<1) return "방금";
+  if(m<60) return m+"분 전";
+  const h=Math.round(m/60); if(h<24) return h+"시간 전";
+  return Math.round(h/24)+"일 전";
+}
+/* 정답을 공개했던 곳은 engine 의 '정답 공개' 와 똑같이 칠한다 */
+function paintRevealed(code){
+  const p=svg.querySelector(`path[data-code="${code}"]`); if(!p) return;
+  p.classList.remove("target","dim"); p.classList.add("revealed");
+  if(labels[code]){ labels[code].textContent=labelFor(code); labels[code].classList.add("show"); }
+  const chip=chipEls[code];
+  if(chip){ chip.textContent=labelFor(code); chip.classList.remove("now"); chip.style.color="#ffcf66"; }
+  if(ovPaths[code]) ovPaths[code].setAttribute("fill","#6b551a");
+}
+
+function restore(){
+  const o=snap; if(!o) return;
+  drop();                                        // 되살리는 순간 저장본은 소비된다
+  const rs={seed:o.seed,codes:o.codes,out:o.out,special:o.special};
+
+  /* 1) 라운드의 성격(특별 라운드·시드)을 먼저 돌려놓아야 resetGame 이 같은 판을 다시 만든다 */
+  if(window.GROW){
+    GROW.setRoundState(rs);
+    GROW.setModeUI(o.mode); if(o.dir) GROW.setDirUI(o.dir);
+    GROW.switchDs(o.ds);                         // 지도 교체 + resetGame (OUT 은 여기서 비워진다)
+    GROW.setRoundState(rs);                      // 그래서 문제별 결과는 한 번 더 넣어 준다
+  }
+
+  /* 2) 진행 상황을 그대로 꽂는다 */
+  ROUND=o.round|0;
+  queue=(o.queue||[]).filter(c=>DATA[c]);
+  found=new Set((o.found||[]).filter(c=>DATA[c]));
+  revealed=new Set((o.revealed||[]).filter(c=>DATA[c]));
+  streak=o.streak|0;
+  REC.live=o.live||{correct:0,wrong:0,peak:0};
+  for(const c of found) try{ markFound(c); }catch(e){}
+  for(const c of revealed) paintRevealed(c);
+
+  /* 3) 멈춰 있던 시계를 흘러간 만큼 뒤로 물려서 다시 돌린다 */
+  over=false; pendingStart=false; roundDs=o.ds;
+  $("startscreen").style.display="none";
+  startTimer(); startedAt=Date.now()-(o.ms||0);
+  updateStats();
+
+  if(mode==="free"){ hint.textContent="떠오르는 이름을 입력하세요! (이어서 하는 중)"; }
+  else{
+    nextTarget();
+    hint.textContent = mode==="quiz" ? "이어서 하는 중 — 하이라이트된 곳의 이름을 입력하고 Enter!"
+      : mode==="type" ? "이어서 하는 중 — 화면의 이름을 그대로 따라 입력!"
+      : "이어서 하는 중 — 특징을 읽고 이름을 입력한 뒤 Enter!";
+  }
+  input.value=""; input.focus();
+  try{ MAS.stage.face("focus",1400).say("이어서 가 보자 🐾",2400); }catch(e){}
+}
+
+function drop(){
+  clearTimeout(tmr); snap=null; write(null);
+  try{ if(window.GROW) GROW.renderStart(); }catch(e){}
+}
+
+/* ---------- 시작 화면 한 줄 (growth.js 의 renderStart 가 불러다 붙인다) ---------- */
+function startRow(){
+  const o=snap; if(!o) return "";
+  const d=DATASETS[o.ds]||{};
+  const n=(o.found||[]).length;
+  return `<div class="rsrow"><div class="rstxt">⏯️ 풀던 판이 남아 있어요`+
+    `<small>${esc(d.icon||"")} ${esc(d.brand||o.ds)} · ${n}/${o.round} 맞힘 · ${fmt(o.ms||0)} · ${fmtAgo(o.at)}</small></div>`+
+    `<div class="rsbtn"><button type="button" data-g="resume">이어서 하기</button>`+
+    `<button type="button" class="ghost" data-g="dropresume">새로 시작</button></div></div>`;
+}
+
+/* ---------- 계정 동기화에서 쓴다 ---------- */
+function get(){ return snap||read(); }
+function put(o){                                    // 다른 기기에서 가져온 저장본을 받는다
+  if(!o||o.v!==1||!o.ds||!DATASETS[o.ds]) return false;
+  const now=get();
+  if(now&&(now.at||0)>=(o.at||0)) return false;     // 여기 것이 더 새것이면 둔다
+  try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){}
+  snap=o;
+  try{ if(window.GROW) GROW.renderStart(); }catch(e){}
+  return true;
+}
+
+const api={startRow,restore,drop,save,get,put};
+try{ window.RESUME=api; }catch(e){}
+
+snap=DEMO?null:read();
+if(snap){ try{ if(window.GROW) GROW.renderStart(); }catch(e){} }
+return api;
+})();
+
+/* =======================================================================
+   AUTH — 계정으로 기록 남기기 (growth.js · resume.js 뒤에 붙는다)
+
+   Firebase Authentication(이메일+비밀번호)을 **SDK 없이** REST로만 쓴다.
+     가입/로그인  https://identitytoolkit.googleapis.com/v1/accounts:signUp|signInWithPassword
+     토큰 갱신    https://securetoken.googleapis.com/v1/token          (idToken 은 1시간짜리)
+     비밀번호     accounts:sendOobCode (재설정 메일) · accounts:update (바꾸기)
+   versus.js 와 같은 이유로 SDK를 넣지 않는다 — "단일 HTML 한 장" 원칙.
+
+   기록 보관함:  <RTDB>/users/{uid}  =  { p: 기록(P), r: 이어하기 저장본, at: 올린 시각 }
+   보안 규칙이 auth.uid 로 잠가 두어서 남의 칸은 읽지도 쓰지도 못한다 (db-rules.json).
+
+   합치기(merge): 두 기기에서 따로 논 기록이 만났을 때
+     최고 기록  더 좋은 쪽            자주 틀린 곳  더 많이 틀린 쪽
+     누적 통계  더 큰 쪽              공부한 날     둘을 합집합
+     업적       먼저 딴 날짜          오늘의 문제   둘을 합집합
+   합이 아니라 '큰 쪽'을 쓰는 이유: 동기화가 오갈 때마다 같은 판이 두 번 세어지면 안 된다.
+
+   auth.json 의 apiKey 가 비어 있으면 이 기능 전체가 조용히 꺼진다.
+   ======================================================================= */
+const AUTH=(function(){
+const CFG={"apiKey": "", "url": "https://geo-arcade-default-rtdb.asia-southeast1.firebasedatabase.app"};                       // {apiKey:"", url:""}
+const KEY="geoarcade.auth.v1";            // {uid,email,refreshToken}
+const IDP="https://identitytoolkit.googleapis.com/v1/accounts:";
+const TOK="https://securetoken.googleapis.com/v1/token";
+
+function on(){ return !!(CFG&&CFG.apiKey&&CFG.url); }
+function $(id){ return document.getElementById(id); }
+function dbRoot(){ return String(CFG.url||"").replace(/\/$/,""); }
+
+let user=null;        // {uid,email,refreshToken,idToken,expAt}
+let busy=false, lastSync=0, pushTimer=0, lastEmail="";
+
+/* ---------- 저장해 둔 로그인 ---------- */
+function remember(){
+  try{ user?localStorage.setItem(KEY,JSON.stringify({uid:user.uid,email:user.email,refreshToken:user.refreshToken}))
+           :localStorage.removeItem(KEY); }catch(e){}
+}
+function recall(){ try{ return JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){ return null; } }
+
+/* ---------- Firebase REST ---------- */
+const MSG={
+  EMAIL_EXISTS:"이미 가입된 이메일이에요. 로그인해 주세요.",
+  EMAIL_NOT_FOUND:"가입되지 않은 이메일이에요.",
+  INVALID_PASSWORD:"비밀번호가 맞지 않아요.",
+  INVALID_LOGIN_CREDENTIALS:"이메일이나 비밀번호가 맞지 않아요.",
+  INVALID_EMAIL:"이메일 형식을 다시 확인해 주세요.",
+  MISSING_PASSWORD:"비밀번호를 입력해 주세요.",
+  USER_DISABLED:"사용이 중지된 계정이에요.",
+  TOO_MANY_ATTEMPTS_TRY_LATER:"잠시 뒤에 다시 시도해 주세요.",
+  OPERATION_NOT_ALLOWED:"콘솔에서 '이메일/비밀번호' 로그인을 켜 주세요.",
+  TOKEN_EXPIRED:"로그인이 만료됐어요. 다시 로그인해 주세요.",
+  USER_NOT_FOUND:"로그인이 만료됐어요. 다시 로그인해 주세요."
+};
+function human(code){
+  const k=String(code||"").split(":")[0].trim();
+  if(MSG[k]) return MSG[k];
+  if(/^WEAK_PASSWORD/.test(k)) return "비밀번호는 6자 이상이어야 해요.";
+  return "잘 안 됐어요 ("+k+")";
+}
+async function idp(method,body){
+  const r=await fetch(IDP+method+"?key="+encodeURIComponent(CFG.apiKey),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error((j.error&&j.error.message)||"UNKNOWN");
+  return j;
+}
+/* idToken 은 1시간이면 끝난다 — 쓸 때마다 남은 시간을 보고 알아서 바꿔 낀다 */
+async function token(){
+  if(!user) return null;
+  if(user.idToken&&Date.now()<user.expAt-60000) return user.idToken;
+  const r=await fetch(TOK+"?key="+encodeURIComponent(CFG.apiKey),
+    {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
+     body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(user.refreshToken)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const code=(j.error&&(j.error.message||j.error))||"TOKEN_EXPIRED";
+    signOut(); throw new Error(typeof code==="string"?code:"TOKEN_EXPIRED");
+  }
+  user.idToken=j.id_token; user.refreshToken=j.refresh_token||user.refreshToken;
+  user.expAt=Date.now()+(+j.expires_in||3600)*1000;
+  remember();
+  return user.idToken;
+}
+function adopt(j){
+  user={uid:j.localId,email:j.email,refreshToken:j.refreshToken,
+        idToken:j.idToken,expAt:Date.now()+(+j.expiresIn||3600)*1000};
+  remember();
+}
+
+/* ---------- 기록 보관함 ---------- */
+async function pull(){
+  const t=await token(); if(!t) return null;
+  const r=await fetch(dbRoot()+"/users/"+user.uid+".json?auth="+encodeURIComponent(t));
+  if(!r.ok) throw new Error("읽기 실패 ("+r.status+")");
+  return await r.json();
+}
+async function push(){
+  const t=await token(); if(!t) return;
+  let resume=null; try{ resume=(window.RESUME&&RESUME.get())||null; }catch(e){}
+  const body={p:P,r:resume,at:Date.now()};
+  const r=await fetch(dbRoot()+"/users/"+user.uid+".json?auth="+encodeURIComponent(t),
+    {method:"PUT",body:JSON.stringify(body)});
+  if(!r.ok) throw new Error("쓰기 실패 ("+r.status+")");
+  lastSync=Date.now(); paintChrome();
+}
+
+/* ---------- 합치기 ---------- */
+function better(a,b){
+  if(!a) return b; if(!b) return a;
+  if((a.found||0)!==(b.found||0)) return (a.found||0)>(b.found||0)?a:b;
+  return (a.ms||0)<=(b.ms||0)?a:b;
+}
+function merge(L,R){
+  if(!R||!R.stats) return L;
+  if(!L||!L.stats) return R;
+  const o=JSON.parse(JSON.stringify(L));
+  o.name=L.name||R.name||"";
+
+  o.best=Object.assign({},R.best||{});
+  for(const k in (L.best||{})) o.best[k]=better(L.best[k],(R.best||{})[k]);
+
+  o.misses=Object.assign({},R.misses||{});
+  for(const k in (L.misses||{})) o.misses[k]=Math.max(L.misses[k]||0,(R.misses||{})[k]||0);
+
+  o.stats={};
+  for(const k of ["plays","clears","totalMs","correct","wrong","bestStreak"])
+    o.stats[k]=Math.max((L.stats||{})[k]||0,(R.stats||{})[k]||0);
+
+  o.days=[...new Set([].concat(L.days||[],R.days||[]))].sort().slice(-400);
+
+  o.ach=Object.assign({},R.ach||{});
+  for(const k in (L.ach||{})){
+    const a=L.ach[k]||0, b=(R.ach||{})[k]||0;
+    o.ach[k]=(a&&b)?Math.min(a,b):(a||b);        // 먼저 딴 날짜를 남긴다
+  }
+
+  o.daily=Object.assign({},R.daily||{},L.daily||{});
+  const dk=Object.keys(o.daily).sort();
+  if(dk.length>90) dk.slice(0,dk.length-90).forEach(k=>delete o.daily[k]);
+
+  o.shares=Math.max(L.shares||0,R.shares||0);
+  o.wins=Math.max(L.wins||0,R.wins||0);
+
+  o.pick=Object.assign({},R.pick||{},L.pick||{});   // 문제 고르기는 이 기기 설정이 우선
+  o.at=Date.now();
+  return o;
+}
+
+/* 받아온 것과 합쳐서 화면까지 다시 그린다 */
+function absorb(remote){
+  if(!remote) return false;
+  let changed=false;
+  if(remote.p&&remote.p.stats){
+    P=merge(P,remote.p);
+    try{ if(window.GROW) GROW.ensure(); }catch(e){}
+    lsSave(); renderRecords(); renderBestStrip();
+    const pn=$("pname"); if(pn) pn.value=P.name||"";
+    try{ if(window.PICK) PICK.paintChips(); }catch(e){}
+    try{ if(window.GROW) GROW.renderStart(); }catch(e){}
+    changed=true;
+  }
+  if(remote.r){ try{ if(window.RESUME) RESUME.put(remote.r); }catch(e){} }
+  return changed;
+}
+
+/* ---------- 바깥에서 부르는 것 ---------- */
+async function sync(){
+  if(!user||busy) return;
+  setBusy(true);
+  try{
+    absorb(await pull());
+    await push();
+    setBusy(false); note("✅ 기록을 맞췄어요.");
+  }catch(e){ setBusy(false); note("⚠️ "+human(e.message)); }
+  paintChrome();
+}
+/* persist() 가 불릴 때마다 — 한 박자 묶어서 올린다 */
+function touch(){
+  if(!user) return;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(()=>{ push().catch(()=>{}); },1500);
+}
+
+async function signIn(email,pw,isNew){
+  const j=await idp(isNew?"signUp":"signInWithPassword",{email,password:pw,returnSecureToken:true});
+  adopt(j);
+  absorb(await pull());          // 저쪽 기록을 먼저 가져와 합치고
+  await push();                  // 합친 결과를 올려 둔다
+}
+function signOut(){
+  if(user&&user.email) lastEmail=user.email;
+  user=null; clearTimeout(pushTimer); remember(); paint();
+}
+async function resetMail(email){
+  await idp("sendOobCode",{requestType:"PASSWORD_RESET",email});
+}
+async function changePw(pw){
+  const t=await token(); if(!t) throw new Error("TOKEN_EXPIRED");
+  const j=await idp("update",{idToken:t,password:pw,returnSecureToken:true});
+  if(j.idToken){ user.idToken=j.idToken; user.expAt=Date.now()+(+j.expiresIn||3600)*1000; }
+  if(j.refreshToken){ user.refreshToken=j.refreshToken; }
+  remember();
+}
+
+/* ---------- 창 ---------- */
+function esc2(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function note(html){ const n=$("aunote"); if(n) n.innerHTML=html; }
+function wrap(){
+  let w=$("auwrap");
+  if(w) return w;
+  w=document.createElement("div"); w.id="auwrap"; w.className="auwrap";
+  document.body.appendChild(w);
+  w.addEventListener("click",e=>{
+    if(e.target===w) return close();
+    const b=e.target.closest("[data-a]"); if(b) act(b.dataset.a);
+  });
+  w.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.tagName==="INPUT"){ e.preventDefault(); act(user?"pw":"in"); } });
+  return w;
+}
+function open(){ wrap().classList.add("open"); paint(); const f=$("auemail")||$("ausync"); if(f) f.focus(); }
+function close(){ const w=$("auwrap"); if(w) w.classList.remove("open"); }
+
+function ago(t){
+  if(!t) return "아직";
+  const m=Math.round((Date.now()-t)/60000);
+  return m<1?"방금":(m<60?m+"분 전":Math.round(m/60)+"시간 전");
+}
+/* 창을 통째로 다시 그리면 입력하던 이메일·비밀번호가 날아간다.
+   그래서 '밖'(상태줄·단추 이름)과 '안'(창 내용)을 나눠 두고, 창은 로그인 상태가
+   바뀔 때만 다시 그린다. 기다리는 동안은 단추만 잠근다. */
+function setBusy(b){
+  busy=b;
+  const w=$("auwrap"); if(!w) return;
+  w.querySelectorAll(".auact button").forEach(x=>{ x.disabled=b; });
+  const sy=$("ausync"); if(sy) sy.textContent=b?"맞추는 중…":"🔄 지금 동기화";
+  const inb=w.querySelector('[data-a="in"]'); if(inb) inb.textContent=b?"잠시만요…":"로그인";
+  const ago1=w.querySelector(".auok small"); if(ago1&&!b) ago1.textContent="마지막 동기화 "+ago(lastSync);
+}
+function paint(){ paintChrome(); paintPanel(); }
+function paintChrome(){
+  /* 기록판 아래 상태줄 */
+  const dot=$("syncdot"), msg=$("syncmsg"), btn=$("aubtn");
+  if(dot) dot.classList.toggle("on",!!user);
+  if(msg&&!DBCONNECTED()) msg.textContent=user
+    ? "☁️ "+user.email+" 계정에 기록이 저장돼요"
+    : "기록은 이 브라우저에 저장됩니다 · 로그인하면 기기를 옮겨도 남아요";
+  if(btn) btn.textContent=user?"👤 계정":"🔑 로그인";
+  const row=$("aurowbtn"); if(row) row.textContent=user?"열기":"로그인";
+  const ago2=document.querySelector("#auwrap .auok small");
+  if(ago2) ago2.textContent="마지막 동기화 "+ago(lastSync);
+}
+function paintPanel(){
+  const w=$("auwrap"); if(!w||!w.classList.contains("open")) return;
+  const body=user?`
+    <div class="auok">✅ <b>${esc2(user.email)}</b> 로 로그인했어요<small>마지막 동기화 ${ago(lastSync)}</small></div>
+    <p class="auhelp">기록·업적·연속 공부·풀던 판이 이 계정에 저장돼요. 다른 기기에서 같은 계정으로 들어가면 그대로 이어서 할 수 있어요.</p>
+    <div class="auact">
+      <button type="button" class="primary" data-a="sync" id="ausync"${busy?" disabled":""}>${busy?"맞추는 중…":"🔄 지금 동기화"}</button>
+      <button type="button" data-a="out">로그아웃</button>
+    </div>
+    <div class="ausep"></div>
+    <label class="aufield">새 비밀번호로 바꾸기<input type="password" id="aupw" autocomplete="new-password" placeholder="6자 이상"></label>
+    <div class="auact"><button type="button" data-a="pw">비밀번호 바꾸기</button></div>`
+  :`
+    <p class="auhelp">이메일과 비밀번호만 있으면 돼요. 기록·업적·연속 공부·<b>풀던 판</b>까지 계정에 저장돼서, 폰에서 하다 끄고 노트북에서 이어서 할 수 있어요.</p>
+    <label class="aufield">이메일<input type="email" id="auemail" autocomplete="username" placeholder="you@example.com" spellcheck="false" value="${esc2(lastEmail)}"></label>
+    <label class="aufield">비밀번호<input type="password" id="aupw" autocomplete="current-password" placeholder="6자 이상"></label>
+    <div class="auact">
+      <button type="button" class="primary" data-a="in"${busy?" disabled":""}>${busy?"잠시만요…":"로그인"}</button>
+      <button type="button" data-a="up"${busy?" disabled":""}>처음이에요 (가입)</button>
+    </div>
+    <button type="button" class="aulink" data-a="forgot">비밀번호를 잊었어요</button>`;
+  w.innerHTML=`<div class="aubox" role="dialog" aria-modal="true" aria-label="계정">
+    <div class="auhead"><h2>👤 계정</h2><button type="button" data-a="close" aria-label="닫기">✕</button></div>
+    <div class="aubody">${body}<div class="aunote" id="aunote" aria-live="polite"></div></div></div>`;
+}
+/* claude 환경의 공유 랭킹판이 붙어 있으면 그쪽 안내문을 건드리지 않는다 */
+function DBCONNECTED(){ try{ return !!DB; }catch(e){ return false; } }
+
+async function act(a){
+  if(a==="close") return close();
+  const em=($("auemail")&&$("auemail").value||"").trim();
+  const pw=($("aupw")&&$("aupw").value||"");
+  if(em) lastEmail=em;
+  if(a==="sync") return sync();
+  if(a==="out"){ signOut(); note("로그아웃했어요. 기록은 이 브라우저에도 그대로 남아 있어요."); return; }
+  if(a==="forgot"){
+    if(!em) return note("이메일을 먼저 입력해 주세요.");
+    try{ await resetMail(em); note("📧 비밀번호 재설정 메일을 보냈어요. 메일함(스팸함도)을 확인해 주세요."); }
+    catch(e){ note("⚠️ "+human(e.message)); }
+    return;
+  }
+  if(a==="pw"){
+    if(pw.length<6) return note("비밀번호는 6자 이상이어야 해요.");
+    try{ await changePw(pw); note("✅ 비밀번호를 바꿨어요."); }catch(e){ note("⚠️ "+human(e.message)); }
+    return;
+  }
+  if(a==="in"||a==="up"){
+    if(!em) return note("이메일을 입력해 주세요.");
+    if(pw.length<6) return note("비밀번호는 6자 이상이어야 해요.");
+    setBusy(true);
+    try{
+      await signIn(em,pw,a==="up");
+      busy=false; paint();                       // 로그인 상태가 바뀌었으니 창을 다시 그린다
+      note(a==="up"?"🎉 가입했어요. 이제 기록이 계정에 남아요.":"✅ 로그인했어요. 기록을 맞췄어요.");
+    }catch(e){
+      setBusy(false);                            // 실패했을 땐 적어 둔 걸 그대로 두고 까닭만 알린다
+      note("⚠️ "+human(e.message));
+    }
+  }
+}
+
+/* ---------- 붙이기 ---------- */
+const api={on,open,close,sync,touch,signOut,user:()=>user&&{uid:user.uid,email:user.email}};
+try{ window.AUTH=api; }catch(e){}
+
+function init(){
+  if(!on()) return;
+
+  /* 설정(⚙️) 줄 */
+  const links=document.querySelector(".setlinks");
+  if(links){
+    const row=document.createElement("div");
+    row.className="settrow";
+    row.innerHTML='<span>👤 계정 (기록 이어가기)</span><button class="btn" id="aurowbtn">로그인</button>';
+    links.parentNode.insertBefore(row,links);
+    $("aurowbtn").addEventListener("click",()=>{
+      const s=document.querySelector(".settings"); if(s) s.classList.remove("open");
+      open();
+    });
+  }
+  /* 기록판 아래 단추 */
+  const foot=document.querySelector(".recfoot");
+  if(foot){
+    const b=document.createElement("button");
+    b.type="button"; b.className="btn aubtn"; b.id="aubtn"; b.textContent="🔑 로그인";
+    foot.appendChild(b);
+    b.addEventListener("click",open);
+  }
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
+
+  /* persist() 가 불릴 때마다 계정에도 올린다 */
+  if(typeof persist==="function"){
+    const _p=persist;
+    persist=function(){ _p(); touch(); };
+  }
+
+  /* 저장된 로그인으로 조용히 들어간다 */
+  const saved=recall();
+  if(saved&&saved.refreshToken){
+    user={uid:saved.uid,email:saved.email,refreshToken:saved.refreshToken,idToken:null,expAt:0};
+    paint();
+    pull().then(r=>{ absorb(r); return push(); }).catch(()=>{});
+  }
+  paint();
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+else init();
+return api;
 })();
 
 /* =======================================================================

@@ -133,6 +133,17 @@ function applyChallenge(o){
   switchDs(o.ds);
 }
 function exitSpecial(){ SPECIAL=null; resetGame(); }
+
+/* 이어하기(resume.js)가 들여다보는 라운드 속사정 — 시드·문제 순서·문제별 결과·특별 라운드 */
+function roundState(){
+  return {seed:SEED,codes:ROUND_CODES.slice(),out:Object.assign({},OUT),
+          special:SPECIAL?JSON.parse(JSON.stringify(SPECIAL)):null};
+}
+function setRoundState(o){
+  if(!o) return;
+  SEED=o.seed>>>0; ROUND_CODES=(o.codes||[]).slice();
+  OUT=o.out||{}; SPECIAL=o.special||null;
+}
 /* 1:1 대결: 방이 정한 지도·모드·시드·문제 수로 라운드를 준비한다 (versus.js가 부른다) */
 function startVersus(o){
   if(!o||!DATASETS[o.ds]) return;
@@ -230,6 +241,7 @@ function renderStart(){
           (canSeason?`<button type="button" class="gbtn" data-g="season">${s.emoji} ${s.m}월 특집 <small>${esc(s.title)}</small></button>`:"")+
           ((window.VS&&window.VS.on())?`<button type="button" class="gbtn" data-g="versus">⚔️ 1:1 대결 <small>실시간</small></button>`:"")+`</div>`;
   }
+  if(window.RESUME&&RESUME.startRow) html+=RESUME.startRow();          // ⏯️ 풀던 판 이어서
   if(!SPECIAL&&window.PICK&&PICK.startRow) html+=PICK.startRow();   // 🏝️ 속령 넣기/빼기
   const tt=titleNow();
   if(tt) html+=`<div class="gtitle">🎖️ 지금 칭호 <b>${esc(tt.t)}</b></div>`;
@@ -450,6 +462,8 @@ function init(){
     else if(b.dataset.g==="season"){ const s=seasonNow(); if(s) startSeason(s.m); }
     else if(b.dataset.g==="minor"){ if(window.PICK) window.PICK.toggleMinor(); }
     else if(b.dataset.g==="versus"){ if(window.VS) window.VS.openNew(); }
+    else if(b.dataset.g==="resume"){ if(window.RESUME) RESUME.restore(); }
+    else if(b.dataset.g==="dropresume"){ if(window.RESUME) RESUME.drop(); }
     else if(b.dataset.g==="exit") exitSpecial();
   });
   // 링크로 들어온 경우: ?c=도전장  ?season=월  ?daily=1  ?ds=데이터셋
@@ -468,5 +482,8 @@ function init(){
   const f=checkAch(); if(f.length){ persist(); }      // 예전 기록으로 이미 달성한 업적은 조용히 채운다
 }
 init();
-return {startDaily,startSeason,exitSpecial,startVersus,renderStart,streakNow,bestDays};
+const api={startDaily,startSeason,exitSpecial,startVersus,renderStart,streakNow,bestDays,
+        roundState,setRoundState,setModeUI,setDirUI,switchDs,ensure};
+try{ window.GROW=api; }catch(e){}     // 뒤에 붙는 파일들이 typeof 없이 안전하게 쓰도록
+return api;
 })();
