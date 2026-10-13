@@ -558,6 +558,9 @@ body:not(.dark) .pickwrap{background:rgba(226,233,243,.84)}
 /* ===================== DEMO — 소개 영상용 자동 시연 ===================== */
 .demoveil{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   background:rgba(5,8,20,.86);backdrop-filter:blur(4px)}
+/* 로비에서 이어 올 때 한 호흡만 가려 준다 */
+.demoveil.blank{background:#050814;animation:demoFade .42s forwards}
+@keyframes demoFade{to{opacity:0}}
 .demobox{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
   background:var(--panel);border:3px solid var(--accent);border-radius:14px;padding:26px 30px;
   box-shadow:7px 7px 0 var(--miss)}
@@ -3540,6 +3543,14 @@ async function run(veil){
 }
 
 function boot(){
+  /* 로비에서 이어 온 경우(&go=1)는 덮개 없이 바로 이어 간다 — 영상 중간에 덮개가 또 뜨면 안 된다 */
+  if(Q.get("go")==="1"){
+    const v=document.createElement("div");      // 넘어오는 순간만 살짝 가린다
+    v.className="demoveil blank";
+    document.body.appendChild(v);
+    setTimeout(()=>run(v),420);
+    return;
+  }
   const veil=overlay();
   const go=()=>{ document.removeEventListener("keydown",key); run(veil); };
   const key=e=>{ if(e.code==="Space"){ e.preventDefault(); go(); } };

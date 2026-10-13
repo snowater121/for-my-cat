@@ -143,6 +143,14 @@ async function run(veil){
 }
 
 function boot(){
+  /* 로비에서 이어 온 경우(&go=1)는 덮개 없이 바로 이어 간다 — 영상 중간에 덮개가 또 뜨면 안 된다 */
+  if(Q.get("go")==="1"){
+    const v=document.createElement("div");      // 넘어오는 순간만 살짝 가린다
+    v.className="demoveil blank";
+    document.body.appendChild(v);
+    setTimeout(()=>run(v),420);
+    return;
+  }
   const veil=overlay();
   const go=()=>{ document.removeEventListener("keydown",key); run(veil); };
   const key=e=>{ if(e.code==="Space"){ e.preventDefault(); go(); } };
