@@ -282,6 +282,20 @@ body{
 body.crtdone #crton{display:none}
 
 /* ---- 고양이 역장 (src/mascot.css 를 build_all.py 가 채운다) ---- */
+/* 소개 영상용 자동 시연 (?demo=1) — 게임 쪽은 demo.css, 로비는 여기 */
+.demoveil{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,8,20,.86);backdrop-filter:blur(4px)}
+.demobox{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
+  background:#0c1230;border:3px solid var(--blue);border-radius:14px;padding:26px 30px;box-shadow:7px 7px 0 var(--pink)}
+.demobox b{font-family:var(--pix);font-size:13px;color:var(--blue);line-height:1.6}
+.demobox small{font-size:12.5px;font-weight:700;color:#9fb6da}
+.demobox em{font-size:11px;font-style:normal;font-weight:700;color:#9fb6da;opacity:.75}
+.demobox button{font:inherit;font-size:14px;font-weight:900;background:var(--yellow);color:#1b1200;
+  border:3px solid var(--yellow);border-radius:10px;padding:12px 22px;cursor:pointer;box-shadow:3px 3px 0 #0007}
+.demobox button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0007}
+.demopress{animation:demoPress .42s cubic-bezier(.2,.9,.2,1)}
+@keyframes demoPress{0%{transform:scale(1)}35%{transform:scale(.95);filter:brightness(1.4)}100%{transform:scale(1)}}
+
 /*MASCOTCSS*//* ===================== MASCOT — 고양이 역장 =====================
    원본 PNG(mascot/*.png)를 상태별로 겹쳐 두고 하나만 보여 준다.
    움직임은 CSS로만 준다 — 그림 자체는 건드리지 않는다. */
@@ -849,6 +863,32 @@ document.querySelectorAll(".cab").forEach(function(c){
     el.onload=function(){ el.classList.add("on"); };
     el.src=url;
   });
+})();
+</script>
+<script>
+/* ---- 소개 영상용 자동 시연: 로비 도입부 (?demo=1 일 때만) ---- */
+(function(){
+  var q; try{ q=new URLSearchParams(location.search); }catch(e){ return; }
+  if(q.get("demo")!=="1") return;
+  var veil=document.createElement("div");
+  veil.className="demoveil";
+  veil.innerHTML='<div class="demobox"><b>시연 준비됨</b>'+
+    '<small>맥 화면 녹화(⌘⇧5)를 켠 뒤 눌러 주세요</small>'+
+    '<button type="button">▶ 시연 시작</button><em>Space 로도 시작</em></div>';
+  document.body.appendChild(veil);
+  function go(){
+    document.removeEventListener("keydown",key);
+    veil.remove();
+    /* 로고와 캐릭터를 잠깐 보여 주고 '지도 타이핑' 카드를 누른 듯이 넘어간다 */
+    setTimeout(function(){
+      var c=document.querySelector('.cab[href="arcade.html"]');
+      if(c) c.classList.add("demopress","pressed");
+      setTimeout(function(){ location.href="arcade.html?demo=1&go=1"; },520);
+    },2600);
+  }
+  function key(e){ if(e.code==="Space"){ e.preventDefault(); go(); } }
+  veil.querySelector("button").addEventListener("click",go);
+  document.addEventListener("keydown",key);
 })();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>

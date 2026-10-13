@@ -593,6 +593,7 @@ sub('/* start screen + countdown */',
     io.open('mapicon.css', encoding='utf-8').read() + '\n' +
     io.open('mapzoom.css', encoding='utf-8').read() + '\n' +
     io.open('pick.css', encoding='utf-8').read() + '\n' +
+    io.open('demo.css', encoding='utf-8').read() + '\n' +
     io.open('mascot.css', encoding='utf-8').read() + '\n' +
     io.open('growth.css', encoding='utf-8').read() + '\n' +
     io.open('versus.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
@@ -602,7 +603,8 @@ sub("connectDB();\n</script>",
     io.open('pick.js', encoding='utf-8').read() + "\n" +
     io.open('growth.js', encoding='utf-8').read() + "\n" +
     io.open('mapzoom.js', encoding='utf-8').read() + "\n" +
-    io.open('versus.js', encoding='utf-8').read() + "\n</script>")
+    io.open('versus.js', encoding='utf-8').read() + "\n" +
+    io.open('demo.js', encoding='utf-8').read() + "\n</script>")
 
 # ---------------------------------------------------------------- 8. Artifact 본문으로 변환
 sub("<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"utf-8\">\n"

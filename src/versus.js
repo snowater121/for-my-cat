@@ -357,7 +357,7 @@ function drawHud(){
 function openNew(){ room=null; state=null; openPanel(); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
-const api={on,openNew,create,join,leave,finish,pushProgress,drawHud,get room(){return room;},
+const api={on,openNew,create,join,leave,finish,pushProgress,drawHud,dbUrl:()=>CFG.url,get room(){return room;},
            get phase(){return phase;},verdict,hideHud};
 
 /* growth.js 가 먼저 평가되므로 이름(VS)으로는 못 본다 — const는 초기화 전 접근이 막힌다(TDZ).
