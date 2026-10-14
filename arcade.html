@@ -346,6 +346,12 @@ body.nocrt::after{display:none !important}
 /* ===== 데이터셋 성격: 조밀한 지도는 라벨 축소, EJU 단서가 없으면 EJU 모드 숨김 ===== */
 body.dense text.lbl{font-size:6px}
 body.noeju #mode button[data-m="eju"]{display:none}
+/* ===== 머리말 로고 ===== */
+.brand{display:flex;align-items:center}
+.brandlogo{height:40px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+/* 화면에는 안 보이고 낭독기에만 읽히는 글 */
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 /* ===== 기록·랭킹 패널 ===== */
 .recwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:14px;
   background:rgba(6,4,22,.72);backdrop-filter:blur(3px)}
@@ -406,6 +412,9 @@ body.recopen .recwrap{display:flex}
   .rectable{font-size:13px}
   .namebox input{width:104px}
 }
+/* 좁은 화면에서는 로고도 같이 줄인다 (헤더가 화면을 잡아먹지 않게) */
+@media(max-width:1100px){ .brandlogo{height:34px} }
+@media(max-width:600px){ .brandlogo{height:27px} }
 /* ===== CRT 전원 켜짐 인트로 ===== */
 #crton{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
 #crton .bar{position:absolute;left:0;right:0;height:51%;background:#000}
@@ -1011,7 +1020,7 @@ body:not(.dark) .startscreen{background:rgba(240,244,250,.72)}
 <body>
 <div id="crton"><div class="bar top"></div><div class="bar bot"></div><div class="seam"></div><div class="noise"></div></div>
 <header>
-  <div class="brand"><span id="brandtxt">🗾 일본 도도부현 메모리</span><small id="modehint">이름을 타이핑하세요</small></div>
+  <div class="brand"><img class="brandlogo" id="brandlogo" width="480" height="283" alt="GEO ARCADE — TYPE THE WORLD!" draggable="false"><span class="vh" id="brandtxt">🗾 일본 도도부현 메모리</span><span class="vh" id="modehint">이름을 타이핑하세요</span></div>
   <div class="tools">
     <div class="seg mode" id="mode">
       <button data-m="free">🗺️ 자유 채우기</button>
@@ -2090,6 +2099,7 @@ if(!api.stage) document.addEventListener("DOMContentLoaded",()=>{ try{ attach();
 return api;
 })();
 
+try{ var _bl=document.getElementById("brandlogo"); if(_bl&&MAS.SPR.logo) _bl.src=MAS.SPR.logo; }catch(e){}
 /* =======================================================================
    MAPICON — 맵 선택 UI (mascot.js 뒤에 붙는다)
 
