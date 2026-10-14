@@ -1,7 +1,12 @@
 // Firebase Realtime Database 보안 규칙 — 콘솔의 Realtime Database → '규칙' 탭에 통째로 붙여넣고 [게시].
 //
-// 로그인이 없으므로 /rooms/<코드> 가지 밖은 전부 막는다. /rooms 자체에는 권한을 주지 않아서
-// 방 목록을 훑거나 한꺼번에 지울 수 없고, 방 안에서도 쓸 수 있는 칸과 자료형을 못 박는다.
+// 두 가지만 연다.
+//   /rooms/<코드>  1:1 대결방. 로그인이 없으므로 가지 밖은 전부 막는다. /rooms 자체에는 권한을
+//                  주지 않아서 방 목록을 훑거나 한꺼번에 지울 수 없고, 쓸 수 있는 칸과 자료형도 못 박는다.
+//   /users/<uid>   계정 기록 보관함. 로그인한 본인만 읽고 쓴다 (auth.uid === $uid).
+//                  /users 자체에는 권한이 없어서 다른 사람 목록을 볼 수 없다.
+//
+// /users 를 쓰려면 Authentication → Sign-in method 에서 '이메일/비밀번호'가 켜져 있어야 한다.
 {
   "rules": {
     "rooms": {
@@ -37,6 +42,19 @@
         },
 
         "go": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "users": {
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['p','at'])",
+
+        "p":  { ".validate": "newData.hasChildren(['stats'])" },
+        "r":  { ".validate": "newData.hasChild('ds') || !newData.exists()" },
+        "at": { ".validate": "newData.isNumber()" },
         "$other": { ".validate": false }
       }
     }

@@ -21,9 +21,11 @@
   <h1>개인정보처리방침</h1>
   <p class="lg-meta">시행일 <mark class="todo">[입력 필요: YYYY-MM-DD]</mark></p>
 
-  <p class="lead">GEO ARCADE는 <strong>회원가입이 없고, 운영자가 따로 운영하는 서버도 없습니다.</strong>
-  게임 기록은 여러분의 브라우저 안에만 저장됩니다. 다만 사이트를 여는 과정에서 호스팅 업체와 글꼴 제공 업체에
-  기본적인 접속 정보가 전달되고, 공유 기능을 쓰면 여러분이 고른 정보가 링크에 담깁니다. 아래에 하나씩 적었습니다.</p>
+  <p class="lead">GEO ARCADE는 <strong>로그인하지 않아도 모든 기능을 쓸 수 있고, 그럴 때 게임 기록은
+  여러분의 브라우저 안에만 저장됩니다.</strong> 다만 세 가지 경우에 정보가 바깥으로 나갑니다.
+  사이트를 여는 과정에서 호스팅 업체와 글꼴 제공 업체에 기본적인 접속 정보가 전달되고,
+  공유 기능을 쓰면 여러분이 고른 정보가 링크에 담기며, <strong>1:1 대결이나 계정 로그인을 쓰면</strong>
+  해당 정보가 Google의 Firebase에 저장됩니다. 아래에 하나씩 적었습니다.</p>
 
   <h2>1. 브라우저에 저장되는 정보</h2>
   <p>게임을 하면 아래 정보가 <strong>이 기기의 브라우저 저장소(localStorage, 이름 <code>geoarcade.player.v2</code>)</strong>에 저장됩니다.
@@ -35,6 +37,8 @@
       <tr><td>게임 기록</td><td>모드별 최고 기록, 자주 틀린 지역, 플레이 횟수·정답률 등 누적 통계</td><td>기록판·약점 복습</td></tr>
       <tr><td>공부한 날짜</td><td>라운드를 끝낸 날짜 목록(최대 400일분)</td><td>연속 공부 표시</td></tr>
       <tr><td>업적·오늘의 문제 결과</td><td>달성한 업적, 날짜별 오늘의 문제 결과(최근 90개)</td><td>업적 탭, 중복 기록 방지</td></tr>
+      <tr><td>풀던 판<br><code>geoarcade.resume.v1</code></td><td>다 풀지 못한 라운드의 진행 상황(지도·남은 문제·맞힌 곳·걸린 시간). 2주 지나면 쓰지 않습니다</td><td>&lsquo;이어서 하기&rsquo;</td></tr>
+      <tr><td>로그인 상태<br><code>geoarcade.auth.v1</code></td><td>로그인했을 때만. 이메일 주소와 재발급용 토큰(비밀번호는 저장하지 않습니다)</td><td>껐다 켜도 로그인 유지</td></tr>
     </tbody>
   </table>
   <p>이 사이트는 <strong>쿠키를 만들지 않으며, 광고·방문자 분석 도구를 쓰지 않습니다.</strong></p>
@@ -57,6 +61,13 @@
         <a href="https://docs.github.com/ko/site-policy/privacy-policies/github-general-privacy-statement">GitHub 개인정보 보호정책</a></td></tr>
       <tr><td>Google Fonts (글꼴 제공)</td><td>화면 글꼴을 불러올 때</td><td>IP 주소, 브라우저 정보.
         <a href="https://policies.google.com/privacy?hl=ko">Google 개인정보처리방침</a></td></tr>
+      <tr><td>Google Firebase (대결방·계정 보관)</td><td><strong>1:1 대결방을 만들거나 들어갈 때</strong></td>
+        <td>방 코드, 플레이어 이름(입력한 경우), 맞힌 개수와 걸린 시간, 문제별 결과 그림. 방 코드를 아는 사람만 볼 수 있습니다.
+        방은 6시간이 지나면 쓰이지 않습니다.</td></tr>
+      <tr><td>Google Firebase (대결방·계정 보관)</td><td><strong>계정으로 로그인할 때</strong></td>
+        <td>이메일 주소와 비밀번호(Firebase Authentication이 받아 보관하며, 운영자는 비밀번호를 볼 수 없습니다),
+        그리고 1번 표의 게임 기록과 풀던 판. 보안 규칙으로 <strong>본인 계정만</strong> 읽고 쓸 수 있습니다.
+        <a href="https://firebase.google.com/support/privacy">Firebase 개인정보 안내</a></td></tr>
     </tbody>
   </table>
   <p>운영자는 위 업체들이 남기는 접속 기록을 받아 보지 않습니다.</p>
@@ -67,25 +78,37 @@
   이 GitHub 사이트에서는 해당되지 않습니다.</p>
   <p class="todo-box"><mark class="todo">[입력 필요: 공유 랭킹판 버전을 계속 운영하는지, 누구와 공유하는지 확인 후 이 항목을 유지하거나 삭제]</mark></p>
 
-  <h2>5. 보관 기간과 삭제</h2>
+  <h2>5. 계정(선택)</h2>
+  <p>기기를 옮겨도 기록이 남고 풀던 판을 이어서 하고 싶을 때만 쓰는 <strong>선택 기능</strong>입니다.
+  로그인하지 않아도 게임의 모든 기능을 쓸 수 있습니다.</p>
+  <ul>
+    <li>필요한 것은 <strong>이메일 주소와 비밀번호뿐</strong>입니다. 이름·나이·전화번호 같은 건 묻지 않습니다.</li>
+    <li>비밀번호는 Google의 Firebase Authentication이 받아 보관합니다. <strong>운영자도 볼 수 없습니다.</strong></li>
+    <li>로그인하면 1번 표의 게임 기록과 풀던 판이 계정에 함께 저장되어, 같은 계정으로 들어간 다른 기기에서도 이어집니다.</li>
+    <li>이메일 주소는 <strong>로그인과 비밀번호 재설정 메일에만</strong> 씁니다. 광고 메일을 보내지 않고, 다른 곳에 넘기지 않습니다.</li>
+    <li>다른 사람의 기록은 볼 수 없습니다(보안 규칙이 본인 계정 밖을 막습니다).</li>
+  </ul>
+
+  <h2>6. 보관 기간과 삭제</h2>
   <p>브라우저에 저장된 정보는 여러분이 지울 때까지 남습니다. 운영자는 따로 보관하지 않습니다.</p>
   <ul>
     <li>모두 지우기: 브라우저 설정에서 이 사이트(<code>snowater121.github.io</code>)의 사이트 데이터를 삭제하세요.</li>
     <li>이름만 지우기: 게임의 <em>🏆 기록</em> 창에서 플레이어 이름 칸을 비우세요.</li>
     <li>이미 보낸 공유 문구·도전장 링크는 받은 사람 쪽에 남으므로 운영자가 지울 수 없습니다.</li>
+    <li>계정에 올라간 기록을 지우거나 계정을 없애고 싶으면 아래 문의처로 알려 주세요. 확인한 뒤 삭제합니다.</li>
   </ul>
 
-  <h2>6. 아동의 이용</h2>
-  <p>이름 입력은 선택이며, 입력하지 않아도 모든 기능을 쓸 수 있습니다. 어린이는 실명을 입력하지 않도록 지도해 주세요.</p>
+  <h2>7. 아동의 이용</h2>
+  <p>이름 입력과 계정 가입은 모두 선택이며, 하지 않아도 모든 기능을 쓸 수 있습니다. 어린이는 실명을 입력하지 않도록 지도해 주세요.</p>
   <p class="todo-box"><mark class="todo">[입력 필요: 만 14세 미만 이용자에 대한 운영 방침. 법률 검토가 필요하면 전문가 확인 권장]</mark></p>
 
-  <h2>7. 문의</h2>
+  <h2>8. 문의</h2>
   <dl class="lg-dl">
     <dt>개인정보 보호책임자</dt><dd><mark class="todo">[입력 필요: 이름 또는 운영 명칭]</mark></dd>
     <dt>연락처</dt><dd><mark class="todo">[입력 필요: 이메일 등 연락 수단]</mark></dd>
   </dl>
 
-  <h2>8. 변경</h2>
+  <h2>9. 변경</h2>
   <p>이 방침을 바꾸면 이 페이지에 새 시행일과 함께 게시합니다.</p>
 </main>
 <footer class="lg-foot"><a href="index.html">← 로비로</a></footer>

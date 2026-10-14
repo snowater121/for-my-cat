@@ -179,8 +179,14 @@ RAF = """requestAnimationFrame(()=>{
 sub(RAF, RAF + "\n}")
 
 # ---------------------------------------------------------------- 3. 헤더 UI
+# 왼쪽 위는 로고 한 장으로. 지금 지도와 모드는 바로 아래 토글(🗾 일본 / 🔍 지목 퀴즈…)이
+# 이미 켜진 채로 보여 주고 있어서 글자로 또 적을 필요가 없었다.
+# brandtxt·modehint 는 지우지 않고 눈에만 안 보이게 둔다 — 화면 낭독기에는 여전히 읽히고,
+# 이 둘을 갱신하는 기존 코드(loadDataset 등)도 그대로 돈다.
 sub('  <div class="brand">🗾 일본 도도부현 메모리<small id="modehint">이름을 타이핑하세요</small></div>',
-    '  <div class="brand"><span id="brandtxt">%s %s</span><small id="modehint">이름을 타이핑하세요</small></div>'
+    '  <div class="brand">'
+    '<img class="brandlogo" id="brandlogo" width="480" height="283" alt="GEO ARCADE — TYPE THE WORLD!" draggable="false">'
+    '<span class="vh" id="brandtxt">%s %s</span><span class="vh" id="modehint">이름을 타이핑하세요</span></div>'
     % (DATASETS[DEF]["icon"], DATASETS[DEF]["brand"]))
 
 sub('    <a class="btn" href="index.html" title="로비로">🏠 로비</a>\n'
@@ -211,6 +217,12 @@ if PAGE == "specialty":
 sub('/* start screen + countdown */', HIDE_MODES + r'''/* ===== 데이터셋 성격: 조밀한 지도는 라벨 축소, EJU 단서가 없으면 EJU 모드 숨김 ===== */
 body.dense text.lbl{font-size:6px}
 body.noeju #mode button[data-m="eju"]{display:none}
+/* ===== 머리말 로고 ===== */
+.brand{display:flex;align-items:center}
+.brandlogo{height:40px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+/* 화면에는 안 보이고 낭독기에만 읽히는 글 */
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 /* ===== 기록·랭킹 패널 ===== */
 .recwrap{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:14px;
   background:rgba(6,4,22,.72);backdrop-filter:blur(3px)}
@@ -274,7 +286,10 @@ body.recopen .recwrap{display:flex}
 /* start screen + countdown */''')
 
 # ---- 4b. CRT 부팅 인트로 (기존 로비 index.html에서 이식) ----
-sub('/* start screen + countdown */', r"""/* ===== CRT 전원 켜짐 인트로 ===== */
+sub('/* start screen + countdown */', r"""/* 좁은 화면에서는 로고도 같이 줄인다 (헤더가 화면을 잡아먹지 않게) */
+@media(max-width:1100px){ .brandlogo{height:34px} }
+@media(max-width:600px){ .brandlogo{height:27px} }
+/* ===== CRT 전원 켜짐 인트로 ===== */
 #crton{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
 #crton .bar{position:absolute;left:0;right:0;height:51%;background:#000}
 #crton .bar.top{top:0;transform-origin:top;animation:crtBar 1.15s cubic-bezier(.7,0,.25,1) forwards}
@@ -594,14 +609,19 @@ sub('/* start screen + countdown */',
     io.open('mapzoom.css', encoding='utf-8').read() + '\n' +
     io.open('pick.css', encoding='utf-8').read() + '\n' +
     io.open('demo.css', encoding='utf-8').read() + '\n' +
+    io.open('resume.css', encoding='utf-8').read() + '\n' +
+    io.open('auth.css', encoding='utf-8').read() + '\n' +
     io.open('mascot.css', encoding='utf-8').read() + '\n' +
     io.open('growth.css', encoding='utf-8').read() + '\n' +
     io.open('versus.css', encoding='utf-8').read() + '\n/* start screen + countdown */')
 sub("connectDB();\n</script>",
     "connectDB();\n" + io.open('mascot.js', encoding='utf-8').read() + "\n" +
+    'try{ var _bl=document.getElementById("brandlogo"); if(_bl&&MAS.SPR.logo) _bl.src=MAS.SPR.logo; }catch(e){}\n' +
     io.open('mapicon.js', encoding='utf-8').read() + "\n" +
     io.open('pick.js', encoding='utf-8').read() + "\n" +
     io.open('growth.js', encoding='utf-8').read() + "\n" +
+    io.open('resume.js', encoding='utf-8').read() + "\n" +
+    io.open('auth.js', encoding='utf-8').read() + "\n" +
     io.open('mapzoom.js', encoding='utf-8').read() + "\n" +
     io.open('versus.js', encoding='utf-8').read() + "\n" +
     io.open('demo.js', encoding='utf-8').read() + "\n</script>")
@@ -622,6 +642,11 @@ H = H.replace("__PAGE_FILE__", json.dumps(CFG["file"]))
 H = H.replace("__SEASON__", json.dumps(SEASON, ensure_ascii=False))
 VERSUS = json.load(io.open("versus.json", encoding="utf-8"))
 H = H.replace("__VERSUS__", json.dumps({"url": VERSUS.get("url", "")}, ensure_ascii=False))
+# 로그인: apiKey 가 비어 있으면 auth.js 가 통째로 잠잔다. url 을 안 적었으면 대결방과 같은 DB를 쓴다.
+AUTHCFG = json.load(io.open("auth.json", encoding="utf-8"))
+H = H.replace("__AUTH__", json.dumps(
+    {"apiKey": AUTHCFG.get("apiKey", ""), "url": AUTHCFG.get("url", "") or VERSUS.get("url", "")},
+    ensure_ascii=False))
 
 # 고양이 그림: 사이트는 파일을 부르고, Artifact 본문은 한 파일이어야 하니 data URI로 박는다
 import base64, build_cat
@@ -632,7 +657,7 @@ SPRITE_B64 = json.dumps({k: "data:image/png;base64," + base64.b64encode(
     for k in build_cat.SPRITES})
 
 for tok in ["__DATA__", "__EJU__", "__DATASETS__", "__MODE_LABEL__", "__BOARDS__", "__PAGE_MODES__", "__DEFAULT__",
-            "__PAGE_FILE__", "__SEASON__", "__VERSUS__",
+            "__PAGE_FILE__", "__SEASON__", "__VERSUS__", "__AUTH__",
             "<!DOCTYPE", "<html", "<head>", "</head>", "<body", "</body>", "</html>"]:
     assert tok not in H, "남아있는 토큰: " + tok
 
